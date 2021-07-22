@@ -9,7 +9,7 @@ import { User } from './user.entity';
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
   async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const { name, avatar } = createUserDto;
+    const { name, avatar = 'default.svg' } = createUserDto;
     const user: User = this.create({
       name,
       avatar,
