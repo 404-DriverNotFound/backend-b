@@ -9,8 +9,11 @@ import { User } from './user.entity';
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const { name, avatar = 'default.svg' } = createUserDto;
+  async createUser(
+    createUserDto: CreateUserDto,
+    avatar = 'default.png',
+  ): Promise<User> {
+    const { name } = createUserDto;
     const user: User = this.create({
       ftId: 1234,
       name,
@@ -25,7 +28,9 @@ export class UsersRepository extends Repository<User> {
         // duplicate name
         throw new ConflictException('User name is already exists');
       } else {
-        throw new InternalServerErrorException();
+        throw new InternalServerErrorException(
+          'Unexpected server error when saving user',
+        );
       }
     }
     return user;

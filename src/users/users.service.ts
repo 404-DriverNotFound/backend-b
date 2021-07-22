@@ -13,8 +13,8 @@ export class UsersService {
   ) {}
 
   // NOTE 추 후에 auth/signup에서 repository로 직접 createUser를 호출 할 것임으로 삭제할 예정
-  createUser(createUserDto: CreateUserDto): Promise<User> {
-    return this.usersRepository.createUser(createUserDto);
+  createUser(createUserDto: CreateUserDto, avatar: string): Promise<User> {
+    return this.usersRepository.createUser(createUserDto, avatar);
   }
 
   findAll() {

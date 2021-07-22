@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsString,
-  IsOptional,
-  MinLength,
-  Matches,
-  MaxLength,
-} from 'class-validator';
+import { IsString, MinLength, Matches, MaxLength } from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -21,15 +15,13 @@ export class CreateUserDto {
   })
   readonly name: string;
 
+  // NOTE 사용하지 않지만 swagger 때문에 추가
   @ApiProperty({
-    example: '/imgsrc/avatar.png',
-    description: 'image format only',
+    example: 'image.png',
+    description: 'MIME type image',
+    type: 'string',
+    format: 'binary',
     required: false,
   })
-  @IsOptional()
-  @IsString()
-  @Matches(/\.(gif|jpe?g|tiff?|png|webp|bmp)$/i, {
-    message: 'not a image file!',
-  })
-  readonly avatar?: string;
+  avatar?: any;
 }
