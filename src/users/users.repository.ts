@@ -4,6 +4,7 @@ import {
 } from '@nestjs/common';
 import { EntityRepository, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UserStatus } from './user-status.enum';
 import { User } from './user.entity';
 
 @EntityRepository(User)
@@ -11,9 +12,10 @@ export class UsersRepository extends Repository<User> {
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { name, avatar = 'default.svg' } = createUserDto;
     const user: User = this.create({
+      ftId: 1234,
       name,
       avatar,
-      ftId: 1234,
+      status: UserStatus.OFFLINE,
       email: 'e@mail.com',
     });
     try {

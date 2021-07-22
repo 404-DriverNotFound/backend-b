@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserStatusDto } from './dto/update-user-status.dto';
 import { User } from './user.entity';
 
 @Controller('users')
@@ -32,9 +32,13 @@ export class UsersController {
     return this.usersService.getUserByName(name);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @Patch(':name/status')
+  updateUserStatus(
+    @Param('name') name: string,
+    @Body() updateUserStatusDto: UpdateUserStatusDto,
+  ): Promise<User> {
+    const { status } = updateUserStatusDto;
+    return this.usersService.updateUserStatus(name, status);
   }
 
   @Delete(':id')
