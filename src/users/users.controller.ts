@@ -22,10 +22,10 @@ export class UsersController {
     return this.usersService.createUser(createUserDto);
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
+  //@Get()
+  //findAll() {
+  //  return this.usersService.findAll();
+  //}
 
   @Get(':name')
   getUserByName(@Param('name') name: string): Promise<User> {
@@ -41,8 +41,8 @@ export class UsersController {
     return this.usersService.updateUserStatus(name, status);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
-  }
+  //@Delete(':id')
+  //remove(@Param('id') id: string) {
+  //  return this.usersService.remove(+id);
+  //}
 }
