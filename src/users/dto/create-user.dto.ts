@@ -23,5 +23,5 @@ export class CreateUserDto {
     format: 'binary',
     required: false,
   })
-  avatar?: any;
+  readonly avatar?: string;
 }
