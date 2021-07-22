@@ -1,7 +1,9 @@
 import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AppService } from './app.service';
 
+@ApiTags('Default')
 @Controller()
 export class AppController {
   constructor(
@@ -10,8 +12,9 @@ export class AppController {
   ) {}
 
   @Get()
+  @ApiOperation({ summary: '서버를 실행 상태를 확인합니다.' })
+  @ApiResponse({ status: 200, description: '서버가 실행 중' })
   getHello(): string {
-    console.log(this.configService.get<string>('DB_USERNAME'));
     return this.appService.getHello();
   }
 }
