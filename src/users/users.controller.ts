@@ -3,13 +3,13 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+  //Patch,
   Param,
   //Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserStatusDto } from './dto/update-user-status.dto';
+//import { UpdateUserStatusDto } from './dto/update-user-status.dto';
 import { User } from './user.entity';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -31,11 +31,6 @@ export class UsersController {
     return this.usersService.createUser(createUserDto);
   }
 
-  //@Get()
-  //findAll() {
-  //  return this.usersService.findAll();
-  //}
-
   @Get(':name')
   @ApiOperation({ summary: '유저 정보를 가져옵니다.' })
   @ApiResponse({ status: 200, description: '성공' })
@@ -44,21 +39,21 @@ export class UsersController {
     return this.usersService.getUserByName(name);
   }
 
-  @Patch(':name/status')
-  @ApiOperation({ summary: '유저의 접속 상태를 변경합니다.' })
-  @ApiResponse({ status: 200, description: '성공' })
-  @ApiResponse({
-    status: 400,
-    description: '유효하지 않은 접속상태를 입력했을 때',
-  })
-  @ApiResponse({ status: 404, description: '유저 없음' })
-  updateUserStatus(
-    @Param('name') name: string,
-    @Body() updateUserStatusDto: UpdateUserStatusDto,
-  ): Promise<User> {
-    const { status } = updateUserStatusDto;
-    return this.usersService.updateUserStatus(name, status);
-  }
+  //@Patch(':name/status')
+  //@ApiOperation({ summary: '유저의 접속 상태를 변경합니다.' })
+  //@ApiResponse({ status: 200, description: '성공' })
+  //@ApiResponse({
+  //  status: 400,
+  //  description: '유효하지 않은 접속상태를 입력했을 때',
+  //})
+  //@ApiResponse({ status: 404, description: '유저 없음' })
+  //updateUserStatus(
+  //  @Param('name') name: string,
+  //  @Body() updateUserStatusDto: UpdateUserStatusDto,
+  //): Promise<User> {
+  //  const { status } = updateUserStatusDto;
+  //  return this.usersService.updateUserStatus(name, status);
+  //}
 
   //@Delete(':id')
   //remove(@Param('id') id: string) {

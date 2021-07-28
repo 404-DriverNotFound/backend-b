@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { UserStatus } from './user-status.enum';
+//import { UserStatus } from './user-status.enum';
 
 @Entity()
 export class User {
@@ -12,15 +12,15 @@ export class User {
   @Column()
   ftId: number;
 
-  @Column({ unique: true })
+  @Column({
+    unique: true,
+    nullable: true,
+  })
   name: string;
 
   @Column()
   avatar: string;
 
-  @Column()
-  status: UserStatus;
-
-  @Column()
-  email: string;
+  //@Column()
+  //status: UserStatus;
 }
