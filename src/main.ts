@@ -2,6 +2,8 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import * as session from 'express-session';
+import * as passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,6 +17,16 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.useGlobalPipes(new ValidationPipe());
+  app.use(
+    session({
+      secret: 'my-secret', // FIXME get env vars
+      resave: false,
+      saveUninitialized: false,
+      cookie: { maxAge: 36000 },
+    }),
+  );
+  app.use(passport.initialize());
+  app.use(passport.session());
   await app.listen(5000);
 }
 bootstrap();
