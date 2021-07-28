@@ -33,6 +33,7 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
       user = this.usersRepository.create({
         ftId: id,
         avatar: photos[0].value,
+        permissions: [],
         //status: UserStatus.ONLINE, // REVIEW 닉네임 설정까지 완료해야 온라인 상태로 바꿀지, 42인증만 마치면 로그인으로 할지
       });
       console.log('created User', user);

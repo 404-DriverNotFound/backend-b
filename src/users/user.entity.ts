@@ -1,3 +1,4 @@
+import { Permission } from 'src/permissions/permission.enum';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 //import { UserStatus } from './user-status.enum';
 
@@ -23,4 +24,10 @@ export class User {
 
   //@Column()
   //status: UserStatus;
+
+  @Column({
+    type: 'simple-array',
+    enum: Permission,
+  })
+  permissions: Permission[];
 }

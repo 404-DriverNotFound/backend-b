@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Permission } from 'src/permissions/permission.enum';
 import { CreateUserDto } from './dto/create-user.dto';
 //import { UserStatus } from './user-status.enum';
 import { User } from './user.entity';
@@ -22,10 +23,21 @@ export class UsersService {
   }
 
   async getUserByName(name: string): Promise<User> {
-    const found = await this.usersRepository.findOne({ name });
+    const found: User = await this.usersRepository.findOne({ name });
     if (!found) {
       throw new NotFoundException(`User with name: ${name} not found`);
     }
+    return found;
+  }
+
+  async updateUserNameByFtId(ftId: number, name: string): Promise<User> {
+    const found: User = await this.usersRepository.findOne({ ftId });
+    if (!found) {
+      throw new NotFoundException(`User with ftId: ${ftId} not found`);
+    }
+    found.name = name;
+    found.permissions = [Permission.ACCESS];
+    await this.usersRepository.save(found);
     return found;
   }
 
