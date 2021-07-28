@@ -15,8 +15,8 @@ export class SessionSerializer extends PassportSerializer {
     done: (err: Error, payload: string) => void,
   ) {
     console.log('deserializeUser payload: ', payload);
+    // REVIEW DB에서 user가 있는지 다시 찾을 필요가 있을까요?
+    // if not found done(null, false);
     done(null, payload);
-    //const userDB = await this.authService.findUser(payload.discordId);
-    //return userDB ? done(null, payload) : done(null, null);
   }
 }

@@ -23,6 +23,8 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
     const user = {
       ftId: id,
     };
+    // TODO validate! findOrCreate user
+
     cb(null, user);
   }
 }
