@@ -22,4 +22,10 @@ export class AuthController {
   ftAuthStatus(@Req() req: Request) {
     return req.user;
   }
+
+  @Get('logout')
+  @UseGuards(AuthenticatedGuard)
+  logOut(@Req() req: Request) {
+    req.logOut();
+  }
 }
