@@ -1,4 +1,12 @@
-import { Controller, Get, Body, Param, Patch, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Param,
+  Patch,
+  UseGuards,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
 import {
@@ -20,9 +28,9 @@ export class UsersController {
   @ApiOperation({ summary: '유저 정보를 가져옵니다.' })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 404, description: '유저 없음' })
-  @Get(':id')
-  getUserById(@Param('id') id: string): Promise<User> {
-    return this.usersService.getUserById(id);
+  @Get(':uuid')
+  getUserById(@Param('uuid', ParseUUIDPipe) uuid: string): Promise<User> {
+    return this.usersService.getUserById(uuid);
   }
 
   @ApiOperation({ summary: '유저 정보를 수정합니다.' })
@@ -30,11 +38,11 @@ export class UsersController {
   @ApiResponse({ status: 400, description: '입력 값 검증 실패' })
   @ApiResponse({ status: 409, description: '닉네임 중복' })
   @ApiResponse({ status: 500, description: '업데이트 실패' })
-  @Patch(':id')
+  @Patch(':uuid')
   updateUserById(
-    @Param('id') id: string,
+    @Param('uuid', ParseUUIDPipe) uuid: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
-    return this.usersService.updateUserById(id, updateUserDto);
+    return this.usersService.updateUserById(uuid, updateUserDto);
   }
 }
