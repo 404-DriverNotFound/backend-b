@@ -1,8 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Permission } from 'src/permissions/permission.enum';
-import { CreateUserDto } from './dto/create-user.dto';
-//import { UserStatus } from './user-status.enum';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './user.entity';
 import { UsersRepository } from './users.repository';
 
@@ -13,42 +17,37 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  // NOTE 추 후에 auth/signup에서 repository로 직접 createUser를 호출 할 것임으로 삭제할 예정
-  createUser(createUserDto: CreateUserDto): Promise<User> {
-    return this.usersRepository.createUser(createUserDto);
-  }
-
-  findAll() {
-    return `This action returns all users`;
-  }
-
-  async getUserByName(name: string): Promise<User> {
-    const found: User = await this.usersRepository.findOne({ name });
+  async getUserById(id: string): Promise<User> {
+    const found: User = await this.usersRepository.findOne({ id });
     if (!found) {
-      throw new NotFoundException(`User with name: ${name} not found`);
+      throw new NotFoundException(`User with id: ${id} not found`);
     }
     return found;
   }
 
-  async updateUserNameByFtId(ftId: number, name: string): Promise<User> {
-    const found: User = await this.usersRepository.findOne({ ftId });
-    if (!found) {
-      throw new NotFoundException(`User with ftId: ${ftId} not found`);
-    }
+  async updateUserById(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<User> {
+    const found: User = await this.getUserById(id);
+    const { name, avatar } = updateUserDto;
     found.name = name;
-    found.permissions = [Permission.ACCESS];
-    await this.usersRepository.save(found);
+    if (avatar) {
+      found.avatar = avatar;
+    }
+    if (!found.permissions.includes(Permission.ACCESS)) {
+      found.permissions.push(Permission.ACCESS);
+    }
+    try {
+      await this.usersRepository.save(found);
+    } catch (error) {
+      if (error.code === '23505') {
+        // NOTE duplicate name
+        throw new ConflictException('User name is already exists');
+      } else {
+        throw new InternalServerErrorException();
+      }
+    }
     return found;
-  }
-
-  //async updateUserStatus(name: string, status: UserStatus): Promise<User> {
-  //  const user = await this.getUserByName(name);
-  //  user.status = status;
-  //  await this.usersRepository.save(user);
-  //  return user;
-  //}
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
   }
 }

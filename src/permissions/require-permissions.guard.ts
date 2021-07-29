@@ -22,7 +22,9 @@ export class RequirePermissionsGuard implements CanActivate {
     }
     const { user } = context.switchToHttp().getRequest();
     if (!user) {
-      throw new UnauthorizedException('request user is undefined');
+      throw new UnauthorizedException(
+        'request user is undefined in RequirePermissionsGuard',
+      );
       //return false;
     }
     console.log('user', user);

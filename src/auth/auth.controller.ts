@@ -19,7 +19,7 @@ export class AuthController {
   @Get('42/callback')
   @UseGuards(FtGuard)
   async ftAuthCallback(): Promise<any> {
-    return { msg: 'Logged in!' };
+    return { message: 'Logged in!' };
   }
 
   @Get('42/status')

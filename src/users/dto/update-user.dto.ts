@@ -7,7 +7,7 @@ import {
   MaxLength,
 } from 'class-validator';
 
-export class CreateUserDto {
+export class UpdateUserDto {
   @ApiProperty({
     example: 'ykoh',
     description: 'Alphanumeric(3 ~ 12)',
