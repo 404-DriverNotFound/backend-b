@@ -31,12 +31,14 @@ export class UsersService {
   ): Promise<User> {
     const found: User = await this.getUserById(id);
     const { name, avatar } = updateUserDto;
-    found.name = name;
+    if (name) {
+      found.name = name;
+      if (!found.permissions.includes(Permission.ACCESS)) {
+        found.permissions.push(Permission.ACCESS);
+      }
+    }
     if (avatar) {
       found.avatar = avatar;
-    }
-    if (!found.permissions.includes(Permission.ACCESS)) {
-      found.permissions.push(Permission.ACCESS);
     }
     try {
       await this.usersRepository.save(found);

@@ -13,13 +13,14 @@ export class UpdateUserDto {
     description: 'Alphanumeric(3 ~ 12)',
     required: true,
   })
+  @IsOptional()
   @IsString()
   @MinLength(3)
   @MaxLength(12)
   @Matches(/^[a-zA-Z0-9_]*$/, {
     message: 'name must be alphanumeric!',
   })
-  readonly name: string;
+  readonly name?: string;
 
   @ApiProperty({
     example: '/imgsrc/avatar.png',
