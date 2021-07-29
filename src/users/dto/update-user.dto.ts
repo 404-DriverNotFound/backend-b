@@ -11,7 +11,7 @@ export class UpdateUserDto {
   @ApiProperty({
     example: 'ykoh',
     description: 'Alphanumeric(3 ~ 12)',
-    required: true,
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -23,7 +23,7 @@ export class UpdateUserDto {
   readonly name?: string;
 
   @ApiProperty({
-    example: '/imgsrc/avatar.png',
+    example: 'https://cdn.intra.42.fr/users/ykoh.jpg',
     description: 'image format only',
     required: false,
   })
