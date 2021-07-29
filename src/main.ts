@@ -6,12 +6,16 @@ import * as session from 'express-session';
 import * as passport from 'passport';
 import * as redis from 'redis';
 import * as connectRedis from 'connect-redis';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get<ConfigService>(ConfigService);
 
   const RedisStore = connectRedis(session);
-  const client = redis.createClient({ url: process.env.REDIS_URL });
+  const client = redis.createClient({
+    url: configService.get<string>('REDIS_URL'),
+  });
   client.on('connect', () => console.log('connect to redis'));
 
   const config = new DocumentBuilder()
@@ -27,10 +31,10 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.use(
     session({
-      secret: 'my-secret', // FIXME get env vars
+      secret: configService.get<string>('SESSION_SECRET'),
       resave: false,
       saveUninitialized: false,
-      cookie: { maxAge: 1000 * 60 * 60 }, // NOTE 3600초
+      cookie: { maxAge: 1000 * 60 * 60 },
       store: new RedisStore({ client }),
     }),
   );
