@@ -1,16 +1,18 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import {
-  DocumentBuilder,
-  SwaggerCustomOptions,
-  SwaggerModule,
-} from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as session from 'express-session';
 import * as passport from 'passport';
+import * as redis from 'redis';
+import * as connectRedis from 'connect-redis';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const RedisStore = connectRedis(session);
+  const client = redis.createClient({ url: process.env.REDIS_URL });
+  client.on('connect', () => console.log('connect to redis'));
 
   const config = new DocumentBuilder()
     .setTitle('ft_transcendence')
@@ -20,7 +22,6 @@ async function bootstrap() {
     .addCookieAuth('optional-session-id')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-
   SwaggerModule.setup('api', app, document);
 
   app.useGlobalPipes(new ValidationPipe());
@@ -29,7 +30,8 @@ async function bootstrap() {
       secret: 'my-secret', // FIXME get env vars
       resave: false,
       saveUninitialized: false,
-      cookie: { maxAge: 36000 },
+      cookie: { maxAge: 1000 * 60 * 60 }, // NOTE 3600초
+      store: new RedisStore({ client }),
     }),
   );
   app.use(passport.initialize());
