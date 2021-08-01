@@ -15,4 +15,7 @@ export class User {
 
   @Column()
   avatar: string;
+
+  @Column()
+  enable2FA: boolean;
 }
