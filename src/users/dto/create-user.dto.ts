@@ -1,9 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
-  IsOptional,
   MinLength,
-  Matches,
   MaxLength,
   IsNotEmpty,
   IsAlphanumeric,
@@ -23,15 +21,13 @@ export class CreateUserDto {
   @IsAlphanumeric()
   readonly name: string;
 
+  // NOTE 실제 사용되진 않지만 swagger 문서를 위해 남겨둠.
   @ApiProperty({
-    example: '/users/ykoh.jpg',
-    description: 'image format only',
+    example: 'image.png',
+    description: 'MIME type image',
+    type: 'string',
+    format: 'binary',
     required: false,
-  })
-  @IsOptional()
-  @IsString()
-  @Matches(/\.(gif|jpe?g|tiff?|png|webp|bmp)$/i, {
-    message: 'not a image file!',
   })
   readonly avatar?: string;
 

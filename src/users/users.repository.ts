@@ -26,12 +26,13 @@ export class UsersRepository extends Repository<User> {
     return found;
   }
 
-  async createUser(ftId: number, createUserDto: CreateUserDto): Promise<User> {
-    const {
-      name,
-      avatar = 'default.svg',
-      enable2FA,
-    }: CreateUserDto = createUserDto;
+  async createUser(
+    ftId: number,
+    createUserDto: CreateUserDto,
+    file: Express.Multer.File,
+  ): Promise<User> {
+    const { name, enable2FA }: CreateUserDto = createUserDto;
+    const avatar = file ? file.path : 'files/avatar/default.png';
     const user: User = this.create({
       ftId,
       name,
@@ -51,13 +52,17 @@ export class UsersRepository extends Repository<User> {
     return user;
   }
 
-  async updateUser(user: User, updateUserDto: UpdateUserDto): Promise<User> {
-    const { name, avatar, enable2FA } = updateUserDto;
+  async updateUser(
+    user: User,
+    updateUserDto: UpdateUserDto,
+    file: Express.Multer.File,
+  ): Promise<User> {
+    const { name, enable2FA } = updateUserDto;
     if (name) {
       user.name = name;
     }
-    if (avatar) {
-      user.avatar = avatar;
+    if (file) {
+      user.avatar = file.path;
     }
     if (enable2FA) {
       user.enable2FA = enable2FA;

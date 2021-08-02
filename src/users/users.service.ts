@@ -24,12 +24,20 @@ export class UsersService {
     return this.usersRepository.getUserByName(name);
   }
 
-  createUser(user: User, createUserDto: CreateUserDto): Promise<User> {
+  createUser(
+    user: User,
+    createUserDto: CreateUserDto,
+    file: Express.Multer.File,
+  ): Promise<User> {
     const { ftId } = user;
-    return this.usersRepository.createUser(+ftId, createUserDto);
+    return this.usersRepository.createUser(+ftId, createUserDto, file);
   }
 
-  updateUser(user: User, updateUserDto: UpdateUserDto): Promise<User> {
-    return this.usersRepository.updateUser(user, updateUserDto);
+  updateUser(
+    user: User,
+    updateUserDto: UpdateUserDto,
+    file: Express.Multer.File,
+  ): Promise<User> {
+    return this.usersRepository.updateUser(user, updateUserDto, file);
   }
 }
