@@ -18,6 +18,14 @@ export class UsersRepository extends Repository<User> {
     return found;
   }
 
+  async getUserByName(name: string): Promise<User> {
+    const found: User = await this.findOne({ name });
+    if (!found) {
+      throw new NotFoundException(`User with ${name} not found`);
+    }
+    return found;
+  }
+
   async createUser(ftId: number, createUserDto: CreateUserDto): Promise<User> {
     const {
       name,

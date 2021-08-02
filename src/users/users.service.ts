@@ -21,7 +21,7 @@ export class UsersService {
   }
 
   getUserByName(name: string): Promise<User> {
-    return this.usersRepository.getUserById(name);
+    return this.usersRepository.getUserByName(name);
   }
 
   createUser(user: User, createUserDto: CreateUserDto): Promise<User> {
