@@ -29,6 +29,6 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
     const { id } = profile;
     let user: User = await this.usersRepository.findOne({ ftId: id });
     user ||= { id: null, ftId: id, name: null, avatar: null, enable2FA: null };
-    cb(null, user);
+    return cb(null, user);
   }
 }
