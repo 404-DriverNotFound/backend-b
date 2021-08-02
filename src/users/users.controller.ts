@@ -9,7 +9,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
+import { FtGuard } from 'src/auth/guards/ft.guard';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { GetUser } from './get-user.decorator';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 
@@ -18,27 +21,44 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @UseGuards(AuthenticatedGuard)
   getUsers(): Promise<User[]> {
     return this.usersService.getUsers();
   }
 
   @Get('me')
-  getUserByRequestUser() {
-    // TODO auth 이후 구현 가능
+  @UseGuards(AuthenticatedGuard)
+  getUserByRequestUser(@GetUser() user: User): User {
+    return user;
   }
 
   @Get(':uuid')
+  @UseGuards(AuthenticatedGuard)
   getUserById(@Param('uuid', ParseUUIDPipe) uuid: string): Promise<User> {
     return this.usersService.getUserById(uuid);
   }
 
-  @Post()
-  createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.usersService.createUser(createUserDto);
+  @Get(':name')
+  @UseGuards(AuthenticatedGuard)
+  getUserByName(@Param('name') name: string): Promise<User> {
+    return this.usersService.getUserByName(name);
   }
 
-  @Patch()
-  updateUser() {
-    // TODO auth 이후 구현 가능
+  @Post()
+  @UseGuards(FtGuard)
+  createUser(
+    @GetUser() user: User,
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<User> {
+    return this.usersService.createUser(user, createUserDto);
+  }
+
+  @Patch('me')
+  @UseGuards(AuthenticatedGuard)
+  updateUser(
+    @GetUser() user: User,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<User> {
+    return this.usersService.updateUser(user, updateUserDto);
   }
 }

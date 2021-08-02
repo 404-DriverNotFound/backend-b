@@ -4,18 +4,17 @@ import {
   MinLength,
   Matches,
   MaxLength,
-  IsNotEmpty,
   IsAlphanumeric,
   IsBooleanString,
 } from 'class-validator';
 
-export class CreateUserDto {
-  @IsNotEmpty()
+export class UpdateUserDto {
+  @IsOptional()
   @IsString()
   @MinLength(3)
   @MaxLength(12)
   @IsAlphanumeric()
-  readonly name: string;
+  readonly name?: string;
 
   @IsOptional()
   @IsString()
@@ -24,7 +23,7 @@ export class CreateUserDto {
   })
   readonly avatar?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBooleanString()
-  readonly enable2FA: boolean;
+  readonly enable2FA?: boolean;
 }
