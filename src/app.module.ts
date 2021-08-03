@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { configValidationSchema } from './config.schema';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     AuthModule,
     UsersModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
