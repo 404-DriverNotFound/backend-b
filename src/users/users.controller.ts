@@ -8,6 +8,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  UnauthorizedException,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -23,7 +24,6 @@ import {
 } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
-import { FtGuard } from 'src/auth/guards/ft.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetUser } from './get-user.decorator';
@@ -104,13 +104,15 @@ export class UsersController {
   @ApiResponse({ status: 409, description: '데이터(닉네임) 중복' })
   @ApiResponse({ status: 500, description: '생성 실패' })
   @Post()
-  //@UseGuards(FtGuard) // FIXME CORS 때문에 임시 주석
   @UseInterceptors(FileInterceptor('avatar', localOptions))
   createUser(
     @GetUser() user: User,
     @Body() createUserDto: CreateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<User> {
+    if (!user) {
+      throw new UnauthorizedException('Request user is undefined');
+    }
     return this.usersService.createUser(user, createUserDto, file);
   }
 

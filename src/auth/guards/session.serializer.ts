@@ -1,4 +1,3 @@
-import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { PassportSerializer } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,22 +15,15 @@ export class SessionSerializer extends PassportSerializer {
 
   serializeUser(user: User, done: (err: Error, user: any) => void): any {
     const { ftId } = user;
-    console.log('serializeUser data: ', { ftId });
+    console.log('serialize data: ', { ftId });
     done(null, { ftId });
   }
 
   async deserializeUser(payload: User, done: (err: Error, user: User) => void) {
-    const user: User = await this.usersRepository.findOne({
-      ftId: payload.ftId,
-    });
-    console.log('deserialized User', user);
-
-    if (!user) {
-      return done(
-        new UnauthorizedException('Request user is not found in our databases'),
-        undefined,
-      );
-    }
+    const { ftId } = payload;
+    let user: User = await this.usersRepository.findOne({ ftId });
+    user ||= { id: null, ftId, name: null, avatar: null, enable2FA: null };
+    console.log('deserialized data: ', user);
     return done(null, user);
   }
 }
