@@ -1,4 +1,4 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Redirect, Req, UseGuards } from '@nestjs/common';
 import {
   ApiExcludeEndpoint,
   ApiOperation,
@@ -26,6 +26,7 @@ export class AuthController {
   @ApiExcludeEndpoint()
   @Get('42/callback')
   @UseGuards(FtGuard)
+  @Redirect(process.env.FRONTEND_URL) // NOTE config 모듈을 사용하고 싶은데 데코레이터라서 그런지 사용이 안됨.
   async ftAuthCallback(@GetUser() user: User): Promise<User> {
     return user;
   }
@@ -41,6 +42,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: '성공' })
   @Get('logout')
   @UseGuards(AuthenticatedGuard)
+  @Redirect(process.env.FRONTEND_URL) // NOTE config 모듈을 사용하고 싶은데 데코레이터라서 그런지 사용이 안됨.
   async logOut(@Req() req: Request): Promise<void> {
     req.logOut();
     return;
