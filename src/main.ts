@@ -13,7 +13,7 @@ import {
 } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
 
   const configService = app.get<ConfigService>(ConfigService);
 
