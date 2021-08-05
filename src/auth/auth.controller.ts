@@ -1,4 +1,4 @@
-import { Controller, Get, Redirect, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import {
   ApiExcludeEndpoint,
   ApiOperation,
@@ -9,26 +9,28 @@ import { GetUser } from 'src/users/get-user.decorator';
 import { User } from 'src/users/user.entity';
 import { AuthenticatedGuard } from './guards/authenticated.guard';
 import { FtGuard } from './guards/ft.guard';
-import { Request } from 'express';
+import { Request, Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
+  constructor(private readonly configService: ConfigService) {}
   @ApiOperation({ summary: '42 OAuth로 로그인합니다(세션 등록).' })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 500, description: '실패' })
   @Get('42')
   @UseGuards(FtGuard)
-  async ftAuth(): Promise<void> {
+  ftAuth(): Promise<void> {
     return;
   }
 
   @ApiExcludeEndpoint()
   @Get('42/callback')
   @UseGuards(FtGuard)
-  @Redirect(process.env.FRONTEND_URL) // NOTE config 모듈을 사용하고 싶은데 데코레이터라서 그런지 사용이 안됨.
-  async ftAuthCallback(@GetUser() user: User): Promise<User> {
-    return user;
+  ftAuthCallback(@Res() res: Response): Promise<void> {
+    res.redirect(this.configService.get<string>('FRONTEND_URL')); // REVIEW 환경변수를 사용하지 못하는 문제 때문에 Res 사용
+    return;
   }
 
   @ApiExcludeEndpoint()
@@ -42,9 +44,9 @@ export class AuthController {
   @ApiResponse({ status: 200, description: '성공' })
   @Get('logout')
   @UseGuards(AuthenticatedGuard)
-  @Redirect(process.env.FRONTEND_URL) // NOTE config 모듈을 사용하고 싶은데 데코레이터라서 그런지 사용이 안됨.
-  async logOut(@Req() req: Request): Promise<void> {
+  logOut(@Req() req: Request, @Res() res: Response): Promise<void> {
     req.logOut();
+    res.redirect(this.configService.get<string>('FRONTEND_URL')); // REVIEW 환경변수를 사용하지 못하는 문제 때문에 Res 사용
     return;
   }
 }
