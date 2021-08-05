@@ -13,9 +13,13 @@ import {
 } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
-
+  const app = await NestFactory.create(AppModule);
   const configService = app.get<ConfigService>(ConfigService);
+
+  app.enableCors({
+    origin: configService.get<string>('ORIGIN'),
+    credentials: true,
+  });
 
   app.useGlobalPipes(new ValidationPipe());
 
