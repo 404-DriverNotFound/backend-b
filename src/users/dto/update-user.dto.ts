@@ -38,5 +38,5 @@ export class UpdateUserDto {
   })
   @IsOptional()
   @IsBooleanString()
-  readonly enable2FA?: boolean;
+  readonly enable2FA?: string;
 }

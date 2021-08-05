@@ -31,13 +31,12 @@ export class UsersRepository extends Repository<User> {
     createUserDto: CreateUserDto,
     file: Express.Multer.File,
   ): Promise<User> {
-    const { name, enable2FA }: CreateUserDto = createUserDto;
-    const avatar = file ? file.path : 'files/avatar/default.png';
+    const { name, enable2FA } = createUserDto;
     const user: User = this.create({
       ftId,
       name,
-      avatar,
-      enable2FA,
+      avatar: file?.path,
+      enable2FA: enable2FA === 'true',
     });
     try {
       await this.save(user);
@@ -46,7 +45,7 @@ export class UsersRepository extends Repository<User> {
         // NOTE someting duplicated ftId or name
         throw new ConflictException('User is already exists');
       } else {
-        throw new InternalServerErrorException();
+        throw new InternalServerErrorException('Error in createUser');
       }
     }
     return user;
@@ -64,8 +63,9 @@ export class UsersRepository extends Repository<User> {
     if (file) {
       user.avatar = file.path;
     }
-    if (enable2FA) {
-      user.enable2FA = enable2FA;
+    if (enable2FA === 'true') {
+      user.enable2FA = enable2FA === 'true';
+      user.isSecondFactorAuthenticated = true; // REVIEW 업데이트하고 바로 인증으로 넘어가지 않고, 재로그인시 검사
     }
     try {
       await this.save(user);
@@ -76,7 +76,7 @@ export class UsersRepository extends Repository<User> {
           'someting duplicated in databases(maybe name?)',
         );
       } else {
-        throw new InternalServerErrorException();
+        throw new InternalServerErrorException('Error in updateUser');
       }
     }
     return user;

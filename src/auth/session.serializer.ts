@@ -19,11 +19,14 @@ export class SessionSerializer extends PassportSerializer {
     done(null, { ftId });
   }
 
-  async deserializeUser(payload: User, done: (err: Error, user: User) => void) {
+  async deserializeUser(payload: User, done: (err: Error, user: any) => void) {
     const { ftId } = payload;
-    let user: User = await this.usersRepository.findOne({ ftId });
-    user ||= { id: null, ftId, name: null, avatar: null, enable2FA: null };
+    const user: User = await this.usersRepository.findOne({ ftId });
     console.log('deserialized data: ', user);
-    return done(null, user);
+    if (user) {
+      return done(null, user);
+    } else {
+      return done(null, { ftId });
+    }
   }
 }

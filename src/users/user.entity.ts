@@ -1,20 +1,29 @@
+import { Exclude } from 'class-transformer';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
-  // NOTE 내부적인 unique 값을 가입시 name으로 설정하는데 이런 값이 필요할까?
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Exclude()
   @Column({ unique: true })
   ftId: number;
 
   @Column({ unique: true })
   name: string;
 
-  @Column()
+  @Column({ default: 'files/avatar/default.png' })
   avatar: string;
 
   @Column()
   enable2FA: boolean;
+
+  @Exclude()
+  @Column({ nullable: true })
+  authenticatorSecret: string;
+
+  @Exclude()
+  @Column({ default: false })
+  isSecondFactorAuthenticated: boolean;
 }

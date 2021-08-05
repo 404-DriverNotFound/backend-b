@@ -38,5 +38,5 @@ export class CreateUserDto {
   })
   @IsNotEmpty()
   @IsBooleanString()
-  readonly enable2FA: boolean;
+  readonly enable2FA: string;
 }

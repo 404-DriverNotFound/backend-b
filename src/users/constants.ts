@@ -6,7 +6,6 @@ export const localOptions: MulterOptions = {
   storage: diskStorage({
     destination: './files/avatar',
     filename: (req, file, cb) => {
-      console.log(req, file, cb);
       const fileName: string = req.body.name;
       const timeStamp = Date.now();
       const fileExt: string = file.mimetype.split('/')[1];

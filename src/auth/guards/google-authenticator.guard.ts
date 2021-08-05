@@ -1,12 +1,12 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 
 @Injectable()
-export class NameGuard implements CanActivate {
+export class GoogleAuthenticatorGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    console.log('NameGuard');
-    if (!req.user?.id) {
-      return false;
+    console.log('GoogleAuthenticatorGuard');
+    if (req.user?.enable2FA) {
+      return req.user?.isSecondFactorAuthenticated;
     }
     return true;
   }

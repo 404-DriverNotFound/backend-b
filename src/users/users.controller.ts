@@ -27,9 +27,11 @@ import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { localOptions } from './constants';
 import { NameGuard } from 'src/auth/guards/name.guard';
+import { GoogleAuthenticatorGuard } from 'src/auth/guards/google-authenticator.guard';
 
 @ApiTags('Users')
 @Controller('users')
+@UseGuards(GoogleAuthenticatorGuard)
 @UseGuards(AuthenticatedGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -77,7 +79,7 @@ export class UsersController {
 
   @ApiOperation({ summary: '유저를 생성합니다.' })
   @ApiConsumes('multipart/form-data')
-  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 201, description: '성공' })
   @ApiResponse({ status: 400, description: '입력 값 검증 실패' })
   @ApiResponse({ status: 409, description: '데이터(닉네임) 중복' })
   @ApiResponse({ status: 500, description: '생성 실패' })

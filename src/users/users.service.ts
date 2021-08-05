@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -39,5 +39,20 @@ export class UsersService {
     file: Express.Multer.File,
   ): Promise<User> {
     return this.usersRepository.updateUser(user, updateUserDto, file);
+  }
+
+  async updateUserAuthenticatorSecret(
+    user: User,
+    secret: string,
+  ): Promise<User> {
+    user.authenticatorSecret = secret;
+    try {
+      await this.usersRepository.save(user);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'server error in updateUserAuthenticatorSecret',
+      );
+    }
+    return user;
   }
 }
