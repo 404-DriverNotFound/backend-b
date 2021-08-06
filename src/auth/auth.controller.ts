@@ -44,8 +44,9 @@ export class AuthController {
   @ApiExcludeEndpoint()
   @Get('42/callback')
   @UseGuards(FtGuard)
-  ftAuthCallback(@Res() res: Response): Promise<void> {
-    res.redirect(this.configService.get<string>('ORIGIN')); // REVIEW 환경변수를 사용하지 못하는 문제 때문에 Res 사용
+  ftAuthCallback(@GetUser() user: User, @Res() res: Response): Promise<void> {
+    const redirectUrl: string = this.authService.redirectUrl(user);
+    res.redirect(this.configService.get<string>('ORIGIN') + redirectUrl); // REVIEW 환경변수를 사용하지 못하는 문제 때문에 Res 사용
     return;
   }
 

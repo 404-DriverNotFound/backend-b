@@ -47,4 +47,14 @@ export class AuthService {
     }
     return user;
   }
+
+  redirectUrl(user: User): string {
+    if (!user?.name) {
+      return '/register';
+    }
+    if (user?.enable2FA) {
+      return '/2fa';
+    }
+    return '';
+  }
 }
