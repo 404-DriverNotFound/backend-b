@@ -1,20 +1,32 @@
-import { Controller, Get } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import {
+  ApiCookieAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AppService } from './app.service';
+import { AuthenticatedGuard } from './auth/guards/authenticated.guard';
 
 @ApiTags('Default')
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly appService: AppService) {}
 
-  @Get()
-  @ApiOperation({ summary: '서버를 실행 상태를 확인합니다.' })
+  @ApiOperation({ summary: '서버의 실행 상태를 확인합니다.' })
   @ApiResponse({ status: 200, description: '서버가 실행 중' })
+  @Get()
   getHello(): string {
     return this.appService.getHello();
+  }
+
+  @ApiCookieAuth()
+  @ApiOperation({ summary: '세션인증 결과를 알려줍니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 403, description: '세션 인증 실패' })
+  @Get('session')
+  @UseGuards(AuthenticatedGuard)
+  hasSession(): void {
+    return;
   }
 }

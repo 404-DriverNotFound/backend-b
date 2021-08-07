@@ -1,25 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
+  IsOptional,
   MinLength,
   MaxLength,
-  IsNotEmpty,
   IsAlphanumeric,
   IsBooleanString,
 } from 'class-validator';
 
-export class CreateUserDto {
+export class UpdateUserDto {
   @ApiProperty({
     example: 'ykoh',
     description: 'Alphanumeric(3 ~ 12)',
-    required: true,
+    required: false,
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MinLength(3)
   @MaxLength(12)
   @IsAlphanumeric()
-  readonly name: string;
+  readonly name?: string;
 
   // NOTE 실제 사용되진 않지만 swagger 문서를 위해 남겨둠.
   @ApiProperty({
@@ -34,9 +34,9 @@ export class CreateUserDto {
   @ApiProperty({
     example: 'false',
     description: 'boolean string only',
-    required: true,
+    required: false,
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsBooleanString()
-  readonly enable2FA: string;
+  readonly enable2FA?: string;
 }

@@ -1,67 +1,114 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
+  Head,
   Param,
-  //Delete,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiConsumes,
+  ApiCookieAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserStatusDto } from './dto/update-user-status.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { GetUser } from './get-user.decorator';
 import { User } from './user.entity';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UsersService } from './users.service';
+import { localOptions } from './constants';
+import { NameGuard } from 'src/auth/guards/name.guard';
+import { GoogleAuthenticatorGuard } from 'src/auth/guards/google-authenticator.guard';
 
 @ApiTags('Users')
 @Controller('users')
+@UseGuards(GoogleAuthenticatorGuard)
+@UseGuards(AuthenticatedGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // NOTE 추 후에 auth/signup 부분으로 이동하는 것이 좋을 것 같아서 삭제할 예정.
-  @Post()
-  @ApiOperation({
-    summary:
-      '유저를 생성합니다(테스트용으로 만들었고, 나중에 사용되지 않을 수 있음).',
-  })
-  @ApiResponse({ status: 201, description: '성공' })
-  @ApiResponse({ status: 400, description: '입력 검증 실패' })
-  @ApiResponse({ status: 409, description: '중복' })
-  createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.usersService.createUser(createUserDto);
+  @ApiCookieAuth()
+  @ApiOperation({ summary: '모든 유저 정보를 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 403, description: '세션 인증 실패' })
+  @Get()
+  @UseGuards(NameGuard)
+  getUsers(): Promise<User[]> {
+    return this.usersService.getUsers();
   }
 
-  //@Get()
-  //findAll() {
-  //  return this.usersService.findAll();
-  //}
-
-  @Get(':name')
-  @ApiOperation({ summary: '유저 정보를 가져옵니다.' })
+  @ApiCookieAuth()
+  @ApiOperation({ summary: '나의 정보를 가져옵니다.' })
   @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 403, description: '세션 인증 실패' })
+  @Get('me')
+  @UseGuards(NameGuard)
+  getUserByRequestUser(@GetUser() user: User): User {
+    return user;
+  }
+
+  @ApiCookieAuth()
+  @ApiOperation({ summary: 'id로 유저 정보를 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 403, description: '세션 인증 실패' })
   @ApiResponse({ status: 404, description: '유저 없음' })
+  @Get(':uuid')
+  @UseGuards(NameGuard)
+  getUserById(@Param('uuid', ParseUUIDPipe) uuid: string): Promise<User> {
+    return this.usersService.getUserById(uuid);
+  }
+
+  @ApiCookieAuth()
+  @ApiOperation({ summary: '중복 닉네임을 확인합니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 403, description: '세션 인증 실패' })
+  @ApiResponse({ status: 404, description: '유저 없음' })
+  @Head('name/:name')
   getUserByName(@Param('name') name: string): Promise<User> {
     return this.usersService.getUserByName(name);
   }
 
-  @Patch(':name/status')
-  @ApiOperation({ summary: '유저의 접속 상태를 변경합니다.' })
-  @ApiResponse({ status: 200, description: '성공' })
-  @ApiResponse({
-    status: 400,
-    description: '유효하지 않은 접속상태를 입력했을 때',
-  })
-  @ApiResponse({ status: 404, description: '유저 없음' })
-  updateUserStatus(
-    @Param('name') name: string,
-    @Body() updateUserStatusDto: UpdateUserStatusDto,
+  @ApiOperation({ summary: '유저를 생성합니다.' })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: 201, description: '성공' })
+  @ApiResponse({ status: 400, description: '입력 값 검증 실패' })
+  @ApiResponse({ status: 409, description: '데이터(닉네임) 중복' })
+  @ApiResponse({ status: 500, description: '생성 실패' })
+  @Post()
+  @UseInterceptors(FileInterceptor('avatar', localOptions))
+  createUser(
+    @GetUser() user: User,
+    @Body() createUserDto: CreateUserDto,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<User> {
-    const { status } = updateUserStatusDto;
-    return this.usersService.updateUserStatus(name, status);
+    return this.usersService.createUser(user, createUserDto, file);
   }
 
-  //@Delete(':id')
-  //remove(@Param('id') id: string) {
-  //  return this.usersService.remove(+id);
-  //}
+  @ApiCookieAuth()
+  @ApiOperation({ summary: '나의 정보를 수정합니다.' })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '입력 값 검증 실패' })
+  @ApiResponse({ status: 403, description: '세션 인증 실패' })
+  @ApiResponse({ status: 409, description: '데이터(닉네임) 중복' })
+  @ApiResponse({ status: 500, description: '업데이트 실패' })
+  @Patch('me')
+  @UseGuards(NameGuard)
+  @UseInterceptors(FileInterceptor('avatar', localOptions))
+  updateUser(
+    @GetUser() user: User,
+    @Body() updateUserDto: UpdateUserDto,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<User> {
+    return this.usersService.updateUser(user, updateUserDto, file);
+  }
 }
