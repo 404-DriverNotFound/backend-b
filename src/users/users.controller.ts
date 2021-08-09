@@ -26,7 +26,7 @@ import { GetUser } from './get-user.decorator';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { localOptions } from './constants';
-import { NameGuard } from 'src/auth/guards/name.guard';
+import { UserCreatedGuard } from 'src/auth/guards/user-created.guard';
 import { GoogleAuthenticatorGuard } from 'src/auth/guards/google-authenticator.guard';
 
 @ApiTags('Users')
@@ -41,7 +41,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 403, description: '세션 인증 실패' })
   @Get()
-  @UseGuards(NameGuard)
+  @UseGuards(UserCreatedGuard)
   getUsers(): Promise<User[]> {
     return this.usersService.getUsers();
   }
@@ -51,7 +51,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 403, description: '세션 인증 실패' })
   @Get('me')
-  @UseGuards(NameGuard)
+  @UseGuards(UserCreatedGuard)
   getUserByRequestUser(@GetUser() user: User): User {
     return user;
   }
@@ -62,7 +62,7 @@ export class UsersController {
   @ApiResponse({ status: 403, description: '세션 인증 실패' })
   @ApiResponse({ status: 404, description: '유저 없음' })
   @Get(':uuid')
-  @UseGuards(NameGuard)
+  @UseGuards(UserCreatedGuard)
   getUserById(@Param('uuid', ParseUUIDPipe) uuid: string): Promise<User> {
     return this.usersService.getUserById(uuid);
   }
@@ -102,7 +102,7 @@ export class UsersController {
   @ApiResponse({ status: 409, description: '데이터(닉네임) 중복' })
   @ApiResponse({ status: 500, description: '업데이트 실패' })
   @Patch('me')
-  @UseGuards(NameGuard)
+  @UseGuards(UserCreatedGuard)
   @UseInterceptors(FileInterceptor('avatar', localOptions))
   updateUser(
     @GetUser() user: User,

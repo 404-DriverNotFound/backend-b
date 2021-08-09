@@ -3,7 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 
 @Injectable()
-export class FtGuard extends AuthGuard('42') {
+export class FtOauthGuard extends AuthGuard('42') {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const activate: boolean = (await super.canActivate(context)) as boolean;
     const request: Request = context.switchToHttp().getRequest();
