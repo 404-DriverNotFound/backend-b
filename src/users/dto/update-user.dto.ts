@@ -6,11 +6,12 @@ import {
   MaxLength,
   IsAlphanumeric,
   IsBooleanString,
+  IsEnum,
 } from 'class-validator';
+import { UserStatus } from '../user-status.enum';
 
 export class UpdateUserDto {
   @ApiProperty({
-    example: 'ykoh',
     description: 'Alphanumeric(3 ~ 12)',
     required: false,
   })
@@ -39,4 +40,14 @@ export class UpdateUserDto {
   @IsOptional()
   @IsBooleanString()
   readonly enable2FA?: string;
+
+  @ApiProperty({
+    example: 'ONLINE',
+    description: 'ONLINE, OFFLINE and IN_GAME',
+    required: false,
+    enum: UserStatus,
+  })
+  @IsOptional()
+  @IsEnum(UserStatus)
+  readonly status?: UserStatus;
 }
