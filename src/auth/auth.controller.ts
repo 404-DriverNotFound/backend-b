@@ -16,9 +16,9 @@ import {
 import { GetUser } from 'src/users/get-user.decorator';
 import { User } from 'src/users/user.entity';
 import { AuthenticatedGuard } from './guards/authenticated.guard';
-import { FtGuard } from './guards/ft.guard';
+import { FtOauthGuard } from './guards/ft-oauth.guard';
 import { Request, Response } from 'express';
-import { NameGuard } from './guards/name.guard';
+import { UserCreatedGuard } from './guards/user-created.guard';
 import { toFileStream } from 'qrcode';
 import { OtpDto } from './dto/otp.dto';
 import { AuthService } from './auth.service';
@@ -36,14 +36,14 @@ export class AuthController {
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 500, description: '실패' })
   @Get('42')
-  @UseGuards(FtGuard)
+  @UseGuards(FtOauthGuard)
   ftAuth(): Promise<void> {
     return;
   }
 
   @ApiExcludeEndpoint()
   @Get('42/callback')
-  @UseGuards(FtGuard)
+  @UseGuards(FtOauthGuard)
   ftAuthCallback(@GetUser() user: User, @Res() res: Response): Promise<void> {
     const redirectUrl: string = this.authService.redirectUrl(user);
     res.redirect(this.configService.get<string>('ORIGIN') + redirectUrl); // REVIEW 환경변수를 사용하지 못하는 문제 때문에 Res 사용
@@ -61,7 +61,7 @@ export class AuthController {
   @ApiResponse({ status: 201, description: '인증 성공' })
   @ApiResponse({ status: 401, description: '인증 실패' })
   @Post('otp')
-  @UseGuards(NameGuard)
+  @UseGuards(UserCreatedGuard)
   @UseGuards(AuthenticatedGuard)
   otpAuth(@GetUser() user: User, @Body() otpDto: OtpDto): Promise<User> {
     return this.authService.otpAuth(user, otpDto);
@@ -70,7 +70,7 @@ export class AuthController {
   @ApiOperation({ summary: '나의 OTP QR코드를 가져옵니다.' })
   @ApiResponse({ status: 200, description: '성공' })
   @Get('otp/qrcode')
-  @UseGuards(NameGuard)
+  @UseGuards(UserCreatedGuard)
   @UseGuards(AuthenticatedGuard)
   async qrCode(@GetUser() user: User, @Res() res: Response): Promise<any> {
     const otpauth = this.authService.generateKeyUri(user);
