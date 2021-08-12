@@ -66,6 +66,7 @@ export class UsersRepository extends Repository<User> {
     if (enable2FA) {
       user.enable2FA = enable2FA === 'true';
       user.isSecondFactorAuthenticated = enable2FA === 'true';
+      user.authenticatorSecret = null;
     }
     try {
       await this.save(user);
