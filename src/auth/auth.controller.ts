@@ -25,12 +25,15 @@ import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
 import { FtOauthUnauthorizedExceptionFilter } from './filters/ft-oauth-unauthorized-exception.filter';
 import { AuthenticatedRedirectExceptionFilter } from './filters/authenticated-redirect-exception.filter';
+import { UsersService } from 'src/users/users.service';
+import { UserStatus } from 'src/users/user-status.enum';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
+    private readonly usersService: UsersService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -48,8 +51,11 @@ export class AuthController {
   @Get('42/callback')
   @UseGuards(FtOauthGuard)
   @UseFilters(FtOauthUnauthorizedExceptionFilter)
-  ftAuthCallback(@GetUser() user: User, @Res() res: Response): void {
-    // TODO ONLINE 변경
+  async ftAuthCallback(
+    @GetUser() user: User,
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.usersService.updateUserStatus(user, UserStatus.ONLINE);
     res.redirect(this.configService.get<string>('ORIGIN'));
     return;
   }
@@ -87,9 +93,9 @@ export class AuthController {
   @ApiResponse({ status: 200, description: '성공' })
   @Get('logout')
   @UseGuards(AuthenticatedGuard)
-  logOut(@Req() req: Request): void {
-    // TODO OFFLINE 변경
-    // TODO OTP 인증 폐기
+  async logOut(@GetUser() user: User, @Req() req: Request): Promise<void> {
+    await this.usersService.updateUserStatus(user, UserStatus.OFFLINE);
+    await this.usersService.updateUserIsSecondFactorUnauthenticated(user);
     req.logOut();
     return;
   }

@@ -41,13 +41,13 @@ export class UpdateUserDto {
   @IsBooleanString()
   readonly enable2FA?: string;
 
-  @ApiProperty({
-    example: 'ONLINE',
-    description: 'ONLINE, OFFLINE and IN_GAME',
-    required: false,
-    enum: UserStatus,
-  })
-  @IsOptional()
-  @IsEnum(UserStatus)
-  readonly status?: UserStatus;
+  //@ApiProperty({
+  //  example: 'ONLINE',
+  //  description: 'ONLINE, OFFLINE and IN_GAME',
+  //  required: false,
+  //  enum: UserStatus,
+  //})
+  //@IsOptional()
+  //@IsEnum(UserStatus)
+  //readonly status?: UserStatus;
 }
