@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   UploadedFile,
+  UseFilters,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -26,13 +27,10 @@ import { GetUser } from './get-user.decorator';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { localOptions } from './constants';
-import { UserCreatedGuard } from 'src/auth/guards/user-created.guard';
-import { GoogleAuthenticatorGuard } from 'src/auth/guards/google-authenticator.guard';
+import { AuthenticatedRedirectExceptionFilter } from 'src/auth/filters/authenticated-redirect-exception.filter';
 
 @ApiTags('Users')
 @Controller('users')
-@UseGuards(GoogleAuthenticatorGuard)
-@UseGuards(AuthenticatedGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -41,7 +39,8 @@ export class UsersController {
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 403, description: '세션 인증 실패' })
   @Get()
-  @UseGuards(UserCreatedGuard)
+  @UseGuards(AuthenticatedGuard)
+  @UseFilters(AuthenticatedRedirectExceptionFilter)
   getUsers(): Promise<User[]> {
     return this.usersService.getUsers();
   }
@@ -51,7 +50,8 @@ export class UsersController {
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 403, description: '세션 인증 실패' })
   @Get('me')
-  @UseGuards(UserCreatedGuard)
+  @UseGuards(AuthenticatedGuard)
+  @UseFilters(AuthenticatedRedirectExceptionFilter)
   getUserByRequestUser(@GetUser() user: User): User {
     return user;
   }
@@ -62,7 +62,8 @@ export class UsersController {
   @ApiResponse({ status: 403, description: '세션 인증 실패' })
   @ApiResponse({ status: 404, description: '유저 없음' })
   @Get(':uuid')
-  @UseGuards(UserCreatedGuard)
+  @UseGuards(AuthenticatedGuard)
+  @UseFilters(AuthenticatedRedirectExceptionFilter)
   getUserById(@Param('uuid', ParseUUIDPipe) uuid: string): Promise<User> {
     return this.usersService.getUserById(uuid);
   }
@@ -73,6 +74,8 @@ export class UsersController {
   @ApiResponse({ status: 403, description: '세션 인증 실패' })
   @ApiResponse({ status: 404, description: '유저 없음' })
   @Head('name/:name')
+  @UseGuards(AuthenticatedGuard)
+  @UseFilters(AuthenticatedRedirectExceptionFilter)
   getUserByName(@Param('name') name: string): Promise<User> {
     return this.usersService.getUserByName(name);
   }
@@ -102,7 +105,8 @@ export class UsersController {
   @ApiResponse({ status: 409, description: '데이터(닉네임) 중복' })
   @ApiResponse({ status: 500, description: '업데이트 실패' })
   @Patch('me')
-  @UseGuards(UserCreatedGuard)
+  @UseGuards(AuthenticatedGuard)
+  @UseFilters(AuthenticatedRedirectExceptionFilter)
   @UseInterceptors(FileInterceptor('avatar', localOptions))
   updateUser(
     @GetUser() user: User,

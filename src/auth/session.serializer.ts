@@ -13,20 +13,19 @@ export class SessionSerializer extends PassportSerializer {
     super();
   }
 
-  serializeUser(user: User, done: (err: Error, user: any) => void): any {
-    const { ftId } = user;
-    console.log('serialize data: ', { ftId });
-    done(null, { ftId });
+  serializeUser(
+    user: User,
+    done: (err: Error, user: { id: string }) => void,
+  ): any {
+    const { id } = user;
+    console.log('serialize data: ', { id });
+    done(null, { id });
   }
 
-  async deserializeUser(payload: User, done: (err: Error, user: any) => void) {
-    const { ftId } = payload;
-    const user: User = await this.usersRepository.findOne({ ftId });
+  async deserializeUser(payload: User, done: (err: Error, user: User) => void) {
+    const { id } = payload;
+    const user: User = await this.usersRepository.findOne({ id });
     console.log('deserialized data: ', user);
-    if (user) {
-      return done(null, user);
-    } else {
-      return done(null, { ftId });
-    }
+    return done(null, user);
   }
 }

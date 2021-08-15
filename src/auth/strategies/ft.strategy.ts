@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -26,20 +26,12 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
     profile: Profile,
     cb: VerifyCallback,
   ): Promise<any> {
+    // NOTE UNAUTHORIZED EXCEPTION in here
     const { id } = profile;
     const user: User = await this.usersRepository.findOne({ ftId: id });
-    if (user) {
-      user.isSecondFactorAuthenticated = false;
-      try {
-        await this.usersRepository.save(user);
-      } catch (err) {
-        throw new InternalServerErrorException(
-          'Someting wrong while saving user data in validate',
-        );
-      }
-      return cb(null, user);
-    } else {
-      return cb(null, { ftId: id });
+    if (!user) {
+      throw new UnauthorizedException(id);
     }
+    return cb(null, user);
   }
 }
