@@ -47,7 +47,7 @@ export class UsersRepository extends Repository<User> {
     updateUserDto: UpdateUserDto,
     file: Express.Multer.File,
   ): Promise<User> {
-    const { name, enable2FA } = updateUserDto;
+    const { name, enable2FA, status } = updateUserDto;
     if (name) {
       user.name = name;
     }
@@ -57,6 +57,9 @@ export class UsersRepository extends Repository<User> {
     if (enable2FA === 'true') {
       user.enable2FA = enable2FA === 'true';
       user.isSecondFactorAuthenticated = true; // REVIEW 업데이트하고 바로 인증으로 넘어가지 않고, 재로그인시 검사
+    }
+    if (status) {
+      user.status = status;
     }
     try {
       await this.save(user);
