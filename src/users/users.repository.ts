@@ -27,11 +27,10 @@ export class UsersRepository extends Repository<User> {
   }
 
   async createUser(
-    ftId: number,
     createUserDto: CreateUserDto,
     file: Express.Multer.File,
   ): Promise<User> {
-    const { name, enable2FA } = createUserDto;
+    const { ftId, name, enable2FA } = createUserDto;
     const user: User = this.create({
       ftId,
       name,

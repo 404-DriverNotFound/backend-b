@@ -25,12 +25,10 @@ export class UsersService {
   }
 
   createUser(
-    user: User,
     createUserDto: CreateUserDto,
     file: Express.Multer.File,
   ): Promise<User> {
-    const { ftId } = user;
-    return this.usersRepository.createUser(+ftId, createUserDto, file);
+    return this.usersRepository.createUser(createUserDto, file);
   }
 
   updateUser(

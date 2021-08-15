@@ -6,9 +6,19 @@ import {
   IsNotEmpty,
   IsAlphanumeric,
   IsBooleanString,
+  IsNumber,
 } from 'class-validator';
 
 export class CreateUserDto {
+  @ApiProperty({
+    example: '123456',
+    description: '42 unique id',
+    required: true,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  readonly ftId: number;
+
   @ApiProperty({
     example: 'ykoh',
     description: 'Alphanumeric(3 ~ 12)',
