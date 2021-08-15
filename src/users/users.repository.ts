@@ -10,14 +10,6 @@ import { User } from './user.entity';
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
-  async getUserById(id: string): Promise<User> {
-    const found: User = await this.findOne({ id });
-    if (!found) {
-      throw new NotFoundException(`User with ${id} not found`);
-    }
-    return found;
-  }
-
   async getUserByName(name: string): Promise<User> {
     const found: User = await this.findOne({ name });
     if (!found) {

@@ -16,10 +16,6 @@ export class UsersService {
     return await this.usersRepository.find();
   }
 
-  getUserById(id: string): Promise<User> {
-    return this.usersRepository.getUserById(id);
-  }
-
   getUserByName(name: string): Promise<User> {
     return this.usersRepository.getUserByName(name);
   }
