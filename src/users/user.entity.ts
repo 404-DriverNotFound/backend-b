@@ -1,5 +1,6 @@
 import { Exclude } from 'class-transformer';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { UserStatus } from './user-status.enum';
 
 @Entity()
 export class User {
@@ -18,6 +19,9 @@ export class User {
 
   @Column()
   enable2FA: boolean;
+
+  @Column({ type: 'enum', enum: UserStatus, default: UserStatus.OFFLINE })
+  status: UserStatus;
 
   @Exclude()
   @Column({ nullable: true })
