@@ -6,7 +6,7 @@ import {
   IsNotEmpty,
   IsAlphanumeric,
   IsBooleanString,
-  IsNumber,
+  IsNumberString,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -16,7 +16,7 @@ export class CreateUserDto {
     required: true,
   })
   @IsNotEmpty()
-  @IsNumber()
+  @IsNumberString()
   readonly ftId: number;
 
   @ApiProperty({

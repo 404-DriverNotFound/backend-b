@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseFilters, UseGuards } from '@nestjs/common';
 import {
   ApiCookieAuth,
   ApiOperation,
@@ -6,6 +6,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AppService } from './app.service';
+import { AuthenticatedRedirectExceptionFilter } from './auth/filters/authenticated-redirect-exception.filter';
 import { AuthenticatedGuard } from './auth/guards/authenticated.guard';
 
 @ApiTags('Default')
@@ -26,6 +27,7 @@ export class AppController {
   @ApiResponse({ status: 403, description: '세션 인증 실패' })
   @Get('session')
   @UseGuards(AuthenticatedGuard)
+  @UseFilters(AuthenticatedRedirectExceptionFilter)
   hasSession(): void {
     return;
   }
