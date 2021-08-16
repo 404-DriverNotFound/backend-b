@@ -6,6 +6,10 @@ import { RedirectException } from '../redirect.exception';
 export class AuthenticatedGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
+    console.log('req.isAuthenticated()', req.isAuthenticated());
+    if (!req.isAuthenticated()) {
+      return req.isAuthenticated();
+    }
     const user: User = req.user;
     // NOTE v1
     //if (user.enable2FA) {
