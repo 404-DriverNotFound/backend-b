@@ -2,9 +2,7 @@ import {
   Body,
   Controller,
   Get,
-  Head,
   Param,
-  ParseUUIDPipe,
   Patch,
   Post,
   UploadedFile,
@@ -57,22 +55,11 @@ export class UsersController {
   }
 
   @ApiCookieAuth()
-  @ApiOperation({ summary: 'id로 유저 정보를 가져옵니다.' })
+  @ApiOperation({ summary: '닉네임으로 유저 정보를 가져옵니다.' })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 403, description: '세션 인증 실패' })
   @ApiResponse({ status: 404, description: '유저 없음' })
-  @Get(':uuid')
-  @UseGuards(UserCreatedGuard)
-  getUserById(@Param('uuid', ParseUUIDPipe) uuid: string): Promise<User> {
-    return this.usersService.getUserById(uuid);
-  }
-
-  @ApiCookieAuth()
-  @ApiOperation({ summary: '중복 닉네임을 확인합니다.' })
-  @ApiResponse({ status: 200, description: '성공' })
-  @ApiResponse({ status: 403, description: '세션 인증 실패' })
-  @ApiResponse({ status: 404, description: '유저 없음' })
-  @Head('name/:name')
+  @Get(':name')
   getUserByName(@Param('name') name: string): Promise<User> {
     return this.usersService.getUserByName(name);
   }
