@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Head,
   Param,
   Patch,
   Post,
@@ -50,6 +51,15 @@ export class UsersController {
   @UseGuards(AuthenticatedGuard)
   getUserByRequestUser(@GetUser() user: User): User {
     return user;
+  }
+
+  @ApiCookieAuth()
+  @ApiOperation({ summary: '닉네임 중복을 체크합니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 404, description: '유저 없음' })
+  @Head(':name')
+  isDuplicated(@Param('name') name: string): Promise<User> {
+    return this.usersService.getUserByName(name);
   }
 
   @ApiCookieAuth()
