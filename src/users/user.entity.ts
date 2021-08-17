@@ -23,7 +23,7 @@ export class User {
   @Column({ type: 'enum', enum: UserStatus, default: UserStatus.OFFLINE })
   status: UserStatus;
 
-  @Transform(() => 'HIDDEN')
+  @Transform(({ value }) => (value ? 'HIDDEN' : null))
   @Column({ nullable: true })
   authenticatorSecret: string;
 
