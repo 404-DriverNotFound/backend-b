@@ -15,7 +15,14 @@ export class AuthenticatedRedirectExceptionFilter implements ExceptionFilter {
       const { location } = exception.getResponse() as {
         location: string;
       };
-      response.redirect(this.configService.get<string>('ORIGIN') + location);
+      response
+        .setHeader('Access-Control-Allow-Credentials', 'true')
+        .setHeader(
+          'Access-Control-Allow-Origin',
+          this.configService.get<string>('ORIGIN'), // NOTE 안되면 *
+          //'*',
+        )
+        .redirect(this.configService.get<string>('ORIGIN') + location);
     }
   }
 }
