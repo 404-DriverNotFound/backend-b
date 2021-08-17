@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -21,6 +22,14 @@ export class AuthService {
   ) {}
 
   generateKeyUri(user: User): string {
+    if (!user.enable2FA) {
+      throw new ForbiddenException(
+        'You must enable second factor authentication to access this request.',
+      );
+    }
+    if (user.authenticatorSecret) {
+      throw new ForbiddenException('You already have an QR code.');
+    }
     const service = this.configService.get<string>('ISSUER');
     const secret = authenticator.generateSecret();
     this.usersService.updateUserAuthenticatorSecret(user, secret);
@@ -29,6 +38,11 @@ export class AuthService {
   }
 
   async otpAuth(user: User, otpDto: OtpDto): Promise<User> {
+    if (!user.enable2FA || !user.authenticatorSecret) {
+      throw new ForbiddenException(
+        'You must get a QR code to access this request.',
+      );
+    }
     const { token } = otpDto;
     const isValid: boolean = authenticator.verify({
       token,

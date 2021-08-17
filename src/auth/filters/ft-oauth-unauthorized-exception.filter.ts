@@ -17,12 +17,6 @@ export class FtOauthUnauthorizedExceptionFilter implements ExceptionFilter {
     const status: number = exception.getStatus();
     if (status === 401) {
       response
-        .setHeader('Access-Control-Allow-Credentials', 'true')
-        .setHeader(
-          'Access-Control-Allow-Origin',
-          this.configService.get<string>('ORIGIN'), // NOTE 안되면 *
-          //'*',
-        )
         .cookie('ftId', exception.message)
         .redirect(this.configService.get<string>('ORIGIN') + '/register');
     }

@@ -1,4 +1,4 @@
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { UserStatus } from './user-status.enum';
 
@@ -23,11 +23,10 @@ export class User {
   @Column({ type: 'enum', enum: UserStatus, default: UserStatus.OFFLINE })
   status: UserStatus;
 
-  @Exclude()
+  @Transform(() => 'HIDDEN')
   @Column({ nullable: true })
   authenticatorSecret: string;
 
-  @Exclude()
   @Column({ default: false })
   isSecondFactorAuthenticated: boolean;
 }

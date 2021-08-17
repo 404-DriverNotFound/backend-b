@@ -6,7 +6,6 @@ import {
   Patch,
   Post,
   UploadedFile,
-  UseFilters,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -25,7 +24,7 @@ import { GetUser } from './get-user.decorator';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { localOptions } from './constants';
-import { AuthenticatedRedirectExceptionFilter } from 'src/auth/filters/authenticated-redirect-exception.filter';
+import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-authenticated.guard';
 
 @ApiTags('Users')
 @Controller('users')
@@ -38,7 +37,7 @@ export class UsersController {
   @ApiResponse({ status: 403, description: '세션 인증 실패' })
   @Get()
   @UseGuards(AuthenticatedGuard)
-  @UseFilters(AuthenticatedRedirectExceptionFilter)
+  @UseGuards(SecondFactorAuthenticatedGuard)
   getUsers(): Promise<User[]> {
     return this.usersService.getUsers();
   }
@@ -49,7 +48,6 @@ export class UsersController {
   @ApiResponse({ status: 403, description: '세션 인증 실패' })
   @Get('me')
   @UseGuards(AuthenticatedGuard)
-  @UseFilters(AuthenticatedRedirectExceptionFilter)
   getUserByRequestUser(@GetUser() user: User): User {
     return user;
   }
@@ -61,7 +59,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: '유저 없음' })
   @Get(':name')
   @UseGuards(AuthenticatedGuard)
-  @UseFilters(AuthenticatedRedirectExceptionFilter)
+  @UseGuards(SecondFactorAuthenticatedGuard)
   getUserByName(@Param('name') name: string): Promise<User> {
     return this.usersService.getUserByName(name);
   }
@@ -91,7 +89,7 @@ export class UsersController {
   @ApiResponse({ status: 500, description: '업데이트 실패' })
   @Patch('me')
   @UseGuards(AuthenticatedGuard)
-  @UseFilters(AuthenticatedRedirectExceptionFilter)
+  @UseGuards(SecondFactorAuthenticatedGuard)
   @UseInterceptors(FileInterceptor('avatar', localOptions))
   updateUser(
     @GetUser() user: User,
