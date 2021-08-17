@@ -17,7 +17,7 @@ export class FtOauthUnauthorizedExceptionFilter implements ExceptionFilter {
     const status: number = exception.getStatus();
     if (status === 401) {
       response
-        .cookie('ftId', exception.message)
+        .cookie('ftId', exception.message, { maxAge: 1000 * 60 * 60 })
         .redirect(this.configService.get<string>('ORIGIN') + '/register');
     }
   }
