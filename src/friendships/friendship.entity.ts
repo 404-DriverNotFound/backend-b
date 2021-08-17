@@ -14,14 +14,14 @@ export class Friendship {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @PrimaryColumn()
-  requesterName: string;
+  //@PrimaryColumn()
+  //requesterName: string;
 
   @ManyToOne(() => User)
   requester: User;
 
-  @PrimaryColumn()
-  addresseeName: string;
+  //@PrimaryColumn()
+  //addresseeName: string;
 
   @ManyToOne(() => User)
   addressee: User;
