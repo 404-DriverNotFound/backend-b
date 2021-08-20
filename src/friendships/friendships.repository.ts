@@ -1,5 +1,10 @@
+import {
+  ConflictException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { User } from 'src/users/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
+import { FriendshipStatus } from './friendship-status.enum';
 import { Friendship } from './friendship.entity';
 
 @EntityRepository(Friendship)
@@ -8,28 +13,34 @@ export class FriendshipsRepository extends Repository<Friendship> {
     requester: User,
     addressee: User,
   ): Promise<Friendship> {
-    // NOTE 둘 중 한 명이라도 차단, 수락, 대기 상태일 때 추가 x
-    // NOTE 상대가 거절했을 때는 추가 가능
+    // NOTE DECLINE을 제외한 friendship이 이미 존재한다면 추가 x
+    // TODO 상대가 거절했을 때는 추가 가능 2회이상 거절하면 추가안되게?
+    const where = [
+      { requester, addressee },
+      { requester: addressee, addressee: requester },
+    ];
+    const friendships: Friendship[] = (await this.find({ where })).filter(
+      (e) => e.status !== FriendshipStatus.DECLINE,
+    );
 
-    //const friendships: Friendship[] = this.getFriendships(requester)
+    if (friendships.length) {
+      throw new ConflictException(
+        `There is a friendship between ${requester.name} and ${addressee.name}.`,
+      );
+    }
 
     const friendship: Friendship = this.create({
       requester,
       addressee,
-      //  status: FriendshipStatus.PENDING,
     });
 
-    //const duplicated: Friendship = await this.findOne(friendship);
-    //if (duplicated) {
-    //  throw new ConflictException(`${addressee.name} has not yet accepted!`);
-    //}
-    //try {
-    await this.save(friendship);
-    //} catch (error) {
-    //  throw new InternalServerErrorException(
-    //    'Someting wrong while saving friendship data in createFriendship',
-    //  );
-    //}
+    try {
+      await this.save(friendship);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Someting wrong while saving a friendship data in createFriendship.',
+      );
+    }
     return friendship;
   }
 }

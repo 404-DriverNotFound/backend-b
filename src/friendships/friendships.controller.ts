@@ -1,18 +1,25 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { ApiCookieAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiCookieAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-authenticated.guard';
 import { GetUser } from 'src/users/get-user.decorator';
 import { User } from 'src/users/user.entity';
 import { CreateFriendshipDto } from './dto/create-friendship.dto';
+
 import { Friendship } from './friendship.entity';
 import { FriendshipsService } from './friendships.service';
 
+@ApiTags('Friendships')
+@ApiCookieAuth()
 @Controller('friendships')
 export class FriendshipsController {
   constructor(private readonly friendshipsService: FriendshipsService) {}
 
-  @ApiCookieAuth()
   @ApiOperation({ summary: '친구관계를 추가합니다.' })
   @ApiResponse({ status: 201, description: '성공' })
   @ApiResponse({ status: 400, description: '자기 자신을 추가했을 때' })

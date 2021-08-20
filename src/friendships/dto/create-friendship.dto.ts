@@ -9,5 +9,5 @@ export class CreateFriendshipDto {
   })
   @IsNotEmpty()
   @IsString()
-  readonly addresseeName: string;
+  readonly addresseeName!: string;
 }

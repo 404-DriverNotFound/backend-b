@@ -25,8 +25,9 @@ export class FriendshipsService {
   ): Promise<Friendship> {
     const { addresseeName } = createFriendshipDto;
     if (requester.name === addresseeName) {
-      throw new BadRequestException('Cannot add yourself.');
+      throw new BadRequestException("You can't add yourself.");
     }
+
     const addressee: User = await this.usersRepository.findOne({
       name: addresseeName,
     });
@@ -35,6 +36,7 @@ export class FriendshipsService {
         `Addressee with name: ${addresseeName} not found.`,
       );
     }
+
     return this.friendshipsRepository.createFriendship(requester, addressee);
   }
 }
