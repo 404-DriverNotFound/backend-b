@@ -26,7 +26,7 @@ export class FriendshipsRepository extends Repository<Friendship> {
     );
   }
 
-  async getFriendshipsByUsers(user1: User, user2: User): Promise<Friendship[]> {
+  async getFriendshipsByUsers(user1: User, user2: User): Promise<Friendship> {
     const where = [
       { requester: user1, addressee: user2 },
       { requester: user2, addressee: user1 },
@@ -34,30 +34,37 @@ export class FriendshipsRepository extends Repository<Friendship> {
     const friendships: Friendship[] = (await this.find({ where })).filter(
       (e) => e.status !== FriendshipStatus.DECLINE,
     );
-    return friendships;
+    return friendships[0];
   }
 
   async createFriendship(
     requester: User,
     addressee: User,
+    status: FriendshipStatus,
   ): Promise<Friendship> {
     // NOTE DECLINE을 제외한 friendship이 이미 존재한다면 추가 x
     // TODO 상대가 거절했을 때는 추가 가능 2회이상 거절하면 추가안되게?
-    const friendships: Friendship[] = await this.getFriendshipsByUsers(
+    let friendship: Friendship = await this.getFriendshipsByUsers(
       requester,
       addressee,
     );
-
-    if (friendships.length) {
-      throw new ConflictException(
-        `There is a friendship between ${requester.name} and ${addressee.name}.`,
-      );
+    if (friendship) {
+      if (
+        friendship.status === FriendshipStatus.BLOCK ||
+        status !== FriendshipStatus.BLOCK
+      ) {
+        throw new ConflictException(
+          `There is a friendship between ${requester.name} and ${addressee.name}.`,
+        );
+      }
+      friendship.status = status;
+    } else {
+      friendship = this.create({
+        requester,
+        addressee,
+        status,
+      });
     }
-
-    const friendship: Friendship = this.create({
-      requester,
-      addressee,
-    });
 
     try {
       await this.save(friendship);

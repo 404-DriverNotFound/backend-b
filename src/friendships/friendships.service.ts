@@ -33,7 +33,7 @@ export class FriendshipsService {
     requester: User,
     createFriendshipDto: CreateFriendshipDto,
   ): Promise<Friendship> {
-    const { addresseeName } = createFriendshipDto;
+    const { addresseeName, status } = createFriendshipDto;
     if (requester.name === addresseeName) {
       throw new BadRequestException("You can't add yourself.");
     }
@@ -47,7 +47,11 @@ export class FriendshipsService {
       );
     }
 
-    return this.friendshipsRepository.createFriendship(requester, addressee);
+    return this.friendshipsRepository.createFriendship(
+      requester,
+      addressee,
+      status,
+    );
   }
 
   async updateFriendshipStatus(

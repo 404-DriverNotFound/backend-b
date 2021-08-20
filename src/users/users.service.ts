@@ -38,9 +38,9 @@ export class UsersService {
     if (!found) {
       throw new NotFoundException(`User with ${name} not found`);
     }
-    const friendships: Friendship[] =
+    const friendship: Friendship =
       await this.friendshipsRepository.getFriendshipsByUsers(user, found);
-    found.friendship = friendships[0];
+    found.friendship = friendship;
     return found;
   }
 
