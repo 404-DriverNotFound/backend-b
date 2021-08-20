@@ -1,5 +1,5 @@
 import {
-  BadRequestException,
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -35,7 +35,7 @@ export class FriendshipsService {
   ): Promise<Friendship> {
     const { addresseeName, status } = createFriendshipDto;
     if (requester.name === addresseeName) {
-      throw new BadRequestException("You can't add yourself.");
+      throw new ConflictException("You can't add yourself.");
     }
 
     const addressee: User = await this.usersRepository.findOne({
@@ -68,11 +68,15 @@ export class FriendshipsService {
       friendship.addressee.id !== user.id &&
       friendship.requester.id !== user.id
     ) {
-      throw new BadRequestException(
+      throw new ConflictException(
         "You can't update a friendship status not yours.",
       );
     }
-
+    if (friendship.status === FriendshipStatus.DECLINE) {
+      throw new ConflictException(
+        ` ${friendship.status} satus can not be updated.`,
+      );
+    }
     friendship.status = status;
     try {
       await this.friendshipsRepository.save(friendship);
