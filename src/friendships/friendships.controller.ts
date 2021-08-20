@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -72,5 +73,17 @@ export class FriendshipsController {
   ): Promise<Friendship> {
     const { status } = updateFriendshipStatusDto;
     return this.friendshipsService.updateFriendshipStatus(user, id, status);
+  }
+
+  @ApiOperation({ summary: '친구 관계를 삭제합니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 404, description: '삭제 실패' })
+  @ApiResponse({ status: 500, description: '서버 에러' })
+  @Delete(':uuid')
+  deleteFriendshipById(
+    @GetUser() user: User,
+    @Param('uuid', ParseUUIDPipe) id: string,
+  ): Promise<void> {
+    return this.friendshipsService.deleteFriendshipById(user, id);
   }
 }

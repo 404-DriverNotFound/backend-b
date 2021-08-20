@@ -79,4 +79,8 @@ export class FriendshipsService {
     }
     return friendship;
   }
+
+  deleteFriendshipById(user: User, id: string): Promise<void> {
+    return this.friendshipsRepository.deleteFriendshipById(user, id);
+  }
 }
