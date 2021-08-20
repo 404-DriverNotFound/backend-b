@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiCookieAuth,
   ApiOperation,
@@ -11,6 +21,7 @@ import { GetUser } from 'src/users/get-user.decorator';
 import { User } from 'src/users/user.entity';
 import { CreateFriendshipDto } from './dto/create-friendship.dto';
 import { GetFriendshipsFilterDto } from './dto/get-friendships-filter.dto';
+import { UpdateFriendshipStatusDto } from './dto/update-friendship-status.dto';
 import { Friendship } from './friendship.entity';
 import { FriendshipsService } from './friendships.service';
 
@@ -48,5 +59,19 @@ export class FriendshipsController {
       requester,
       createFriendshipDto,
     );
+  }
+
+  @ApiCookieAuth()
+  @ApiOperation({ summary: '친구 관계를 수정합니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 500, description: '서버 에러' })
+  @Patch(':uuid/status')
+  updateFriendshipStatus(
+    @GetUser() user: User,
+    @Param('uuid', ParseUUIDPipe) id: string,
+    @Body() updateFriendshipStatusDto: UpdateFriendshipStatusDto,
+  ): Promise<Friendship> {
+    const { status } = updateFriendshipStatusDto;
+    return this.friendshipsService.updateFriendshipStatus(user, id, status);
   }
 }

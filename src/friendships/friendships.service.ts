@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +9,7 @@ import { User } from 'src/users/user.entity';
 import { UsersRepository } from 'src/users/users.repository';
 import { CreateFriendshipDto } from './dto/create-friendship.dto';
 import { GetFriendshipsFilterDto } from './dto/get-friendships-filter.dto';
+import { FriendshipStatus } from './friendship-status.enum';
 import { Friendship } from './friendship.entity';
 import { FriendshipsRepository } from './friendships.repository';
 
@@ -46,5 +48,24 @@ export class FriendshipsService {
     }
 
     return this.friendshipsRepository.createFriendship(requester, addressee);
+  }
+
+  async updateFriendshipStatus(
+    user: User,
+    id: string,
+    status: FriendshipStatus,
+  ): Promise<Friendship> {
+    const friendship: Friendship = await this.friendshipsRepository.findOne(id);
+    if (friendship) {
+      friendship.status = status;
+    }
+    try {
+      await this.friendshipsRepository.save(friendship);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Someting wrong while updating a friendship data in updateFriendshipStatus.',
+      );
+    }
+    return friendship;
   }
 }
