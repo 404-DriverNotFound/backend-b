@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiCookieAuth,
   ApiOperation,
@@ -10,7 +10,7 @@ import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-au
 import { GetUser } from 'src/users/get-user.decorator';
 import { User } from 'src/users/user.entity';
 import { CreateFriendshipDto } from './dto/create-friendship.dto';
-
+import { GetFriendshipsFilterDto } from './dto/get-friendships-filter.dto';
 import { Friendship } from './friendship.entity';
 import { FriendshipsService } from './friendships.service';
 
@@ -19,6 +19,17 @@ import { FriendshipsService } from './friendships.service';
 @Controller('friendships')
 export class FriendshipsController {
   constructor(private readonly friendshipsService: FriendshipsService) {}
+
+  @ApiOperation({ summary: '나의 친구관계를 가져옵니다(DECLINE 제외).' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 500, description: '서버 에러' })
+  @Get()
+  getFriendships(
+    @GetUser() user: User,
+    @Query() filterDto: GetFriendshipsFilterDto,
+  ): Promise<Friendship[]> {
+    return this.friendshipsService.getFriendships(user, filterDto);
+  }
 
   @ApiOperation({ summary: '친구관계를 추가합니다.' })
   @ApiResponse({ status: 201, description: '성공' })

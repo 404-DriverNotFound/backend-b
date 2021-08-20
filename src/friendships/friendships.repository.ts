@@ -4,11 +4,27 @@ import {
 } from '@nestjs/common';
 import { User } from 'src/users/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
+import { GetFriendshipsFilterDto } from './dto/get-friendships-filter.dto';
 import { FriendshipStatus } from './friendship-status.enum';
 import { Friendship } from './friendship.entity';
 
 @EntityRepository(Friendship)
 export class FriendshipsRepository extends Repository<Friendship> {
+  async getFriendships(
+    user: User,
+    filterDto: GetFriendshipsFilterDto,
+  ): Promise<Friendship[]> {
+    const { status } = filterDto;
+    let where = [{ requester: user }, { addressee: user }];
+    if (status) {
+      where = where.map((e) => ({ ...e, status }));
+    }
+
+    return (await this.find({ where })).filter(
+      (e) => e.status !== FriendshipStatus.DECLINE,
+    );
+  }
+
   async createFriendship(
     requester: User,
     addressee: User,

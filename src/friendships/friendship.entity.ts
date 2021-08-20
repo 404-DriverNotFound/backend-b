@@ -3,7 +3,6 @@ import {
   Column,
   Entity,
   ManyToOne,
-  PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -17,13 +16,13 @@ export class Friendship {
   //@PrimaryColumn()
   //requesterName: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { eager: true })
   requester: User;
 
   //@PrimaryColumn()
   //addresseeName: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { eager: true })
   addressee: User;
 
   @Column({

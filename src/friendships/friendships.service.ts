@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { UsersRepository } from 'src/users/users.repository';
 import { CreateFriendshipDto } from './dto/create-friendship.dto';
+import { GetFriendshipsFilterDto } from './dto/get-friendships-filter.dto';
 import { Friendship } from './friendship.entity';
 import { FriendshipsRepository } from './friendships.repository';
 
@@ -18,6 +19,13 @@ export class FriendshipsService {
     @InjectRepository(UsersRepository)
     private readonly usersRepository: UsersRepository,
   ) {}
+
+  getFriendships(
+    user: User,
+    filterDto: GetFriendshipsFilterDto,
+  ): Promise<Friendship[]> {
+    return this.friendshipsRepository.getFriendships(user, filterDto);
+  }
 
   async createFriendship(
     requester: User,
