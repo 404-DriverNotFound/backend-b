@@ -56,9 +56,20 @@ export class FriendshipsService {
     status: FriendshipStatus,
   ): Promise<Friendship> {
     const friendship: Friendship = await this.friendshipsRepository.findOne(id);
-    if (friendship) {
-      friendship.status = status;
+    if (!friendship) {
+      throw new NotFoundException(`Friendship with id: ${id} not found.`);
     }
+
+    if (
+      friendship.addressee.id !== user.id &&
+      friendship.requester.id !== user.id
+    ) {
+      throw new BadRequestException(
+        "You can't update a friendship status not yours.",
+      );
+    }
+
+    friendship.status = status;
     try {
       await this.friendshipsRepository.save(friendship);
     } catch (error) {

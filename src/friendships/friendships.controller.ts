@@ -61,7 +61,6 @@ export class FriendshipsController {
     );
   }
 
-  @ApiCookieAuth()
   @ApiOperation({ summary: '친구 관계를 수정합니다.' })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 500, description: '서버 에러' })
