@@ -26,18 +26,26 @@ export class FriendshipsRepository extends Repository<Friendship> {
     );
   }
 
+  async getFriendshipsByUsers(user1: User, user2: User): Promise<Friendship[]> {
+    const where = [
+      { requester: user1, addressee: user2 },
+      { requester: user2, addressee: user1 },
+    ];
+    const friendships: Friendship[] = (await this.find({ where })).filter(
+      (e) => e.status !== FriendshipStatus.DECLINE,
+    );
+    return friendships;
+  }
+
   async createFriendship(
     requester: User,
     addressee: User,
   ): Promise<Friendship> {
     // NOTE DECLINE을 제외한 friendship이 이미 존재한다면 추가 x
     // TODO 상대가 거절했을 때는 추가 가능 2회이상 거절하면 추가안되게?
-    const where = [
-      { requester, addressee },
-      { requester: addressee, addressee: requester },
-    ];
-    const friendships: Friendship[] = (await this.find({ where })).filter(
-      (e) => e.status !== FriendshipStatus.DECLINE,
+    const friendships: Friendship[] = await this.getFriendshipsByUsers(
+      requester,
+      addressee,
     );
 
     if (friendships.length) {
