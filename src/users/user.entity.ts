@@ -1,4 +1,5 @@
 import { Exclude, Transform } from 'class-transformer';
+import { Friendship } from 'src/friendships/friendship.entity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { UserStatus } from './user-status.enum';
 
@@ -29,4 +30,6 @@ export class User {
 
   @Column({ default: false })
   isSecondFactorAuthenticated: boolean;
+
+  friendship?: Friendship;
 }
