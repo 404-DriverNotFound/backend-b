@@ -19,11 +19,10 @@ export class UsersRepository extends Repository<User> {
   }
 
   async createUser(
-    ftId: number,
     createUserDto: CreateUserDto,
     file: Express.Multer.File,
   ): Promise<User> {
-    const { name, enable2FA } = createUserDto;
+    const { ftId, name, enable2FA } = createUserDto;
     const user: User = this.create({
       ftId,
       name,
@@ -48,19 +47,17 @@ export class UsersRepository extends Repository<User> {
     updateUserDto: UpdateUserDto,
     file: Express.Multer.File,
   ): Promise<User> {
-    const { name, enable2FA, status } = updateUserDto;
+    const { name, enable2FA } = updateUserDto;
     if (name) {
       user.name = name;
     }
     if (file) {
       user.avatar = file.path;
     }
-    if (enable2FA === 'true') {
+    if (enable2FA) {
       user.enable2FA = enable2FA === 'true';
       user.isSecondFactorAuthenticated = true; // REVIEW 업데이트하고 바로 인증으로 넘어가지 않고, 재로그인시 검사
-    }
-    if (status) {
-      user.status = status;
+      user.authenticatorSecret = null;
     }
     try {
       await this.save(user);
