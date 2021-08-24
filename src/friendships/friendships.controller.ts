@@ -148,6 +148,9 @@ export class FriendshipsController {
   @ApiOperation({
     summary: '특정 유저를 차단합니다.',
   })
+  @ApiResponse({ status: 201, description: '차단 성공' })
+  @ApiResponse({ status: 400, description: '요청이 잘못됐을 때' })
+  @ApiResponse({ status: 404, description: '없는 유저를 차단했을 때' })
   @Post('blacks')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
@@ -161,13 +164,20 @@ export class FriendshipsController {
   @ApiOperation({
     summary: '특정 유저의 차단을 해제합니다.',
   })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '요청이 잘못됐을 때' })
+  @ApiResponse({
+    status: 404,
+    description: '없는 유저나 관계를 차단 해제했을 때',
+  })
+  @ApiResponse({ status: 409, description: '자기 자신을 차단 해제했을 때' })
   @Delete('blacks/:name')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
   deleteBlack(
-    @GetUser() user: User,
-    @Param('name') opponentName: string,
-  ): Promise<Friendship> {
-    return this.friendshipsService.deleteBlack(user, opponentName);
+    @GetUser() requester: User,
+    @Param('name') addresseeName: string,
+  ): Promise<void> {
+    return this.friendshipsService.deleteBlack(requester, addresseeName);
   }
 }

@@ -52,10 +52,12 @@ export class FriendshipsService {
     const result = await this.friendshipsRepository.delete({
       requester,
       addressee,
+      status: FriendshipStatus.REQUESTED,
     });
+
     if (result.affected === 0) {
       throw new NotFoundException(
-        `Friendship with ${addresseeName} not found.`,
+        `Friendship with ${addresseeName} which status is ${FriendshipStatus.REQUESTED} not found.`,
       );
     }
   }
@@ -182,7 +184,25 @@ export class FriendshipsService {
     return this.friendshipsRepository.createBlack(requester, addressee);
   }
 
-  deleteBlack(user: User, opponentName: string) {
-    return undefined;
+  async deleteBlack(requester: User, addresseeName: string): Promise<void> {
+    if (addresseeName === requester.name) {
+      throw new ConflictException('Cannot unblock yourself');
+    }
+
+    const addressee: User = await this.usersService.getUserByName(
+      addresseeName,
+    );
+
+    const result = await this.friendshipsRepository.delete({
+      requester,
+      addressee,
+      status: FriendshipStatus.BLOCKED,
+    });
+
+    if (result.affected === 0) {
+      throw new NotFoundException(
+        `Friendship with ${addresseeName} which status is ${FriendshipStatus.BLOCKED} not found.`,
+      );
+    }
   }
 }
