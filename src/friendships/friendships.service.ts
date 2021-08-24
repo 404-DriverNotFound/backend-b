@@ -154,8 +154,19 @@ export class FriendshipsService {
     }
   }
 
-  getBlacks(user: User) {
-    return undefined;
+  async getBlacks(requester: User): Promise<User[]> {
+    const friendships: Friendship[] = await this.friendshipsRepository.find({
+      requester,
+      status: FriendshipStatus.BLOCKED,
+    });
+
+    const users: User[] = [];
+
+    for (const friendship of friendships) {
+      users.push(friendship.addressee);
+    }
+
+    return users;
   }
 
   createBlack(requester: User, createFriendshipDto: CreateFriendshipDto) {

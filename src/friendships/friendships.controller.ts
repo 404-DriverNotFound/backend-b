@@ -83,11 +83,11 @@ export class FriendshipsController {
     description: '친구 요청 수락 and 친구 요청 거절',
   })
   @ApiResponse({ status: 200, description: '성공' })
-  @ApiResponse({ status: 400, description: '자기 자신을 추가했을 때' })
   @ApiResponse({
     status: 404,
     description: '없는 유저를 추가했을 때, 요청받은 친구관계가 없을 때',
   })
+  @ApiResponse({ status: 409, description: '자기 자신을 추가했을 때' })
   @ApiResponse({ status: 500, description: '서버 에러' })
   @Patch('friendships/:name/status')
   @UseGuards(AuthenticatedGuard)
@@ -118,11 +118,12 @@ export class FriendshipsController {
   @ApiOperation({
     summary: '특정 친구를 삭제합니다.',
   })
-  //@ApiResponse({ status: 201, description: '성공' })
-  //@ApiResponse({ status: 400, description: '자기 자신을 추가했을 때' })
-  //@ApiResponse({ status: 404, description: '없는 유저를 추가했을 때' })
-  //@ApiResponse({ status: 409, description: '이미 추가된 요청일 때' })
-  //@ApiResponse({ status: 500, description: '서버 에러' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({
+    status: 404,
+    description: '없는 유저를 추가했을 때, 친구 관계가 없을 때',
+  })
+  @ApiResponse({ status: 409, description: '자기 자신을 추가했을 때' })
   @Delete('friends/:name')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
@@ -134,18 +135,14 @@ export class FriendshipsController {
   }
 
   @ApiOperation({
-    summary: '차단된 친구 목록을 가져옵니다.',
+    summary: '차단한 유저목록을 가져옵니다.',
   })
-  //@ApiResponse({ status: 201, description: '성공' })
-  //@ApiResponse({ status: 400, description: '자기 자신을 추가했을 때' })
-  //@ApiResponse({ status: 404, description: '없는 유저를 추가했을 때' })
-  //@ApiResponse({ status: 409, description: '이미 추가된 요청일 때' })
-  //@ApiResponse({ status: 500, description: '서버 에러' })
+  @ApiResponse({ status: 200, description: '성공' })
   @Get('blacks')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  getBlacks(@GetUser() user: User): Promise<Friendship> {
-    return this.friendshipsService.getBlacks(user);
+  getBlacks(@GetUser() requester: User): Promise<User[]> {
+    return this.friendshipsService.getBlacks(requester);
   }
 
   @ApiOperation({
