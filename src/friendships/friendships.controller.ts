@@ -33,6 +33,7 @@ export class FriendshipsController {
 
   @ApiOperation({ summary: '대기중인 친구 요청 목록을 가져옵니다.' })
   @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '잘못된 요청' })
   @Get('friendships')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
@@ -45,8 +46,8 @@ export class FriendshipsController {
 
   @ApiOperation({ summary: '친구 관계(친구)를 요청(추가)합니다.' })
   @ApiResponse({ status: 201, description: '성공' })
-  @ApiResponse({ status: 400, description: '자기 자신을 요청했을 때' })
   @ApiResponse({ status: 404, description: '없는 유저를 요청했을 때' })
+  @ApiResponse({ status: 409, description: '자기 자신을 요청했을 때' })
   //@ApiResponse({ status: 409, description: '이미 추가된 요청일 때' })
   @ApiResponse({ status: 500, description: '서버 에러' })
   @Post('friendships')
@@ -54,12 +55,9 @@ export class FriendshipsController {
   @UseGuards(SecondFactorAuthenticatedGuard)
   createFriendship(
     @GetUser() requester: User,
-    @Body() createFriendshipDto: CreateFriendshipDto,
+    @Body() { addresseeName }: CreateFriendshipDto,
   ): Promise<Friendship> {
-    return this.friendshipsService.createFriendship(
-      requester,
-      createFriendshipDto,
-    );
+    return this.friendshipsService.createFriendship(requester, addresseeName);
   }
 
   @ApiOperation({ summary: '친구 요청을 취소(삭제)합니다.' })
