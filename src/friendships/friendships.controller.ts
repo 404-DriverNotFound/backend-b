@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
   Post,
   Query,
@@ -31,14 +32,15 @@ export class FriendshipsController {
   constructor(private readonly friendshipsService: FriendshipsService) {}
 
   @ApiOperation({ summary: '대기중인 친구 요청 목록을 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
   @Get('friendships')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
   getFriendships(
-    @GetUser() requester: User,
+    @GetUser() user: User,
     @Query() filterDto: GetFriendshipsFilterDto,
   ): Promise<Friendship> {
-    return undefined;
+    return this.friendshipsService.getFriendships(user, filterDto);
   }
 
   @ApiOperation({ summary: '친구 관계(친구)를 요청(추가)합니다.' })
@@ -54,7 +56,10 @@ export class FriendshipsController {
     @GetUser() requester: User,
     @Body() createFriendshipDto: CreateFriendshipDto,
   ): Promise<Friendship> {
-    return undefined;
+    return this.friendshipsService.createFriendship(
+      requester,
+      createFriendshipDto,
+    );
   }
 
   @ApiOperation({ summary: '친구 요청을 취소(삭제)합니다.' })
@@ -66,8 +71,11 @@ export class FriendshipsController {
   @Delete('friendships/:name')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  deleteFriendship(@GetUser() requester: User): Promise<Friendship> {
-    return undefined;
+  deleteFriendship(
+    @GetUser() user: User,
+    @Param('name') opponentName: string,
+  ): Promise<Friendship> {
+    return this.friendshipsService.deleteFriendship(user, opponentName);
   }
 
   @ApiOperation({
@@ -83,10 +91,15 @@ export class FriendshipsController {
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
   updateFriendshipStatus(
-    @GetUser() requester: User,
+    @GetUser() user: User,
+    @Param('name') opponentName: string,
     @Body() updateFriendshipStatusDto: UpdateFriendshipStatusDto,
   ): Promise<Friendship> {
-    return undefined;
+    return this.friendshipsService.updateFriendshipStatus(
+      user,
+      opponentName,
+      updateFriendshipStatusDto,
+    );
   }
 
   @ApiOperation({
@@ -95,8 +108,8 @@ export class FriendshipsController {
   @Get('friends')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  getFriends(@GetUser() requester: User): Promise<Friendship> {
-    return undefined;
+  getFriends(@GetUser() user: User): Promise<Friendship> {
+    return this.friendshipsService.getFriends(user);
   }
 
   @ApiOperation({
@@ -110,8 +123,11 @@ export class FriendshipsController {
   @Delete('friends/:name')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  deleteFriend(@GetUser() requester: User): Promise<Friendship> {
-    return undefined;
+  deleteFriend(
+    @GetUser() user: User,
+    @Param('name') opponentName: string,
+  ): Promise<Friendship> {
+    return this.friendshipsService.deleteFriend(user, opponentName);
   }
 
   @ApiOperation({
@@ -125,8 +141,8 @@ export class FriendshipsController {
   @Get('blacks')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  getBlacks(@GetUser() requester: User): Promise<Friendship> {
-    return undefined;
+  getBlacks(@GetUser() user: User): Promise<Friendship> {
+    return this.friendshipsService.getBlacks(user);
   }
 
   @ApiOperation({
@@ -139,7 +155,7 @@ export class FriendshipsController {
     @GetUser() requester: User,
     @Body() createFriendshipDto: CreateFriendshipDto,
   ): Promise<Friendship> {
-    return undefined;
+    return this.friendshipsService.createBlack(requester, createFriendshipDto);
   }
 
   @ApiOperation({
@@ -148,7 +164,10 @@ export class FriendshipsController {
   @Delete('blacks/:name')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  deleteBlack(@GetUser() requester: User): Promise<Friendship> {
-    return undefined;
+  deleteBlack(
+    @GetUser() user: User,
+    @Param('name') opponentName: string,
+  ): Promise<Friendship> {
+    return this.friendshipsService.deleteBlack(user, opponentName);
   }
 }

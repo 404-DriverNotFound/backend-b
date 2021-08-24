@@ -1,9 +1,10 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { CreateFriendshipDto } from './dto/create-friendship.dto';
-import { Friendship } from './friendship.entity';
+import { GetFriendshipsFilterDto } from './dto/get-friendships-filter.dto';
+import { UpdateFriendshipStatusDto } from './dto/update-friendship-status.dto';
 import { FriendshipsRepository } from './friendships.repository';
 
 @Injectable()
@@ -14,22 +15,43 @@ export class FriendshipsService {
     private readonly usersService: UsersService,
   ) {}
 
-  //async createFriendship(
-  //  requester: User,
-  //  { addresseeName, status }: CreateFriendshipDto,
-  //): Promise<Friendship> {
-  //  if (requester.name === addresseeName) {
-  //    throw new ConflictException("You can't add yourself.");
-  //  }
+  getFriendships(user: User, filterDto: GetFriendshipsFilterDto) {
+    return undefined;
+  }
 
-  //  const addressee: User = await this.usersService.getUserByName(
-  //    addresseeName,
-  //  );
+  createFriendship(requester: User, createFriendshipDto: CreateFriendshipDto) {
+    return undefined;
+  }
 
-  //  return this.friendshipsRepository.createFriendship(
-  //    requester,
-  //    addressee,
-  //    status,
-  //  );
-  //}
+  deleteFriendship(user: User, opponentName: string) {
+    return undefined;
+  }
+
+  updateFriendshipStatus(
+    user: User,
+    opponentName: string,
+    updateFriendshipStatusDto: UpdateFriendshipStatusDto,
+  ) {
+    return undefined;
+  }
+
+  getFriends(user: User) {
+    return undefined;
+  }
+
+  deleteFriend(user: User, opponentName: string) {
+    return undefined;
+  }
+
+  getBlacks(user: User) {
+    return undefined;
+  }
+
+  createBlack(requester: User, createFriendshipDto: CreateFriendshipDto) {
+    return undefined;
+  }
+
+  deleteBlack(user: User, opponentName: string) {
+    return undefined;
+  }
 }
