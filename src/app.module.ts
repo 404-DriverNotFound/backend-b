@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
 //import { FriendshipsModule } from './friendships/friendships.module';
+import { FriendsModule } from './friends/friends.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { FilesModule } from './files/files.module';
     AuthModule,
     UsersModule,
     FilesModule,
+    FriendsModule,
     //FriendshipsModule,
   ],
   controllers: [AppController],
