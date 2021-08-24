@@ -63,6 +63,21 @@ export class FriendshipsController {
     return this.friendshipsService.createFriendship(requester, addresseeName);
   }
 
+  @ApiOperation({ summary: '특정 유저와의 관계를 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '요청이 잘못됐을 때' })
+  @ApiResponse({ status: 404, description: '관계를 알 수 없을 때' })
+  @ApiResponse({ status: 409, description: '자기 자신과의 관계를 삭제했을 때' })
+  @Get('friendships/:name')
+  @UseGuards(AuthenticatedGuard)
+  @UseGuards(SecondFactorAuthenticatedGuard)
+  getFriendshipByName(
+    @GetUser() user: User,
+    @Param('name') opponentName: string,
+  ): Promise<Friendship> {
+    return this.friendshipsService.getFriendshipByName(user, opponentName);
+  }
+
   @ApiOperation({ summary: '친구 요청을 취소(삭제)합니다.' })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 400, description: '요청이 잘못됐을 때' })

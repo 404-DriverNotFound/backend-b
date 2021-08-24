@@ -37,6 +37,35 @@ export class FriendshipsService {
     return this.friendshipsRepository.createFriendship(requester, addressee);
   }
 
+  async getFriendshipByName(
+    user: User,
+    opponentName: string,
+  ): Promise<Friendship> {
+    if (opponentName === user.name) {
+      throw new ConflictException('Cannot get yours.');
+    }
+
+    const opponent: User = await this.usersService.getUserByName(opponentName);
+
+    const friendships: Friendship[] = (
+      await this.friendshipsRepository.getFriendshipsBetweenUsers(
+        user,
+        opponent,
+      )
+    ).filter(
+      (e: Friendship) =>
+        e.status !== FriendshipStatus.BLOCKED || e.requester.id === user.id,
+    );
+
+    if (!friendships.length) {
+      throw new NotFoundException(
+        `Friendhip between ${user.name} and ${opponentName} not found.`,
+      );
+    }
+
+    return friendships[0];
+  }
+
   async deleteFriendship(
     requester: User,
     addresseeName: string,
