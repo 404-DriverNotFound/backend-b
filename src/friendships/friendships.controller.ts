@@ -110,7 +110,7 @@ export class FriendshipsController {
   @Get('friends')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  getFriends(@GetUser() user: User): Promise<Friendship> {
+  getFriends(@GetUser() user: User): Promise<User[]> {
     return this.friendshipsService.getFriends(user);
   }
 

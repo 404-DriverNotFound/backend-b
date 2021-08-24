@@ -100,8 +100,25 @@ export class FriendshipsService {
     return friendship;
   }
 
-  getFriends(user: User) {
-    return undefined;
+  async getFriends(user: User): Promise<User[]> {
+    const where = [
+      { requester: user, status: FriendshipStatus.ACCEPTED },
+      { addressee: user, status: FriendshipStatus.ACCEPTED },
+    ];
+    const friendships: Friendship[] = await this.friendshipsRepository.find({
+      where,
+    });
+    const users: User[] = [];
+    for (const friendship of friendships) {
+      if (friendship.requester.id === user.id) {
+        users.push(friendship.addressee);
+      }
+      if (friendship.addressee.id === user.id) {
+        users.push(friendship.requester);
+      }
+    }
+    // REVIEW 서로 수락한 경우, 중복이 발생할 수 있다. 서로 수락한 경우가 안생기게 확인하기
+    return users;
   }
 
   deleteFriend(user: User, opponentName: string) {

@@ -30,8 +30,7 @@ export class FriendshipsRepository extends Repository<Friendship> {
       requester,
       addressee,
     );
-
-    if (friendships) {
+    if (friendships.length) {
       throw new ConflictException(
         `There is a friendship with ${addressee.name}.`,
       );

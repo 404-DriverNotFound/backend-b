@@ -16,10 +16,10 @@ export class Friendship {
   @PrimaryColumn()
   addresseeId: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { eager: true })
   requester: User;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { eager: true })
   addressee: User;
 
   @Column({
