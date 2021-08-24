@@ -8,8 +8,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { CreateFriendshipDto } from './dto/create-friendship.dto';
-import { GetFriendshipsFilterDto } from './dto/get-friendships-filter.dto';
-import { UpdateFriendshipStatusDto } from './dto/update-friendship-status.dto';
 import { FriendshipStatus } from './friendship-status.enum';
 import { Friendship } from './friendship.entity';
 import { FriendshipsRepository } from './friendships.repository';
@@ -117,12 +115,43 @@ export class FriendshipsService {
         users.push(friendship.requester);
       }
     }
-    // REVIEW 서로 수락한 경우, 중복이 발생할 수 있다. 서로 수락한 경우가 안생기게 확인하기
+    // REVIEW 서로 수락한 경우, 친구 중복이 발생할 수 있다. 서로 수락한 경우가 안생기게 확인하기
     return users;
   }
 
-  deleteFriend(user: User, opponentName: string) {
-    return undefined;
+  async deleteFriend(user: User, opponentName: string): Promise<void> {
+    if (opponentName === user.name) {
+      throw new ConflictException('Cannot delete yourself');
+    }
+
+    const opponent: User = await this.usersService.getUserByName(opponentName);
+
+    const friendships: Friendship[] = (
+      await this.friendshipsRepository.getFriendshipsBetweenUsers(
+        user,
+        opponent,
+      )
+    ).filter((e: Friendship) => e.status === FriendshipStatus.ACCEPTED);
+
+    if (!friendships.length) {
+      throw new NotFoundException(
+        `Friendhip between ${user.name} and ${opponentName} not found.`,
+      );
+    }
+
+    // REVIEW 둘 사이의 친구 관계가 2개 이상이면 모두 삭제된다.
+    for (const friendship of friendships) {
+      const result = await this.friendshipsRepository.delete({
+        requester: friendship.requester,
+        addressee: friendship.addressee,
+      });
+
+      if (!result.affected) {
+        throw new NotFoundException(
+          `Friendhip between ${user.name} and ${opponentName} not found.`,
+        );
+      }
+    }
   }
 
   getBlacks(user: User) {

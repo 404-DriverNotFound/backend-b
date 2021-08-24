@@ -107,6 +107,7 @@ export class FriendshipsController {
   @ApiOperation({
     summary: '친구 목록을 가져옵니다.',
   })
+  @ApiResponse({ status: 200, description: '성공' })
   @Get('friends')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
@@ -128,7 +129,7 @@ export class FriendshipsController {
   deleteFriend(
     @GetUser() user: User,
     @Param('name') opponentName: string,
-  ): Promise<Friendship> {
+  ): Promise<void> {
     return this.friendshipsService.deleteFriend(user, opponentName);
   }
 

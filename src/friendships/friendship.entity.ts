@@ -10,16 +10,16 @@ import { FriendshipStatus } from './friendship-status.enum';
 
 @Entity('user_friendship_user')
 export class Friendship {
-  @PrimaryColumn()
-  requesterId: string;
+  //@PrimaryColumn()
+  //requesterId: string;
 
-  @PrimaryColumn()
-  addresseeId: string;
+  //@PrimaryColumn()
+  //addresseeId: string;
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => User, { eager: true, primary: true })
   requester: User;
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => User, { eager: true, primary: true })
   addressee: User;
 
   @Column({
