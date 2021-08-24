@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
@@ -35,8 +39,27 @@ export class FriendshipsService {
     return this.friendshipsRepository.createFriendship(requester, addressee);
   }
 
-  deleteFriendship(user: User, opponentName: string) {
-    return undefined;
+  async deleteFriendship(
+    requester: User,
+    addresseeName: string,
+  ): Promise<void> {
+    if (addresseeName === requester.name) {
+      throw new ConflictException('Cannot add yourself');
+    }
+
+    const addressee: User = await this.usersService.getUserByName(
+      addresseeName,
+    );
+
+    const result = await this.friendshipsRepository.delete({
+      requester,
+      addressee,
+    });
+    if (result.affected === 0) {
+      throw new NotFoundException(
+        `Friendship with ${addresseeName} not found.`,
+      );
+    }
   }
 
   updateFriendshipStatus(

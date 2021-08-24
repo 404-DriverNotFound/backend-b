@@ -46,9 +46,10 @@ export class FriendshipsController {
 
   @ApiOperation({ summary: '친구 관계(친구)를 요청(추가)합니다.' })
   @ApiResponse({ status: 201, description: '성공' })
+  @ApiResponse({ status: 400, description: '요청이 잘못됐을 때' })
   @ApiResponse({ status: 404, description: '없는 유저를 요청했을 때' })
   @ApiResponse({ status: 409, description: '자기 자신을 요청했을 때' })
-  //@ApiResponse({ status: 409, description: '이미 추가된 요청일 때' })
+  @ApiResponse({ status: 409, description: '친구 관계 이력이 있을 때' })
   @ApiResponse({ status: 500, description: '서버 에러' })
   @Post('friendships')
   @UseGuards(AuthenticatedGuard)
@@ -61,19 +62,18 @@ export class FriendshipsController {
   }
 
   @ApiOperation({ summary: '친구 요청을 취소(삭제)합니다.' })
-  //@ApiResponse({ status: 201, description: '성공' })
-  //@ApiResponse({ status: 400, description: '자기 자신을 추가했을 때' })
-  //@ApiResponse({ status: 404, description: '없는 유저를 추가했을 때' })
-  //@ApiResponse({ status: 409, description: '이미 추가된 요청일 때' })
-  //@ApiResponse({ status: 500, description: '서버 에러' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '요청이 잘못됐을 때' })
+  @ApiResponse({ status: 404, description: '없는 관계를 삭제했을 때' })
+  @ApiResponse({ status: 409, description: '자기 자신과의 관계를 삭제했을 때' })
   @Delete('friendships/:name')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
   deleteFriendship(
-    @GetUser() user: User,
-    @Param('name') opponentName: string,
-  ): Promise<Friendship> {
-    return this.friendshipsService.deleteFriendship(user, opponentName);
+    @GetUser() requester: User,
+    @Param('name') addresseeName: string,
+  ): Promise<void> {
+    return this.friendshipsService.deleteFriendship(requester, addresseeName);
   }
 
   @ApiOperation({
