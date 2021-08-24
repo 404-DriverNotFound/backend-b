@@ -14,30 +14,6 @@ import { Friendship } from './friendship.entity';
 
 @EntityRepository(Friendship)
 export class FriendshipsRepository extends Repository<Friendship> {
-  //  async getFriendships(
-  //    user: User,
-  //    filterDto: GetFriendshipsFilterDto,
-  //  ): Promise<Friendship[]> {
-  //    const { status } = filterDto;
-  //    let where = [{ requester: user }, { addressee: user }];
-  //    if (status) {
-  //      where = where.map((e) => ({ ...e, status }));
-  //    }
-  //    return (await this.find({ where })).filter(
-  //      (e) => e.status !== FriendshipStatus.DECLINE,
-  //    );
-  //  }
-  //  async getFriendshipsByUsers(user1: User, user2: User): Promise<Friendship> {
-  //    const where = [
-  //      { requester: user1, addressee: user2 },
-  //      { requester: user2, addressee: user1 },
-  //    ];
-  //    const friendships: Friendship[] = (await this.find({ where })).filter(
-  //      (e) => e.status !== FriendshipStatus.DECLINE,
-  //    );
-  //    return friendships[0];
-  //  }
-
   async createFriendship(
     requester: User,
     addressee: User,

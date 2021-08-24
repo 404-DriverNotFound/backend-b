@@ -5,6 +5,8 @@ import { UsersService } from 'src/users/users.service';
 import { CreateFriendshipDto } from './dto/create-friendship.dto';
 import { GetFriendshipsFilterDto } from './dto/get-friendships-filter.dto';
 import { UpdateFriendshipStatusDto } from './dto/update-friendship-status.dto';
+import { FriendshipStatus } from './friendship-status.enum';
+import { Friendship } from './friendship.entity';
 import { FriendshipsRepository } from './friendships.repository';
 
 @Injectable()
@@ -15,8 +17,8 @@ export class FriendshipsService {
     private readonly usersService: UsersService,
   ) {}
 
-  getFriendships(user: User, filterDto: GetFriendshipsFilterDto) {
-    return undefined;
+  getFriendships(user: User, status: FriendshipStatus): Promise<Friendship[]> {
+    return this.friendshipsRepository.find({ addressee: user, status });
   }
 
   createFriendship(requester: User, createFriendshipDto: CreateFriendshipDto) {

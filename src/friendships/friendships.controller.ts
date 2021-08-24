@@ -38,9 +38,9 @@ export class FriendshipsController {
   @UseGuards(SecondFactorAuthenticatedGuard)
   getFriendships(
     @GetUser() user: User,
-    @Query() filterDto: GetFriendshipsFilterDto,
-  ): Promise<Friendship> {
-    return this.friendshipsService.getFriendships(user, filterDto);
+    @Query() { status }: GetFriendshipsFilterDto,
+  ): Promise<Friendship[]> {
+    return this.friendshipsService.getFriendships(user, status);
   }
 
   @ApiOperation({ summary: '친구 관계(친구)를 요청(추가)합니다.' })
