@@ -7,8 +7,7 @@ import { configValidationSchema } from './config.schema';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
-//import { FriendshipsModule } from './friendships/friendships.module';
-import { FriendsModule } from './friends/friends.module';
+import { FriendshipsModule } from './friendships/friendships.module';
 
 @Module({
   imports: [
@@ -33,8 +32,7 @@ import { FriendsModule } from './friends/friends.module';
     AuthModule,
     UsersModule,
     FilesModule,
-    FriendsModule,
-    //FriendshipsModule,
+    FriendshipsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

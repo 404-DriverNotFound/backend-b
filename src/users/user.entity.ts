@@ -30,6 +30,4 @@ export class User {
 
   @Column({ default: false })
   isSecondFactorAuthenticated: boolean;
-
-  //friendship?: Friendship;
 }

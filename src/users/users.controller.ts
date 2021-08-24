@@ -74,7 +74,7 @@ export class UsersController {
     @GetUser() user: User,
     @Param('name') name: string,
   ): Promise<User> {
-    return this.usersService.getUserByName(user, name);
+    return this.usersService.getUserByName(/*user, */ name);
   }
 
   @ApiOperation({ summary: '유저를 생성합니다.' })

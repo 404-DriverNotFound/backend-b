@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersRepository } from 'src/users/users.repository';
-import { FriendsController } from './friends.controller';
-import { FriendsService } from './friends.service';
+import { UsersService } from 'src/users/users.service';
+import { FriendshipsController } from './friendships.controller';
 import { FriendshipsRepository } from './friendships.repository';
+import { FriendshipsService } from './friendships.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([FriendshipsRepository, UsersRepository])],
-  controllers: [FriendsController],
-  providers: [FriendsService],
+  controllers: [FriendshipsController],
+  providers: [FriendshipsService, UsersService],
 })
-export class FriendsModule {}
+export class FriendshipsModule {}
