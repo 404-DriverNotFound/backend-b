@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -44,7 +45,7 @@ export class FriendshipsService {
     addresseeName: string,
   ): Promise<void> {
     if (addresseeName === requester.name) {
-      throw new ConflictException('Cannot add yourself');
+      throw new ConflictException('Cannot delete yourself');
     }
 
     const addressee: User = await this.usersService.getUserByName(
@@ -62,12 +63,41 @@ export class FriendshipsService {
     }
   }
 
-  updateFriendshipStatus(
-    user: User,
-    opponentName: string,
-    updateFriendshipStatusDto: UpdateFriendshipStatusDto,
-  ) {
-    return undefined;
+  async updateFriendshipStatus(
+    requesterName: string,
+    addressee: User,
+    status: FriendshipStatus,
+  ): Promise<Friendship> {
+    if (requesterName === addressee.name) {
+      throw new ConflictException('Cannot delete yourself');
+    }
+
+    const requester: User = await this.usersService.getUserByName(
+      requesterName,
+    );
+
+    const friendship: Friendship = await this.friendshipsRepository.findOne({
+      requester,
+      addressee,
+    });
+
+    if (!friendship || friendship.status !== FriendshipStatus.REQUESTED) {
+      throw new NotFoundException(
+        'There is no friendship that you are requested.',
+      );
+    }
+
+    friendship.status = status;
+
+    try {
+      await this.friendshipsRepository.save(friendship);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Something wrong while saving friendship in updateFriendshipStatus',
+      );
+    }
+
+    return friendship;
   }
 
   getFriends(user: User) {

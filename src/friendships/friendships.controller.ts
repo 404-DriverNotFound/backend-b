@@ -48,8 +48,10 @@ export class FriendshipsController {
   @ApiResponse({ status: 201, description: '성공' })
   @ApiResponse({ status: 400, description: '요청이 잘못됐을 때' })
   @ApiResponse({ status: 404, description: '없는 유저를 요청했을 때' })
-  @ApiResponse({ status: 409, description: '자기 자신을 요청했을 때' })
-  @ApiResponse({ status: 409, description: '친구 관계 이력이 있을 때' })
+  @ApiResponse({
+    status: 409,
+    description: '자기 자신을 요청했을 때, 친구 관계 이력이 있을 때',
+  })
   @ApiResponse({ status: 500, description: '서버 에러' })
   @Post('friendships')
   @UseGuards(AuthenticatedGuard)
@@ -77,26 +79,28 @@ export class FriendshipsController {
   }
 
   @ApiOperation({
-    summary: '상대방과의 친구 관계 상태를 수정합니다.',
+    summary: '요청 받은 친구 관계 상태를 수정합니다.',
     description: '친구 요청 수락 and 친구 요청 거절',
   })
-  //@ApiResponse({ status: 201, description: '성공' })
-  //@ApiResponse({ status: 400, description: '자기 자신을 추가했을 때' })
-  //@ApiResponse({ status: 404, description: '없는 유저를 추가했을 때' })
-  //@ApiResponse({ status: 409, description: '이미 추가된 요청일 때' })
-  //@ApiResponse({ status: 500, description: '서버 에러' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '자기 자신을 추가했을 때' })
+  @ApiResponse({
+    status: 404,
+    description: '없는 유저를 추가했을 때, 요청받은 친구관계가 없을 때',
+  })
+  @ApiResponse({ status: 500, description: '서버 에러' })
   @Patch('friendships/:name/status')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
   updateFriendshipStatus(
-    @GetUser() user: User,
-    @Param('name') opponentName: string,
-    @Body() updateFriendshipStatusDto: UpdateFriendshipStatusDto,
+    @Param('name') requesterName: string,
+    @GetUser() addressee: User,
+    @Body() { status }: UpdateFriendshipStatusDto,
   ): Promise<Friendship> {
     return this.friendshipsService.updateFriendshipStatus(
-      user,
-      opponentName,
-      updateFriendshipStatusDto,
+      requesterName,
+      addressee,
+      status,
     );
   }
 

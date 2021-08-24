@@ -9,6 +9,8 @@ export class GetFriendshipsFilterDto {
     enum: [FriendshipStatus.REQUESTED],
   })
   @IsNotEmpty()
-  @Matches(/^REQUESTED$/, { message: "'REQUESTED' status only." })
+  @Matches(/^REQUESTED$/, {
+    message: `${FriendshipStatus.REQUESTED} status only.`,
+  })
   readonly status!: FriendshipStatus;
 }
