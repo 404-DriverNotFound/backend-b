@@ -4,6 +4,7 @@ import {
 } from '@nestjs/common';
 import { User } from 'src/users/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
+import { FriendshipStatus } from './friendship-status.enum';
 import { Friendship } from './friendship.entity';
 
 @EntityRepository(Friendship)
@@ -52,21 +53,21 @@ export class FriendshipsRepository extends Repository<Friendship> {
     return friendship;
   }
 
-  //  async deleteFriendshipById(user: User, id: string): Promise<void> {
-  //    const qb = this.createQueryBuilder('friendship');
-  //    const result = await qb
-  //      .delete()
-  //      .where('id = :id AND requesterId = :userId', {
-  //        id,
-  //        userId: user.id,
-  //      })
-  //      .orWhere('id = :id AND addresseeId = :userId', {
-  //        id,
-  //        userId: user.id,
-  //      })
-  //      .execute();
-  //    if (result.affected === 0) {
-  //      throw new NotFoundException(`Friendship with id: ${id} not found.`);
-  //    }
-  //  }
+  async createBlack(requester: User, addressee: User): Promise<Friendship> {
+    const friendship: Friendship = this.create({
+      requester,
+      addressee,
+      status: FriendshipStatus.BLOCKED,
+    });
+
+    try {
+      await this.save(friendship);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Someting wrong while saving a friendship data in createBlack.',
+      );
+    }
+
+    return friendship;
+  }
 }

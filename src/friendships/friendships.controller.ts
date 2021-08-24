@@ -153,9 +153,9 @@ export class FriendshipsController {
   @UseGuards(SecondFactorAuthenticatedGuard)
   createBlack(
     @GetUser() requester: User,
-    @Body() createFriendshipDto: CreateFriendshipDto,
+    @Body() { addresseeName }: CreateFriendshipDto,
   ): Promise<Friendship> {
-    return this.friendshipsService.createBlack(requester, createFriendshipDto);
+    return this.friendshipsService.createBlack(requester, addresseeName);
   }
 
   @ApiOperation({

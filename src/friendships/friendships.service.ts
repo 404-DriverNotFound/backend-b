@@ -7,7 +7,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
-import { CreateFriendshipDto } from './dto/create-friendship.dto';
 import { FriendshipStatus } from './friendship-status.enum';
 import { Friendship } from './friendship.entity';
 import { FriendshipsRepository } from './friendships.repository';
@@ -169,8 +168,18 @@ export class FriendshipsService {
     return users;
   }
 
-  createBlack(requester: User, createFriendshipDto: CreateFriendshipDto) {
-    return undefined;
+  async createBlack(
+    requester: User,
+    addresseeName: string,
+  ): Promise<Friendship> {
+    if (addresseeName === requester.name) {
+      throw new ConflictException('Cannot block yourself');
+    }
+
+    const addressee: User = await this.usersService.getUserByName(
+      addresseeName,
+    );
+    return this.friendshipsRepository.createBlack(requester, addressee);
   }
 
   deleteBlack(user: User, opponentName: string) {
