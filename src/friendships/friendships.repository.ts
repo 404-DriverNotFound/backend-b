@@ -31,19 +31,49 @@ export class FriendshipsRepository extends Repository<Friendship> {
       requester,
       addressee,
     );
-    if (friendships.length) {
-      throw new ConflictException(
-        `There is a friendship with ${addressee.name}.`,
-      );
+
+    for (const friendship of friendships) {
+      if (friendship.requester.id === requester.id) {
+        // NOTE requseter req.user
+        switch (friendship.status) {
+          case FriendshipStatus.REQUESTED:
+            throw new ConflictException(
+              `You already requested to ${addressee.name}.`,
+            );
+          case FriendshipStatus.ACCEPTED:
+            throw new ConflictException(
+              `You are already friends of ${addressee.name}.`,
+            );
+          case FriendshipStatus.BLOCKED:
+            throw new ConflictException(`You blocked ${addressee.name}.`);
+        }
+      } else {
+        // NOTE addressee req.user
+        switch (friendship.status) {
+          case FriendshipStatus.REQUESTED:
+            throw new ConflictException(
+              `Accept request of ${addressee.name} first.`,
+            );
+          case FriendshipStatus.ACCEPTED:
+            throw new ConflictException(
+              `You are already friends of ${addressee.name}.`,
+            );
+          case FriendshipStatus.BLOCKED:
+            throw new ConflictException(
+              `You are blocked by ${addressee.name}.`,
+            );
+        }
+      }
     }
 
     const friendship: Friendship = this.create({
       requester,
       addressee,
+      status: FriendshipStatus.REQUESTED,
     });
 
     try {
-      await this.insert(friendship);
+      await this.save(friendship);
     } catch (error) {
       throw new InternalServerErrorException(
         'Someting wrong while saving a friendship data in createFriendship.',
