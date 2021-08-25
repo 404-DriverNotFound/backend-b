@@ -45,15 +45,11 @@ export class FriendshipsService {
 
     const opponent: User = await this.usersService.getUserByName(opponentName);
 
-    const friendships: Friendship[] = (
+    const friendships: Friendship[] =
       await this.friendshipsRepository.getFriendshipsBetweenUsers(
         user,
         opponent,
-      )
-    ).filter(
-      (e: Friendship) =>
-        e.status === FriendshipStatus.ACCEPTED || e.requester.id === user.id,
-    );
+      );
 
     if (!friendships.length) {
       throw new NotFoundException(
@@ -61,15 +57,33 @@ export class FriendshipsService {
       );
     }
 
-    for (const friendhip of friendships) {
-      if (friendhip.status === FriendshipStatus.BLOCKED) {
-        return friendhip;
+    for (const friendship of friendships) {
+      if (
+        friendship.requester.id === user.id &&
+        friendship.status === FriendshipStatus.BLOCKED
+      ) {
+        return friendship;
       }
     }
 
-    for (const friendhip of friendships) {
-      if (friendhip.status === FriendshipStatus.ACCEPTED) {
-        return friendhip;
+    for (const friendship of friendships) {
+      if (friendship.status === FriendshipStatus.ACCEPTED) {
+        return friendship;
+      }
+    }
+
+    for (const friendship of friendships) {
+      if (friendship.status === FriendshipStatus.REQUESTED) {
+        return friendship;
+      }
+    }
+
+    for (const friendship of friendships) {
+      if (
+        friendship.requester.id === user.id &&
+        friendship.status === FriendshipStatus.DECLINED
+      ) {
+        return friendship;
       }
     }
 
