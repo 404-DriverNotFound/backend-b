@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -7,6 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
+import { FriendshipRole } from './friendship-role.enum';
 import { FriendshipStatus } from './friendship-status.enum';
 import { Friendship } from './friendship.entity';
 import { FriendshipsRepository } from './friendships.repository';
@@ -18,10 +20,6 @@ export class FriendshipsService {
     private readonly friendshipsRepository: FriendshipsRepository,
     private readonly usersService: UsersService,
   ) {}
-
-  getFriendships(user: User, status: FriendshipStatus): Promise<Friendship[]> {
-    return this.friendshipsRepository.find({ addressee: user, status });
-  }
 
   async createFriendship(
     requester: User,
@@ -128,11 +126,31 @@ export class FriendshipsService {
     return friendship;
   }
 
-  async getFriends(user: User): Promise<User[]> {
-    const where = [
+  async getFriends(
+    user: User,
+    role?: FriendshipRole,
+    status?: FriendshipStatus,
+  ): Promise<User[]> {
+    let where = [
       { requester: user, status: FriendshipStatus.ACCEPTED },
       { addressee: user, status: FriendshipStatus.ACCEPTED },
     ];
+
+    if (role) {
+      where = where.filter(
+        (e: any) => Object.keys(e)[0] === role.toLowerCase(),
+      );
+      if (!status) {
+        throw new BadRequestException(
+          'role query must need follwing status query.',
+        );
+      }
+    }
+
+    if (status) {
+      where = where.map((e: any) => ({ ...e, status }));
+    }
+
     const friendships: Friendship[] = await this.friendshipsRepository.find({
       where,
     });

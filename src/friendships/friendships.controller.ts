@@ -20,7 +20,7 @@ import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-au
 import { GetUser } from 'src/users/get-user.decorator';
 import { User } from 'src/users/user.entity';
 import { CreateFriendshipDto } from './dto/create-friendship.dto';
-import { GetFriendshipsFilterDto } from './dto/get-friendships-filter.dto';
+import { GetFriendsFilterDto } from './dto/get-friends-filter.dto';
 import { UpdateFriendshipStatusDto } from './dto/update-friendship-status.dto';
 import { Friendship } from './friendship.entity';
 import { FriendshipsService } from './friendships.service';
@@ -30,19 +30,6 @@ import { FriendshipsService } from './friendships.service';
 @Controller()
 export class FriendshipsController {
   constructor(private readonly friendshipsService: FriendshipsService) {}
-
-  @ApiOperation({ summary: '대기중인 친구 요청 목록을 가져옵니다.' })
-  @ApiResponse({ status: 200, description: '성공' })
-  @ApiResponse({ status: 400, description: '잘못된 요청' })
-  @Get('friendships')
-  @UseGuards(AuthenticatedGuard)
-  @UseGuards(SecondFactorAuthenticatedGuard)
-  getFriendships(
-    @GetUser() user: User,
-    @Query() { status }: GetFriendshipsFilterDto,
-  ): Promise<Friendship[]> {
-    return this.friendshipsService.getFriendships(user, status);
-  }
 
   @ApiOperation({ summary: '친구 관계(친구)를 요청(추가)합니다.' })
   @ApiResponse({ status: 201, description: '성공' })
@@ -121,13 +108,19 @@ export class FriendshipsController {
 
   @ApiOperation({
     summary: '친구 목록을 가져옵니다.',
+    description:
+      '나랑 친구인 유저 목록(쿼리 없이 요청을 보낼 시), 내가 친구 요청한 유저 목록, 나에게 친구요청한 유저 목록',
   })
   @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '잘못된 요청' })
   @Get('friends')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  getFriends(@GetUser() user: User): Promise<User[]> {
-    return this.friendshipsService.getFriends(user);
+  getFriends(
+    @GetUser() user: User,
+    @Query() { role, status }: GetFriendsFilterDto,
+  ): Promise<User[]> {
+    return this.friendshipsService.getFriends(user, role, status);
   }
 
   @ApiOperation({
