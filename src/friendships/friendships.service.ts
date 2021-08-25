@@ -52,13 +52,25 @@ export class FriendshipsService {
       )
     ).filter(
       (e: Friendship) =>
-        e.status !== FriendshipStatus.BLOCKED || e.requester.id === user.id,
+        e.status === FriendshipStatus.ACCEPTED || e.requester.id === user.id,
     );
 
     if (!friendships.length) {
       throw new NotFoundException(
         `Friendhip between ${user.name} and ${opponentName} not found.`,
       );
+    }
+
+    for (const friendhip of friendships) {
+      if (friendhip.status === FriendshipStatus.BLOCKED) {
+        return friendhip;
+      }
+    }
+
+    for (const friendhip of friendships) {
+      if (friendhip.status === FriendshipStatus.ACCEPTED) {
+        return friendhip;
+      }
     }
 
     return friendships[0];
