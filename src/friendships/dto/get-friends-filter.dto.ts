@@ -22,5 +22,5 @@ export class GetFriendsFilterDto {
   })
   @IsOptional()
   @IsEnum(FriendshipRole)
-  readonly role?: FriendshipRole;
+  readonly me?: FriendshipRole;
 }

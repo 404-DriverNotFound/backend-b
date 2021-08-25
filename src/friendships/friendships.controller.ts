@@ -118,9 +118,9 @@ export class FriendshipsController {
   @UseGuards(SecondFactorAuthenticatedGuard)
   getFriends(
     @GetUser() user: User,
-    @Query() { role, status }: GetFriendsFilterDto,
+    @Query() { me, status }: GetFriendsFilterDto,
   ): Promise<User[]> {
-    return this.friendshipsService.getFriends(user, role, status);
+    return this.friendshipsService.getFriends(user, me, status);
   }
 
   @ApiOperation({

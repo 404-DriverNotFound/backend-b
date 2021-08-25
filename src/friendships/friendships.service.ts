@@ -128,7 +128,7 @@ export class FriendshipsService {
 
   async getFriends(
     user: User,
-    role?: FriendshipRole,
+    me?: FriendshipRole,
     status?: FriendshipStatus,
   ): Promise<User[]> {
     let where = [
@@ -136,13 +136,11 @@ export class FriendshipsService {
       { addressee: user, status: FriendshipStatus.ACCEPTED },
     ];
 
-    if (role) {
-      where = where.filter(
-        (e: any) => Object.keys(e)[0] === role.toLowerCase(),
-      );
+    if (me) {
+      where = where.filter((e: any) => Object.keys(e)[0] === me.toLowerCase());
       if (!status) {
         throw new BadRequestException(
-          'role query must need follwing status query.',
+          'me query must need follwing status query.',
         );
       }
     }
