@@ -50,9 +50,7 @@ export class FriendshipsService {
         user,
         opponent,
       )
-    ).sort((a: Friendship, b: Friendship) =>
-      a.requester.id === user.id && b.requester.id !== user.id ? 1 : -1,
-    );
+    ).sort((a: Friendship) => (a.requester.id === user.id ? -1 : 1));
 
     if (!friendships.length) {
       throw new NotFoundException(
