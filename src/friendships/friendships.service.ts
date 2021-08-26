@@ -223,7 +223,7 @@ export class FriendshipsService {
     }
   }
 
-  async getBlacks(requester: User): Promise<User[]> {
+  async getBlocks(requester: User): Promise<User[]> {
     const friendships: Friendship[] = await this.friendshipsRepository.find({
       requester,
       status: FriendshipStatus.BLOCKED,

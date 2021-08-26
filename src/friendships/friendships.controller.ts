@@ -146,11 +146,11 @@ export class FriendshipsController {
     summary: '차단한 유저목록을 가져옵니다.',
   })
   @ApiResponse({ status: 200, description: '성공' })
-  @Get('blacks')
+  @Get('blocks')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  getBlacks(@GetUser() requester: User): Promise<User[]> {
-    return this.friendshipsService.getBlacks(requester);
+  getBlocks(@GetUser() requester: User): Promise<User[]> {
+    return this.friendshipsService.getBlocks(requester);
   }
 
   @ApiOperation({
@@ -159,7 +159,7 @@ export class FriendshipsController {
   @ApiResponse({ status: 201, description: '차단 성공' })
   @ApiResponse({ status: 400, description: '요청이 잘못됐을 때' })
   @ApiResponse({ status: 404, description: '없는 유저를 차단했을 때' })
-  @Post('blacks')
+  @Post('blocks')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
   createBlack(
@@ -179,7 +179,7 @@ export class FriendshipsController {
     description: '없는 유저나 관계를 차단 해제했을 때',
   })
   @ApiResponse({ status: 409, description: '자기 자신을 차단 해제했을 때' })
-  @Delete('blacks/:name')
+  @Delete('blocks/:name')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
   deleteBlack(
