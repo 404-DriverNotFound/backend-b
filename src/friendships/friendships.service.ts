@@ -45,11 +45,14 @@ export class FriendshipsService {
 
     const opponent: User = await this.usersService.getUserByName(opponentName);
 
-    const friendships: Friendship[] =
+    const friendships: Friendship[] = (
       await this.friendshipsRepository.getFriendshipsBetweenUsers(
         user,
         opponent,
-      );
+      )
+    ).sort((a: Friendship, b: Friendship) =>
+      a.requester.id === user.id && b.requester.id !== user.id ? 1 : -1,
+    );
 
     if (!friendships.length) {
       throw new NotFoundException(
@@ -58,10 +61,7 @@ export class FriendshipsService {
     }
 
     for (const friendship of friendships) {
-      if (
-        friendship.requester.id === user.id &&
-        friendship.status === FriendshipStatus.BLOCKED
-      ) {
+      if (friendship.status === FriendshipStatus.BLOCKED) {
         return friendship;
       }
     }
@@ -79,10 +79,7 @@ export class FriendshipsService {
     }
 
     for (const friendship of friendships) {
-      if (
-        friendship.requester.id === user.id &&
-        friendship.status === FriendshipStatus.DECLINED
-      ) {
+      if (friendship.status === FriendshipStatus.DECLINED) {
         return friendship;
       }
     }

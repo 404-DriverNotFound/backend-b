@@ -98,6 +98,15 @@ export class FriendshipsRepository extends Repository<Friendship> {
       );
     }
 
+    const found: Friendship = await this.findOne({
+      requester: addressee,
+      addressee: requester,
+    });
+
+    if (found && found.status !== FriendshipStatus.BLOCKED) {
+      await this.delete({ requester: addressee, addressee: requester });
+    }
+
     return friendship;
   }
 }
