@@ -4,6 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+//import { Friendship } from 'src/friendships/friendship.entity';
+//import { FriendshipsRepository } from 'src/friendships/friendships.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -15,7 +17,7 @@ import { UsersRepository } from './users.repository';
 export class UsersService {
   constructor(
     @InjectRepository(UsersRepository)
-    private readonly usersRepository: UsersRepository,
+    private readonly usersRepository: UsersRepository, //@InjectRepository(FriendshipsRepository) //private readonly friendshipsRepository: FriendshipsRepository,
   ) {}
 
   async getUsers(filterDto: GetUsersFilterDto) {
@@ -30,11 +32,16 @@ export class UsersService {
     return found;
   }
 
-  async getUserByName(name: string): Promise<User> {
+
+  async getUserByName(/*user: User,*/ name: string): Promise<User> {
     const found: User = await this.usersRepository.findOne({ name });
     if (!found) {
       throw new NotFoundException(`User with ${name} not found`);
     }
+
+    //const friendship: Friendship =
+    //await this.friendshipsRepository.getFriendshipsByUsers(user, found);
+    //found.friendship = friendship;
     return found;
   }
 
