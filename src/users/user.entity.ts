@@ -1,6 +1,6 @@
 import { Exclude, Transform } from 'class-transformer';
-import { Friendship } from 'src/friendships/friendship.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+//import { Friendship } from 'src/friendships/friendship.entity';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { UserStatus } from './user-status.enum';
 
 @Entity()
@@ -13,6 +13,7 @@ export class User {
   ftId: number;
 
   @Column({ unique: true })
+  @Index()
   name: string;
 
   @Column({ default: 'files/avatar/default.png' })
@@ -30,6 +31,4 @@ export class User {
 
   @Column({ default: false })
   isSecondFactorAuthenticated: boolean;
-
-  friendship?: Friendship;
 }

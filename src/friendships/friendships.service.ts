@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -6,9 +7,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
-import { UsersRepository } from 'src/users/users.repository';
-import { CreateFriendshipDto } from './dto/create-friendship.dto';
-import { GetFriendshipsFilterDto } from './dto/get-friendships-filter.dto';
+import { UsersService } from 'src/users/users.service';
+import { FriendshipRole } from './friendship-role.enum';
 import { FriendshipStatus } from './friendship-status.enum';
 import { Friendship } from './friendship.entity';
 import { FriendshipsRepository } from './friendships.repository';
@@ -18,77 +18,257 @@ export class FriendshipsService {
   constructor(
     @InjectRepository(FriendshipsRepository)
     private readonly friendshipsRepository: FriendshipsRepository,
-    @InjectRepository(UsersRepository)
-    private readonly usersRepository: UsersRepository,
+    private readonly usersService: UsersService,
   ) {}
-
-  getFriendships(
-    user: User,
-    filterDto: GetFriendshipsFilterDto,
-  ): Promise<Friendship[]> {
-    return this.friendshipsRepository.getFriendships(user, filterDto);
-  }
 
   async createFriendship(
     requester: User,
-    createFriendshipDto: CreateFriendshipDto,
+    addresseeName: string,
   ): Promise<Friendship> {
-    const { addresseeName, status } = createFriendshipDto;
-    if (requester.name === addresseeName) {
-      throw new ConflictException("You can't add yourself.");
+    if (addresseeName === requester.name) {
+      throw new ConflictException('Cannot add yourself');
     }
 
-    const addressee: User = await this.usersRepository.findOne({
-      name: addresseeName,
-    });
-    if (!addressee) {
+    const addressee: User = await this.usersService.getUserByName(
+      addresseeName,
+    );
+    return this.friendshipsRepository.createFriendship(requester, addressee);
+  }
+
+  async getFriendshipByName(
+    user: User,
+    opponentName: string,
+  ): Promise<Friendship> {
+    if (opponentName === user.name) {
+      throw new ConflictException('Cannot get yours.');
+    }
+
+    const opponent: User = await this.usersService.getUserByName(opponentName);
+
+    const friendships: Friendship[] = (
+      await this.friendshipsRepository.getFriendshipsBetweenUsers(
+        user,
+        opponent,
+      )
+    ).sort((a: Friendship) => (a.requester.id === user.id ? -1 : 1));
+
+    if (!friendships.length) {
       throw new NotFoundException(
-        `Addressee with name: ${addresseeName} not found.`,
+        `Friendhip between ${user.name} and ${opponentName} not found.`,
       );
     }
 
-    return this.friendshipsRepository.createFriendship(
+    for (const friendship of friendships) {
+      if (friendship.status === FriendshipStatus.BLOCKED) {
+        return friendship;
+      }
+    }
+
+    for (const friendship of friendships) {
+      if (friendship.status === FriendshipStatus.ACCEPTED) {
+        return friendship;
+      }
+    }
+
+    for (const friendship of friendships) {
+      if (friendship.status === FriendshipStatus.REQUESTED) {
+        return friendship;
+      }
+    }
+
+    for (const friendship of friendships) {
+      if (friendship.status === FriendshipStatus.DECLINED) {
+        return friendship;
+      }
+    }
+
+    return friendships[0];
+  }
+
+  async deleteFriendship(
+    requester: User,
+    addresseeName: string,
+  ): Promise<void> {
+    if (addresseeName === requester.name) {
+      throw new ConflictException('Cannot delete yourself');
+    }
+
+    const addressee: User = await this.usersService.getUserByName(
+      addresseeName,
+    );
+
+    const result = await this.friendshipsRepository.delete({
       requester,
       addressee,
-      status,
-    );
+      status: FriendshipStatus.REQUESTED,
+    });
+
+    if (result.affected === 0) {
+      throw new NotFoundException(
+        `Friendship with ${addresseeName} which status is ${FriendshipStatus.REQUESTED} not found.`,
+      );
+    }
   }
 
   async updateFriendshipStatus(
-    user: User,
-    id: string,
+    requesterName: string,
+    addressee: User,
     status: FriendshipStatus,
   ): Promise<Friendship> {
-    const friendship: Friendship = await this.friendshipsRepository.findOne(id);
-    if (!friendship) {
-      throw new NotFoundException(`Friendship with id: ${id} not found.`);
+    if (requesterName === addressee.name) {
+      throw new ConflictException('Cannot delete yourself');
     }
 
-    if (
-      friendship.addressee.id !== user.id &&
-      friendship.requester.id !== user.id
-    ) {
-      throw new ConflictException(
-        "You can't update a friendship status not yours.",
+    const requester: User = await this.usersService.getUserByName(
+      requesterName,
+    );
+
+    const friendship: Friendship = await this.friendshipsRepository.findOne({
+      requester,
+      addressee,
+    });
+
+    if (!friendship || friendship.status !== FriendshipStatus.REQUESTED) {
+      throw new NotFoundException(
+        'There is no friendship that you are requested.',
       );
     }
-    if (friendship.status === FriendshipStatus.DECLINE) {
-      throw new ConflictException(
-        ` ${friendship.status} satus can not be updated.`,
-      );
-    }
+
     friendship.status = status;
+
     try {
       await this.friendshipsRepository.save(friendship);
     } catch (error) {
       throw new InternalServerErrorException(
-        'Someting wrong while updating a friendship data in updateFriendshipStatus.',
+        'Something wrong while saving friendship in updateFriendshipStatus',
       );
     }
+
     return friendship;
   }
 
-  deleteFriendshipById(user: User, id: string): Promise<void> {
-    return this.friendshipsRepository.deleteFriendshipById(user, id);
+  async getFriends(
+    user: User,
+    me?: FriendshipRole,
+    status?: FriendshipStatus,
+  ): Promise<User[]> {
+    let where = [
+      { requester: user, status: FriendshipStatus.ACCEPTED },
+      { addressee: user, status: FriendshipStatus.ACCEPTED },
+    ];
+
+    if (me) {
+      where = where.filter((e: any) => Object.keys(e)[0] === me.toLowerCase());
+      if (!status) {
+        throw new BadRequestException(
+          'me query must need follwing status query.',
+        );
+      }
+    }
+
+    if (status) {
+      where = where.map((e: any) => ({ ...e, status }));
+    }
+
+    const friendships: Friendship[] = await this.friendshipsRepository.find({
+      where,
+    });
+    const users: User[] = [];
+    for (const friendship of friendships) {
+      if (friendship.requester.id === user.id) {
+        users.push(friendship.addressee);
+      }
+      if (friendship.addressee.id === user.id) {
+        users.push(friendship.requester);
+      }
+    }
+    // REVIEW 서로 수락한 경우, 친구 중복이 발생할 수 있다. 서로 수락한 경우가 안생기게 확인하기
+    return users;
+  }
+
+  async deleteFriend(user: User, opponentName: string): Promise<void> {
+    if (opponentName === user.name) {
+      throw new ConflictException('Cannot delete yourself');
+    }
+
+    const opponent: User = await this.usersService.getUserByName(opponentName);
+
+    const friendships: Friendship[] = (
+      await this.friendshipsRepository.getFriendshipsBetweenUsers(
+        user,
+        opponent,
+      )
+    ).filter((e: Friendship) => e.status === FriendshipStatus.ACCEPTED);
+
+    if (!friendships.length) {
+      throw new NotFoundException(
+        `Friendhip between ${user.name} and ${opponentName} not found.`,
+      );
+    }
+
+    // REVIEW 둘 사이의 친구 관계가 2개 이상이면 모두 삭제된다.
+    for (const friendship of friendships) {
+      const result = await this.friendshipsRepository.delete({
+        requester: friendship.requester,
+        addressee: friendship.addressee,
+      });
+
+      if (!result.affected) {
+        throw new NotFoundException(
+          `Friendhip between ${user.name} and ${opponentName} not found.`,
+        );
+      }
+    }
+  }
+
+  async getBlocks(requester: User): Promise<User[]> {
+    const friendships: Friendship[] = await this.friendshipsRepository.find({
+      requester,
+      status: FriendshipStatus.BLOCKED,
+    });
+
+    const users: User[] = [];
+
+    for (const friendship of friendships) {
+      users.push(friendship.addressee);
+    }
+
+    return users;
+  }
+
+  async createBlack(
+    requester: User,
+    addresseeName: string,
+  ): Promise<Friendship> {
+    if (addresseeName === requester.name) {
+      throw new ConflictException('Cannot block yourself');
+    }
+
+    const addressee: User = await this.usersService.getUserByName(
+      addresseeName,
+    );
+    return this.friendshipsRepository.createBlack(requester, addressee);
+  }
+
+  async deleteBlack(requester: User, addresseeName: string): Promise<void> {
+    if (addresseeName === requester.name) {
+      throw new ConflictException('Cannot unblock yourself');
+    }
+
+    const addressee: User = await this.usersService.getUserByName(
+      addresseeName,
+    );
+
+    const result = await this.friendshipsRepository.delete({
+      requester,
+      addressee,
+      status: FriendshipStatus.BLOCKED,
+    });
+
+    if (result.affected === 0) {
+      throw new NotFoundException(
+        `Friendship with ${addresseeName} which status is ${FriendshipStatus.BLOCKED} not found.`,
+      );
+    }
   }
 }

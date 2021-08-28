@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -26,6 +27,7 @@ import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { localOptions } from './constants';
 import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-authenticated.guard';
+import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -39,8 +41,8 @@ export class UsersController {
   @Get()
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  getUsers(): Promise<User[]> {
-    return this.usersService.getUsers();
+  getUsers(@Query() filterDto: GetUsersFilterDto) {
+    return this.usersService.getUsers(filterDto);
   }
 
   @ApiCookieAuth()
@@ -74,7 +76,7 @@ export class UsersController {
     @GetUser() user: User,
     @Param('name') name: string,
   ): Promise<User> {
-    return this.usersService.getUserByName(user, name);
+    return this.usersService.getUserByName(/*user, */ name);
   }
 
   @ApiOperation({ summary: '유저를 생성합니다.' })

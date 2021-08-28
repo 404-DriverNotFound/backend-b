@@ -1,15 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, Matches } from 'class-validator';
 import { FriendshipStatus } from '../friendship-status.enum';
 
 export class UpdateFriendshipStatusDto {
   @ApiProperty({
-    example: 'PENDING',
-    description: 'Status of friendships.',
+    example: 'ACCEPTED',
     required: true,
-    enum: FriendshipStatus,
+    enum: [FriendshipStatus.ACCEPTED, FriendshipStatus.DECLINED],
   })
   @IsNotEmpty()
-  @IsEnum(FriendshipStatus)
+  @Matches(/^ACCEPTED$|^DECLINED$/, {
+    message: `${FriendshipStatus.ACCEPTED} and ${FriendshipStatus.DECLINED} status only.`,
+  })
   readonly status!: FriendshipStatus;
 }

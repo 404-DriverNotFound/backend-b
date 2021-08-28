@@ -2,7 +2,7 @@ import { Controller, Get, Param, Res } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
-@ApiTags('files')
+@ApiTags('Files')
 @Controller('files')
 export class FilesController {
   @Get('avatar/:path')

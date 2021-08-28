@@ -16,7 +16,7 @@ export class SecondFactorAuthenticatedGuard implements CanActivate {
     console.log('SecondFactorAuthenticatedGuard: ', request.isAuthenticated());
 
     const user: User = request.user;
-    if (user.enable2FA) {
+    if (user?.enable2FA) {
       if (!user.isSecondFactorAuthenticated) {
         if (!user.authenticatorSecret) {
           throw new ForbiddenException(
