@@ -20,6 +20,7 @@ import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-au
 import { GetUser } from 'src/users/get-user.decorator';
 import { User } from 'src/users/user.entity';
 import { CreateFriendshipDto } from './dto/create-friendship.dto';
+import { GetBlocksFilterDto } from './dto/get-blocks-filter.dto';
 import { GetFriendsFilterDto } from './dto/get-friends-filter.dto';
 import { UpdateFriendshipStatusDto } from './dto/update-friendship-status.dto';
 import { Friendship } from './friendship.entity';
@@ -155,8 +156,11 @@ export class FriendshipsController {
   @Get('blocks')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  getBlocks(@GetUser() requester: User): Promise<User[]> {
-    return this.friendshipsService.getBlocks(requester);
+  getBlocks(
+    @GetUser() requester: User,
+    @Query() { perPage, page }: GetBlocksFilterDto,
+  ): Promise<User[]> {
+    return this.friendshipsService.getBlocks(requester, +perPage, +page);
   }
 
   @ApiOperation({

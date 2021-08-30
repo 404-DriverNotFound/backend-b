@@ -235,17 +235,29 @@ export class FriendshipsService {
     }
   }
 
-  async getBlocks(requester: User): Promise<User[]> {
-    const friendships: Friendship[] = await this.friendshipsRepository.find({
-      requester,
-      status: FriendshipStatus.BLOCKED,
-    });
+  async getBlocks(
+    requester: User,
+    perPage?: number,
+    page?: number,
+  ): Promise<User[]> {
+    const options: any = { order: { updatedAt: 'DESC' } };
 
-    const users: User[] = [];
+    options.where = { requester, status: FriendshipStatus.BLOCKED };
 
-    for (const friendship of friendships) {
-      users.push(friendship.addressee);
+    if (perPage) {
+      options.take = perPage;
     }
+
+    if (page) {
+      options.skip = perPage * (page - 1);
+    }
+
+    const [data] = await this.friendshipsRepository.findAndCount(options);
+
+    const users: User[] = data.reduce((acc, cur) => {
+      acc.push(cur.addressee);
+      return acc;
+    }, []);
 
     return users;
   }
