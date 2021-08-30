@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Like } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
-import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserStatus } from './user-status.enum';
 import { User } from './user.entity';
@@ -18,8 +18,28 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  async getUsers(filterDto: GetUsersFilterDto) {
-    return this.usersRepository.getUsers(filterDto);
+  async getUsers(
+    search?: string,
+    perPage?: number,
+    page?: number,
+  ): Promise<User[]> {
+    const options: any = { order: { name: 'ASC' } };
+
+    if (search) {
+      options.where = { name: Like(`%${search}%`) };
+    }
+
+    if (perPage) {
+      options.take = perPage;
+    }
+
+    if (page) {
+      options.skip = perPage * (page - 1);
+    }
+    console.log(options);
+    const [data] = await this.usersRepository.findAndCount(options);
+
+    return data;
   }
 
   async isDuplicated(name: string): Promise<User> {

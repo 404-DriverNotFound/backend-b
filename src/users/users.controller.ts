@@ -41,8 +41,10 @@ export class UsersController {
   @Get()
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  getUsers(@Query() filterDto: GetUsersFilterDto) {
-    return this.usersService.getUsers(filterDto);
+  getUsers(
+    @Query() { search, perPage, page }: GetUsersFilterDto,
+  ): Promise<User[]> {
+    return this.usersService.getUsers(search, +perPage, +page);
   }
 
   @ApiCookieAuth()
