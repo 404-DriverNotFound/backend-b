@@ -4,7 +4,6 @@ import {
   IsOptional,
   IsNumber,
   Min,
-  IsBase64,
   IsString,
   MaxLength,
   IsAlphanumeric,
@@ -22,28 +21,22 @@ export class GetUsersFilterDto {
   search?: string;
 
   @ApiProperty({
-    description: 'counts per request',
+    description: 'counts per page',
     required: false,
   })
   @IsOptional()
   @IsNumber()
   @Min(1)
   @Type(() => Number)
-  readonly limit?: number;
+  readonly perPage?: number;
 
   @ApiProperty({
-    description: 'Usage of both before and after cursor is undefined.',
+    description: 'pages',
     required: false,
   })
   @IsOptional()
-  @IsBase64()
-  readonly beforeCursor?: string;
-
-  @ApiProperty({
-    description: 'Usage of both before and after cursor is undefined.',
-    required: false,
-  })
-  @IsOptional()
-  @IsBase64()
-  readonly afterCursor?: string;
+  @IsNumber()
+  @Min(1)
+  @Type(() => Number)
+  readonly page?: number;
 }
