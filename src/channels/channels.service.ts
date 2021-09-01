@@ -44,4 +44,26 @@ export class ChannelsService {
     }
     return channel;
   }
+
+  async updateChannelPassword(
+    owner: User,
+    name: string,
+    password?: string,
+  ): Promise<Channel> {
+    const channel: Channel = await this.channelsRepository.findOne({
+      name,
+      owner,
+    });
+
+    if (password) {
+      const salt: string = await bcrypt.genSalt();
+      channel.password = await bcrypt.hash(password, salt);
+    } else {
+      channel.password = null;
+    }
+
+    await this.channelsRepository.save(channel);
+
+    return channel;
+  }
 }
