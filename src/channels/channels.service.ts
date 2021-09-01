@@ -8,6 +8,7 @@ import { Channel } from './channel.entity';
 import { ChannelsRepository } from './channels.repository';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/users/user.entity';
+import { Like } from 'typeorm';
 
 @Injectable()
 export class ChannelsService {
@@ -15,6 +16,29 @@ export class ChannelsService {
     @InjectRepository(ChannelsRepository)
     private channelsRepository: ChannelsRepository,
   ) {}
+
+  async getChannels(
+    search?: string,
+    perPage?: number,
+    page?: number,
+  ): Promise<Channel[]> {
+    const options: any = { order: { createdAt: 'DESC' } };
+
+    if (search) {
+      options.where = { name: Like(`%${search}%`) };
+    }
+
+    if (perPage) {
+      options.take = perPage;
+    }
+
+    if (page) {
+      options.skip = perPage * (page - 1);
+    }
+    const [data] = await this.channelsRepository.findAndCount(options);
+
+    return data;
+  }
 
   async createChannel(
     user: User,

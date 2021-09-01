@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -19,6 +21,7 @@ import { User } from 'src/users/user.entity';
 import { Channel } from './channel.entity';
 import { ChannelsService } from './channels.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
+import { GetChannelsFilterDto } from './dto/get-channels-filter.dto';
 import { UpdateChannelPasswordDto } from './dto/update-channel.dto';
 
 @ApiTags('Channels')
@@ -28,6 +31,15 @@ import { UpdateChannelPasswordDto } from './dto/update-channel.dto';
 @Controller('channels')
 export class ChannelsController {
   constructor(private readonly channelsService: ChannelsService) {}
+
+  @ApiOperation({ summary: '전체 채널 목록을 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @Get()
+  getChannels(
+    @Query() { search, perPage, page }: GetChannelsFilterDto,
+  ): Promise<Channel[]> {
+    return this.channelsService.getChannels(search, perPage, page);
+  }
 
   @ApiOperation({ summary: '채널을 추가합니다.' })
   @ApiResponse({ status: 201, description: '성공' })

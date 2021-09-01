@@ -17,6 +17,8 @@ export class CreateChannelDto {
   })
   @IsNotEmpty()
   @IsString()
+  @MinLength(3)
+  @MaxLength(30)
   @Transform(({ value }) => value.trim())
   readonly name!: string;
 
