@@ -2,6 +2,8 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from './entities/channel.entity';
@@ -11,14 +13,16 @@ import { User } from 'src/users/user.entity';
 import { Like } from 'typeorm';
 import { Membership } from './entities/membership.entity';
 import { MembershipsRepository } from './repositories/memberships.repository';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ChannelsService {
   constructor(
     @InjectRepository(ChannelsRepository)
-    private channelsRepository: ChannelsRepository,
+    private readonly channelsRepository: ChannelsRepository,
     @InjectRepository(MembershipsRepository)
-    private membershipsRepository: MembershipsRepository,
+    private readonly membershipsRepository: MembershipsRepository,
+    private readonly usersService: UsersService,
   ) {}
 
   async getChannels(
@@ -52,6 +56,14 @@ export class ChannelsService {
     page?: number,
   ): Promise<Channel[]> {
     return this.channelsRepository.getChannelsByMe(user, search, perPage, page);
+  }
+
+  async getChannelByName(name: string): Promise<Channel> {
+    const channel: Channel = await this.channelsRepository.findOne({ name });
+    if (!channel) {
+      throw new NotFoundException('Channel you requested is not found!');
+    }
+    return channel;
   }
 
   async createChannel(
@@ -120,5 +132,32 @@ export class ChannelsService {
     await this.channelsRepository.save(channel);
 
     return channel;
+  }
+
+  async createChannelMembers(name: string, password: string, user: User) {
+    const channel: Channel = await this.getChannelByName(name);
+
+    const isCorrect: boolean = await bcrypt.compare(password, channel.password);
+
+    if (!isCorrect) {
+      throw new UnauthorizedException('Invalid password.');
+    }
+
+    const membership: Membership = this.membershipsRepository.create({
+      channel,
+      user,
+    });
+
+    try {
+      await this.membershipsRepository.insert(membership);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException('Membership is already exists');
+      } else {
+        throw new InternalServerErrorException();
+      }
+    }
+
+    return membership;
   }
 }
