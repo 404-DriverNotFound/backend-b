@@ -1,5 +1,12 @@
 import { Exclude, Transform } from 'class-transformer';
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { Membership } from 'src/channels/entities/membership.entity';
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { UserStatus } from './user-status.enum';
 
 @Entity()
@@ -30,4 +37,7 @@ export class User {
 
   @Column({ default: false })
   isSecondFactorAuthenticated: boolean;
+
+  @OneToMany(() => Membership, (membership) => membership.user)
+  memberships: Membership[];
 }

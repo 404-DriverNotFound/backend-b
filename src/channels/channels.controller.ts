@@ -18,7 +18,7 @@ import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-authenticated.guard';
 import { GetUser } from 'src/users/get-user.decorator';
 import { User } from 'src/users/user.entity';
-import { Channel } from './channel.entity';
+import { Channel } from './entities/channel.entity';
 import { ChannelsService } from './channels.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { GetChannelsFilterDto } from './dto/get-channels-filter.dto';
@@ -39,6 +39,16 @@ export class ChannelsController {
     @Query() { search, perPage, page }: GetChannelsFilterDto,
   ): Promise<Channel[]> {
     return this.channelsService.getChannels(search, perPage, page);
+  }
+
+  @ApiOperation({ summary: '내가 속한 채널 목록을 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @Get('me')
+  getChannelsByMe(
+    @GetUser() user: User,
+    @Query() { search, perPage, page }: GetChannelsFilterDto,
+  ): Promise<Channel[]> {
+    return this.channelsService.getChannelsByMe(user, search, perPage, page);
   }
 
   @ApiOperation({ summary: '채널을 추가합니다.' })

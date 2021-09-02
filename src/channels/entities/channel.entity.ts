@@ -5,9 +5,11 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Membership } from './membership.entity';
 
 @Entity()
 export class Channel {
@@ -27,9 +29,12 @@ export class Channel {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @ManyToOne(() => User, { nullable: true })
+  admin: User;
+
   @ManyToOne(() => User, { nullable: false })
   owner: User;
 
-  @ManyToOne(() => User, { nullable: true })
-  admin: User;
+  @OneToMany(() => Membership, (membership) => membership.channel)
+  memberships: Membership[];
 }
