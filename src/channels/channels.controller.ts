@@ -95,4 +95,15 @@ export class ChannelsController {
   ) {
     return this.channelsService.createChannelMembers(name, password, user);
   }
+
+  @ApiOperation({ summary: '특정 채널의 유저목록을 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 404, description: '채널 없음' })
+  @Get(':name/members')
+  getChannelMembers(
+    @Param('name') name: string,
+    @Query() { search, perPage, page }: GetChannelsFilterDto,
+  ): Promise<User[]> {
+    return this.channelsService.getChannelMembers(name, search, perPage, page);
+  }
 }

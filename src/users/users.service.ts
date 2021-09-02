@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Channel } from 'src/channels/entities/channel.entity';
 //import { Friendship } from 'src/friendships/friendship.entity';
 //import { FriendshipsRepository } from 'src/friendships/friendships.repository';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,7 +18,7 @@ import { UsersRepository } from './users.repository';
 export class UsersService {
   constructor(
     @InjectRepository(UsersRepository)
-    private readonly usersRepository: UsersRepository, //@InjectRepository(FriendshipsRepository) //private readonly friendshipsRepository: FriendshipsRepository,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
   async getUsers(filterDto: GetUsersFilterDto) {
@@ -31,7 +32,6 @@ export class UsersService {
     }
     return found;
   }
-
 
   async getUserByName(/*user: User,*/ name: string): Promise<User> {
     const found: User = await this.usersRepository.findOne({ name });
@@ -97,5 +97,19 @@ export class UsersService {
       );
     }
     return user;
+  }
+
+  getChannelMembers(
+    channel: Channel,
+    search?: string,
+    perPage?: number,
+    page?: number,
+  ): Promise<User[]> {
+    return this.usersRepository.getChannelMembers(
+      channel,
+      search,
+      perPage,
+      page,
+    );
   }
 }

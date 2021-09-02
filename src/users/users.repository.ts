@@ -9,6 +9,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './user.entity';
 import { buildPaginator, PagingQuery } from 'typeorm-cursor-pagination';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
+import { Channel } from 'src/channels/entities/channel.entity';
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
@@ -114,5 +115,40 @@ export class UsersRepository extends Repository<User> {
       }
     }
     return user;
+  }
+
+  async getChannelMembers(
+    channel: Channel,
+    search?: string,
+    perPage?: number,
+    page?: number,
+  ): Promise<User[]> {
+    const qb = this.createQueryBuilder('user');
+
+    qb.innerJoin(
+      'user.memberships',
+      'memberships',
+      'memberships.channelId = :id',
+      { id: channel.id },
+    );
+
+    if (search) {
+      qb.andWhere('user.name LIKE :search', { search: `%${search}%` });
+    }
+
+    if (perPage) {
+      qb.take(perPage);
+    }
+
+    if (page) {
+      qb.skip(perPage * (page - 1));
+    }
+
+    try {
+      const users: User[] = await qb.getMany();
+      return users;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 }

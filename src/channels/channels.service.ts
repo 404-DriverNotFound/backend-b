@@ -160,4 +160,20 @@ export class ChannelsService {
 
     return membership;
   }
+
+  async getChannelMembers(
+    name: string,
+    search?: string,
+    perPage?: number,
+    page?: number,
+  ): Promise<User[]> {
+    const channel: Channel = await this.getChannelByName(name);
+
+    return await this.usersService.getChannelMembers(
+      channel,
+      search,
+      perPage,
+      page,
+    );
+  }
 }
