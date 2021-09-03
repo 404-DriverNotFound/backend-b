@@ -131,7 +131,11 @@ export class ChannelsService {
     return channel;
   }
 
-  async createChannelMembers(name: string, password: string, user: User) {
+  async createChannelMember(
+    name: string,
+    password: string,
+    memberName: string,
+  ) {
     const channel: Channel = await this.getChannelByName(name);
 
     const isCorrect: boolean = await bcrypt.compare(password, channel.password);
@@ -139,6 +143,8 @@ export class ChannelsService {
     if (!isCorrect) {
       throw new UnauthorizedException('Invalid password.');
     }
+
+    const user: User = await this.usersService.getUserByName(memberName);
 
     const membership: Membership = this.membershipsRepository.create({
       channel,

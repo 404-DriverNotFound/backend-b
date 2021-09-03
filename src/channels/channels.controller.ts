@@ -24,6 +24,7 @@ import { ChannelsService } from './channels.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { GetChannelsFilterDto } from './dto/get-channels-filter.dto';
 import { UpdateChannelPasswordDto } from './dto/update-channel-password.dto';
+import { CreateChannelMemberDto } from './dto/create-channel-member.dto';
 
 @ApiTags('Channels')
 @ApiCookieAuth()
@@ -89,12 +90,11 @@ export class ChannelsController {
   @ApiResponse({ status: 404, description: '찾을 수 없음' })
   @ApiResponse({ status: 500, description: '서버 에러' })
   @Post(':name/members')
-  createChannelMembers(
+  createChannelMember(
     @Param('name') name: string,
-    @GetUser() user: User,
-    @Body() { password }: UpdateChannelPasswordDto,
+    @Body() { memberName, password }: CreateChannelMemberDto,
   ) {
-    return this.channelsService.createChannelMembers(name, password, user);
+    return this.channelsService.createChannelMember(name, password, memberName);
   }
 
   @ApiOperation({ summary: '특정 채널의 유저목록을 가져옵니다.' })
