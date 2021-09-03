@@ -239,6 +239,21 @@ export class ChannelsService {
     }
   }
 
+  async createChannelChat(
+    name: string,
+    user: User,
+    content: string,
+  ): Promise<Chat> {
+    const channel: Channel = await this.getChannelByName(name);
+    const chat = this.chatsRepository.create({ channel, user, content });
+    await this.chatsRepository.save(chat);
+    // TODO socket.io 설정 추가
+    //this.eventsGateway.server
+    //.to(`/ws-${url}-${chatWithUser.ChannelId}`)
+    //.emit('message', chatWithUser);
+    return chat;
+  }
+
   async getChannelChats(
     name: string,
     search?: string,

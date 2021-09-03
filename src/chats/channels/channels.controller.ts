@@ -26,6 +26,7 @@ import { UpdateChannelPasswordDto } from './dto/update-channel-password.dto';
 import { CreateChannelMemberDto } from './dto/create-channel-member.dto';
 import { PaginationFilterDto } from './dto/pagination-filter.dto';
 import { Chat } from './entities/chat.entity';
+import { CreateChannelChatDto } from './dto/create-channel-chat.dto';
 
 @ApiTags('Channels')
 @ApiCookieAuth()
@@ -118,6 +119,18 @@ export class ChannelsController {
     @Param('memberName') memberName: string,
   ): Promise<void> {
     return this.channelsService.deleteChannelMember(name, memberName);
+  }
+
+  @ApiOperation({ summary: '특정 채널의 채팅을 추가합니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 404, description: '채널 없음' })
+  @Post(':name/chats')
+  createChannelChat(
+    @Param('name') name: string,
+    @GetUser() user: User,
+    @Body() { content }: CreateChannelChatDto,
+  ): Promise<Chat> {
+    return this.channelsService.createChannelChat(name, user, content);
   }
 
   @ApiOperation({ summary: '특정 채널의 채팅을 모두 가져옵니다.' })
