@@ -10,7 +10,7 @@ import { Channel } from './entities/channel.entity';
 import { ChannelsRepository } from './repositories/channels.repository';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/users/user.entity';
-import { Like } from 'typeorm';
+import { Like, MoreThan } from 'typeorm';
 import { Membership } from './entities/membership.entity';
 import { MembershipsRepository } from './repositories/memberships.repository';
 import { UsersService } from 'src/users/users.service';
@@ -280,5 +280,14 @@ export class ChannelsService {
     const [data] = await this.chatsRepository.findAndCount(options);
 
     return data;
+  }
+
+  async getChannelChatsCount(name: string, after?: Date): Promise<number> {
+    const channel: Channel = await this.getChannelByName(name);
+    const options: any = { channel };
+    if (after) {
+      options.createdAt = MoreThan(after);
+    }
+    return await this.chatsRepository.count(options);
   }
 }

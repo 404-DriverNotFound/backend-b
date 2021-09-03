@@ -24,9 +24,10 @@ import { ChannelsService } from './channels.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelPasswordDto } from './dto/update-channel-password.dto';
 import { CreateChannelMemberDto } from './dto/create-channel-member.dto';
-import { PaginationFilterDto } from './dto/pagination-filter.dto';
+import { PaginationFilterDto } from './dto/pagination.dto';
 import { Chat } from './entities/chat.entity';
 import { CreateChannelChatDto } from './dto/create-channel-chat.dto';
+import { GetChannelChatsCountDto } from './dto/get-channel-chats-count.dto';
 
 @ApiTags('Channels')
 @ApiCookieAuth()
@@ -142,5 +143,17 @@ export class ChannelsController {
     @Query() { search, perPage, page }: PaginationFilterDto,
   ): Promise<Chat[]> {
     return this.channelsService.getChannelChats(name, search, perPage, page);
+  }
+
+  @ApiOperation({
+    summary: '특정 시점 이후에 생성된 채팅의 갯수를 가져옵니다.',
+  })
+  @ApiResponse({ status: 200, description: '성공' })
+  @Get(':name/chats/count')
+  getChannelChatsCount(
+    @Param('name') name: string,
+    @Query() { after }: GetChannelChatsCountDto,
+  ): Promise<number> {
+    return this.channelsService.getChannelChatsCount(name, after);
   }
 }
