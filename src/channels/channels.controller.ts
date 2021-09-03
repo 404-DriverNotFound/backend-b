@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -105,5 +106,16 @@ export class ChannelsController {
     @Query() { search, perPage, page }: GetChannelsFilterDto,
   ): Promise<User[]> {
     return this.channelsService.getChannelMembers(name, search, perPage, page);
+  }
+
+  @ApiOperation({ summary: '특정 채널에서 유저를 제거(강퇴, 퇴장)합니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 404, description: '채널, 유저 없음' })
+  @Delete(':name/members/:memberName')
+  deleteChannelMember(
+    @Param('name') name: string,
+    @Param('memberName') memberName: string,
+  ): Promise<void> {
+    return this.channelsService.deleteChannelMember(name, memberName);
   }
 }

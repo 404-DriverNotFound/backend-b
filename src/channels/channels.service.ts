@@ -14,6 +14,7 @@ import { Like } from 'typeorm';
 import { Membership } from './entities/membership.entity';
 import { MembershipsRepository } from './repositories/memberships.repository';
 import { UsersService } from 'src/users/users.service';
+import { MembershipRole } from './membership-role.enum';
 
 @Injectable()
 export class ChannelsService {
@@ -76,11 +77,7 @@ export class ChannelsService {
       password = await bcrypt.hash(password, salt);
     }
 
-    const channel: Channel = this.channelsRepository.create({
-      owner: user,
-      name,
-      password,
-    });
+    const channel: Channel = this.channelsRepository.create({ name, password });
 
     try {
       await this.channelsRepository.save(channel);
@@ -96,6 +93,7 @@ export class ChannelsService {
     const membership: Membership = this.membershipsRepository.create({
       channel,
       user,
+      role: MembershipRole.OWNER,
     });
 
     try {
@@ -119,7 +117,6 @@ export class ChannelsService {
   ): Promise<Channel> {
     const channel: Channel = await this.channelsRepository.findOne({
       name,
-      owner,
     });
 
     if (password) {
@@ -175,5 +172,60 @@ export class ChannelsService {
       perPage,
       page,
     );
+  }
+
+  async deleteChannelMember(name: string, memberName: string): Promise<void> {
+    const channel: Channel = await this.getChannelByName(name);
+    const user: User = await this.usersService.getUserByName(memberName);
+    const membership: Membership = await this.membershipsRepository.findOne({
+      channel,
+      user,
+    });
+
+    const result = await this.membershipsRepository.delete({ channel, user });
+
+    if (!result.affected) {
+      throw new NotFoundException(
+        `${memberName} is not a member of channel(${name}).`,
+      );
+    }
+
+    if (membership.role === MembershipRole.OWNER) {
+      const admin: Membership = await this.membershipsRepository.findOne({
+        where: { channel, role: MembershipRole.ADMIN },
+        relations: ['user'],
+      });
+
+      if (admin) {
+        // NOTE 위임 to admin
+        await this.membershipsRepository.save({
+          channel,
+          user: admin.user,
+          role: MembershipRole.OWNER,
+        });
+      } else {
+        const member: Membership = await this.membershipsRepository.findOne({
+          where: { channel, role: MembershipRole.MEMBER },
+          relations: ['user'],
+        });
+
+        if (member) {
+          // NOTE 위임
+          await this.membershipsRepository.save({
+            channel,
+            user: member.user,
+            role: MembershipRole.OWNER,
+          });
+        } else {
+          // NOTE 채널삭제
+          console.log(channel);
+          const result = await this.channelsRepository.delete(channel.id);
+
+          if (!result.affected) {
+            throw new NotFoundException('Cannot delete Channel');
+          }
+        }
+      }
+    }
   }
 }

@@ -1,10 +1,8 @@
 import { Exclude } from 'class-transformer';
-import { User } from 'src/users/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -29,12 +27,8 @@ export class Channel {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => User, { nullable: true })
-  admin: User;
-
-  @ManyToOne(() => User, { nullable: false })
-  owner: User;
-
-  @OneToMany(() => Membership, (membership) => membership.channel)
+  @OneToMany(() => Membership, (membership) => membership.channel, {
+    cascade: true,
+  })
   memberships: Membership[];
 }
