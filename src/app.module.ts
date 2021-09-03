@@ -8,7 +8,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
 import { FriendshipsModule } from './friendships/friendships.module';
-import { ChannelsModule } from './channels/channels.module';
+import { ChannelsModule } from './chats/channels/channels.module';
+import { ChatsModule } from './chats/chats.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ChannelsModule } from './channels/channels.module';
     FilesModule,
     FriendshipsModule,
     ChannelsModule,
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

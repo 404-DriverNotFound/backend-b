@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Channel } from 'src/channels/entities/channel.entity';
+import { Channel } from 'src/chats/channels/entities/channel.entity';
 //import { Friendship } from 'src/friendships/friendship.entity';
 //import { FriendshipsRepository } from 'src/friendships/friendships.repository';
 import { CreateUserDto } from './dto/create-user.dto';

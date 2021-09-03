@@ -9,7 +9,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './user.entity';
 import { buildPaginator, PagingQuery } from 'typeorm-cursor-pagination';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
-import { Channel } from 'src/channels/entities/channel.entity';
+import { Channel } from 'src/chats/channels/entities/channel.entity';
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
