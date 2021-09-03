@@ -6,6 +6,7 @@ import { ChannelsService } from './channels.service';
 import { MembershipsRepository } from './repositories/memberships.repository';
 import { UsersRepository } from 'src/users/users.repository';
 import { UsersService } from 'src/users/users.service';
+import { ChatsRepository } from './repositories/chats.repository';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { UsersService } from 'src/users/users.service';
       ChannelsRepository,
       MembershipsRepository,
       UsersRepository,
+      ChatsRepository,
     ]),
   ],
   controllers: [ChannelsController],

@@ -15,15 +15,19 @@ import { Membership } from './entities/membership.entity';
 import { MembershipsRepository } from './repositories/memberships.repository';
 import { UsersService } from 'src/users/users.service';
 import { MembershipRole } from './membership-role.enum';
+import { Chat } from './entities/chat.entity';
+import { ChatsRepository } from './repositories/chats.repository';
 
 @Injectable()
 export class ChannelsService {
   constructor(
+    private readonly usersService: UsersService,
     @InjectRepository(ChannelsRepository)
     private readonly channelsRepository: ChannelsRepository,
     @InjectRepository(MembershipsRepository)
     private readonly membershipsRepository: MembershipsRepository,
-    private readonly usersService: UsersService,
+    @InjectRepository(ChatsRepository)
+    private readonly chatsRepository: ChatsRepository,
   ) {}
 
   async getChannels(
@@ -233,5 +237,33 @@ export class ChannelsService {
         }
       }
     }
+  }
+
+  async getChannelChats(
+    name: string,
+    search?: string,
+    perPage?: number,
+    page?: number,
+  ): Promise<Chat[]> {
+    const channel: Channel = await this.getChannelByName(name);
+
+    const options: any = { where: { channel }, order: { createdAt: 'DESC' } };
+
+    //REVIEW 채팅 내용 검색 테스트 필요
+    if (search) {
+      options.where = { ...options.where, content: Like(`%${search}%`) };
+    }
+
+    if (perPage) {
+      options.take = perPage;
+    }
+
+    if (page) {
+      options.skip = perPage * (page - 1);
+    }
+
+    const [data] = await this.chatsRepository.findAndCount(options);
+
+    return data;
   }
 }

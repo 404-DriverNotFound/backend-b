@@ -1,4 +1,5 @@
 import { Exclude, Transform } from 'class-transformer';
+import { Chat } from 'src/chats/channels/entities/chat.entity';
 import { Membership } from 'src/chats/channels/entities/membership.entity';
 import {
   Column,
@@ -38,6 +39,11 @@ export class User {
   @Column({ default: false })
   isSecondFactorAuthenticated: boolean;
 
-  @OneToMany(() => Membership, (membership) => membership.user)
+  @OneToMany(() => Membership, (membership) => membership.user, {
+    cascade: true,
+  })
   memberships: Membership[];
+
+  @OneToMany(() => Chat, (chat) => chat.user, { cascade: true })
+  chats: Chat[];
 }

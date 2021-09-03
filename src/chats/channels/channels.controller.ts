@@ -22,9 +22,10 @@ import { User } from 'src/users/user.entity';
 import { Channel } from './entities/channel.entity';
 import { ChannelsService } from './channels.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
-import { GetChannelsFilterDto } from './dto/get-channels-filter.dto';
 import { UpdateChannelPasswordDto } from './dto/update-channel-password.dto';
 import { CreateChannelMemberDto } from './dto/create-channel-member.dto';
+import { PaginationFilterDto } from './dto/pagination-filter.dto';
+import { Chat } from './entities/chat.entity';
 
 @ApiTags('Channels')
 @ApiCookieAuth()
@@ -38,7 +39,7 @@ export class ChannelsController {
   @ApiResponse({ status: 200, description: '성공' })
   @Get()
   getChannels(
-    @Query() { search, perPage, page }: GetChannelsFilterDto,
+    @Query() { search, perPage, page }: PaginationFilterDto,
   ): Promise<Channel[]> {
     return this.channelsService.getChannels(search, perPage, page);
   }
@@ -48,7 +49,7 @@ export class ChannelsController {
   @Get('me')
   getChannelsByMe(
     @GetUser() user: User,
-    @Query() { search, perPage, page }: GetChannelsFilterDto,
+    @Query() { search, perPage, page }: PaginationFilterDto,
   ): Promise<Channel[]> {
     return this.channelsService.getChannelsByMe(user, search, perPage, page);
   }
@@ -103,7 +104,7 @@ export class ChannelsController {
   @Get(':name/members')
   getChannelMembers(
     @Param('name') name: string,
-    @Query() { search, perPage, page }: GetChannelsFilterDto,
+    @Query() { search, perPage, page }: PaginationFilterDto,
   ): Promise<User[]> {
     return this.channelsService.getChannelMembers(name, search, perPage, page);
   }
@@ -117,5 +118,16 @@ export class ChannelsController {
     @Param('memberName') memberName: string,
   ): Promise<void> {
     return this.channelsService.deleteChannelMember(name, memberName);
+  }
+
+  @ApiOperation({ summary: '특정 채널의 채팅을 모두 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 404, description: '채널 없음' })
+  @Get(':name/chats')
+  getChannelChats(
+    @Param('name') name: string,
+    @Query() { search, perPage, page }: PaginationFilterDto,
+  ): Promise<Chat[]> {
+    return this.channelsService.getChannelChats(name, search, perPage, page);
   }
 }

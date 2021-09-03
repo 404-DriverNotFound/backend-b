@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Chat } from './chat.entity';
 import { Membership } from './membership.entity';
 
 @Entity()
@@ -31,4 +32,7 @@ export class Channel {
     cascade: true,
   })
   memberships: Membership[];
+
+  @OneToMany(() => Chat, (chat) => chat.user, { cascade: true })
+  chats: Chat[];
 }

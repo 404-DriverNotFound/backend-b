@@ -8,7 +8,7 @@ import {
   MaxLength,
 } from 'class-validator';
 
-export class GetChannelsFilterDto {
+export class PaginationFilterDto {
   @ApiProperty({
     description: 'Channel name search',
     required: false,
