@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
 import { FriendshipsModule } from './friendships/friendships.module';
 import { ChannelsModule } from './channels/channels.module';
+import { DmsModule } from './dms/dms.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ChannelsModule } from './channels/channels.module';
     FilesModule,
     FriendshipsModule,
     ChannelsModule,
+    DmsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
