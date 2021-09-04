@@ -14,11 +14,11 @@ export class DmsService {
   ) {}
 
   async createDm(sender: User, name?: string, content?: string): Promise<Dm> {
-    const receiver: User = await this.usersService.getUserByName(name);
-
-    if (sender.id === receiver.id) {
+    if (sender.name === name) {
       throw new ConflictException('Cannot send dm to you');
     }
+
+    const receiver: User = await this.usersService.getUserByName(name);
 
     const dm: Dm = this.dmsRepository.create({ sender, receiver, content });
 
@@ -26,5 +26,21 @@ export class DmsService {
     // TODO socket 설정
 
     return dm;
+  }
+
+  async getDms(
+    user: User,
+    oppositeName?: string,
+    search?: string,
+    perPage?: number,
+    page?: number,
+  ): Promise<Dm[]> {
+    if (user.name === oppositeName) {
+      throw new ConflictException('Cannot send dm to you');
+    }
+
+    const opposite: User = await this.usersService.getUserByName(oppositeName);
+
+    return this.dmsRepository.getDms(user, opposite, search, perPage, page);
   }
 }

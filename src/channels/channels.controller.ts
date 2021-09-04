@@ -24,7 +24,7 @@ import { ChannelsService } from './channels.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelPasswordDto } from './dto/update-channel-password.dto';
 import { CreateChannelMemberDto } from './dto/create-channel-member.dto';
-import { PaginationFilterDto } from './dto/pagination.dto';
+import { PaginationFilterDto } from './dto/pagination-filter.dto';
 import { Chat } from './entities/chat.entity';
 import { CreateChannelChatDto } from './dto/create-channel-chat.dto';
 import { GetChannelChatsCountDto } from './dto/get-channel-chats-count.dto';

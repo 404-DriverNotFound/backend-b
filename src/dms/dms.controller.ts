@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiCookieAuth,
   ApiOperation,
@@ -12,6 +12,7 @@ import { User } from 'src/users/user.entity';
 import { Dm } from './dm.entity';
 import { DmsService } from './dms.service';
 import { CreateDmDto } from './dto/create-dm.dto';
+import { GetDmsDto } from './dto/get-dms.dto';
 
 @ApiTags('Dms')
 @ApiCookieAuth()
@@ -29,5 +30,15 @@ export class DmsController {
     @Body() { name, content }: CreateDmDto,
   ): Promise<Dm> {
     return this.dmsService.createDm(user, name, content);
+  }
+
+  @ApiOperation({ summary: '특정 유저와 나눈 DM을 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @Get()
+  getDms(
+    @GetUser() user: User,
+    @Query() { opposite: oppositeName, search, perPage, page }: GetDmsDto,
+  ): Promise<Dm[]> {
+    return this.dmsService.getDms(user, oppositeName, search, perPage, page);
   }
 }
