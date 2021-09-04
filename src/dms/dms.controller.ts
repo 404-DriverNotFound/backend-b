@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiCookieAuth,
   ApiOperation,
@@ -7,12 +15,12 @@ import {
 } from '@nestjs/swagger';
 import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-authenticated.guard';
+import { PaginationFilterDto } from 'src/channels/dto/pagination-filter.dto';
 import { GetUser } from 'src/users/get-user.decorator';
 import { User } from 'src/users/user.entity';
 import { Dm } from './dm.entity';
 import { DmsService } from './dms.service';
 import { CreateDmDto } from './dto/create-dm.dto';
-import { GetDmsDto } from './dto/get-dms.dto';
 
 @ApiTags('Dms')
 @ApiCookieAuth()
@@ -34,11 +42,18 @@ export class DmsController {
 
   @ApiOperation({ summary: '특정 유저와 나눈 DM을 가져옵니다.' })
   @ApiResponse({ status: 200, description: '성공' })
-  @Get()
-  getDms(
+  @Get('opposite/:name')
+  getDmsByOpposite(
     @GetUser() user: User,
-    @Query() { opposite: oppositeName, search, perPage, page }: GetDmsDto,
+    @Param('name') oppositeName: string,
+    @Query() { search, perPage, page }: PaginationFilterDto,
   ): Promise<Dm[]> {
-    return this.dmsService.getDms(user, oppositeName, search, perPage, page);
+    return this.dmsService.getDmsByOpposite(
+      user,
+      oppositeName,
+      search,
+      perPage,
+      page,
+    );
   }
 }

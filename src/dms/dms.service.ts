@@ -28,9 +28,9 @@ export class DmsService {
     return dm;
   }
 
-  async getDms(
+  async getDmsByOpposite(
     user: User,
-    oppositeName?: string,
+    oppositeName: string,
     search?: string,
     perPage?: number,
     page?: number,
