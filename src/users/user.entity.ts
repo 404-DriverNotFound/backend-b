@@ -1,6 +1,6 @@
 import { Exclude, Transform } from 'class-transformer';
-import { Chat } from 'src/chats/channels/entities/chat.entity';
-import { Membership } from 'src/chats/channels/entities/membership.entity';
+import { Chat } from 'src/channels/entities/chat.entity';
+import { Membership } from 'src/channels/entities/membership.entity';
 import {
   Column,
   Entity,
