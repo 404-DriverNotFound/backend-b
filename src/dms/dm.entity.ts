@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity()
+@Entity('user_dm_user')
 export class Dm {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -20,9 +20,9 @@ export class Dm {
   @Index()
   createdAt: Date;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.senderDms)
   sender: User;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.receiverDms)
   receiver: User;
 }

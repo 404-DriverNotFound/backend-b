@@ -1,6 +1,7 @@
 import { Exclude, Transform } from 'class-transformer';
 import { Chat } from 'src/channels/entities/chat.entity';
 import { Membership } from 'src/channels/entities/membership.entity';
+import { Dm } from 'src/dms/dm.entity';
 import {
   Column,
   Entity,
@@ -46,4 +47,10 @@ export class User {
 
   @OneToMany(() => Chat, (chat) => chat.user, { cascade: true })
   chats: Chat[];
+
+  @OneToMany(() => Dm, (dm) => dm.sender, { cascade: true })
+  senderDms: Dm[];
+
+  @OneToMany(() => Dm, (dm) => dm.receiver, { cascade: true })
+  receiverDms: Dm[];
 }

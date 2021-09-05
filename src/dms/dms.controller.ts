@@ -21,39 +21,50 @@ import { User } from 'src/users/user.entity';
 import { Dm } from './dm.entity';
 import { DmsService } from './dms.service';
 import { CreateDmDto } from './dto/create-dm.dto';
+import { GetDMersFilterDto } from './dto/get-dmers.dto';
 
 @ApiTags('Dms')
 @ApiCookieAuth()
 @UseGuards(AuthenticatedGuard)
 @UseGuards(SecondFactorAuthenticatedGuard)
-@Controller('dms')
+@Controller()
 export class DmsController {
   constructor(private readonly dmsService: DmsService) {}
 
   @ApiOperation({ summary: '특정 유저에게 DM을 보냅니다.' })
   @ApiResponse({ status: 200, description: '성공' })
-  @Post()
-  createDm(
+  @Post('dms')
+  createDM(
     @GetUser() user: User,
     @Body() { name, content }: CreateDmDto,
   ): Promise<Dm> {
-    return this.dmsService.createDm(user, name, content);
+    return this.dmsService.createDM(user, name, content);
   }
 
   @ApiOperation({ summary: '특정 유저와 나눈 DM을 가져옵니다.' })
   @ApiResponse({ status: 200, description: '성공' })
-  @Get('opposite/:name')
-  getDmsByOpposite(
+  @Get('dms/opposite/:name')
+  getDMsByOppositeName(
     @GetUser() user: User,
     @Param('name') oppositeName: string,
     @Query() { search, perPage, page }: PaginationFilterDto,
   ): Promise<Dm[]> {
-    return this.dmsService.getDmsByOpposite(
+    return this.dmsService.getDMsByOppositeName(
       user,
       oppositeName,
       search,
       perPage,
       page,
     );
+  }
+
+  @ApiOperation({ summary: '나와 DM을 나눈 유저 목록을 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @Get('dmers')
+  getDMers(
+    @GetUser() user: User,
+    @Query() { perPage, page }: GetDMersFilterDto,
+  ): Promise<User[]> {
+    return this.dmsService.getDMers(user, perPage, page);
   }
 }

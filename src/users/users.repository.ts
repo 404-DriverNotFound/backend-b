@@ -3,7 +3,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { EntityRepository, Repository } from 'typeorm';
+import { Brackets, EntityRepository, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './user.entity';
@@ -135,6 +135,52 @@ export class UsersRepository extends Repository<User> {
     if (search) {
       qb.andWhere('user.name LIKE :search', { search: `%${search}%` });
     }
+
+    if (perPage) {
+      qb.take(perPage);
+    }
+
+    if (page) {
+      qb.skip(perPage * (page - 1));
+    }
+
+    try {
+      const users: User[] = await qb.getMany();
+      return users;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  async getDMers(user: User, perPage?: number, page?: number): Promise<User[]> {
+    //NOTE Query version
+    //const qb = this.createQueryBuilder('user')
+    //  .leftJoin('user.senderDms', 'senderDms')
+    //  .leftJoin('user.receiverDms', 'receiverDms')
+    //  .where(
+    //    '(receiverDms.senderId = :id AND receiverDms.receiverId != :id) OR (senderDms.senderId != :id AND senderDms.receiverId = :id)',
+    //    {
+    //      id: user.id,
+    //    },
+    //  );
+
+    //NOTE Brackets version
+    const parameters = { id: user.id };
+    const qb = this.createQueryBuilder('user')
+      .leftJoin('user.senderDms', 'senderDms')
+      .leftJoin('user.receiverDms', 'receiverDms')
+      .where(
+        new Brackets((qb) => {
+          qb.where('receiverDms.senderId = :id', parameters);
+          qb.andWhere('receiverDms.receiverId != :id', parameters);
+        }),
+      )
+      .orWhere(
+        new Brackets((qb) => {
+          qb.where('senderDms.senderId != :id', parameters);
+          qb.andWhere('senderDms.receiverId = :id', parameters);
+        }),
+      );
 
     if (perPage) {
       qb.take(perPage);

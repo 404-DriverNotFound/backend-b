@@ -1,6 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
+import { UsersRepository } from 'src/users/users.repository';
 import { UsersService } from 'src/users/users.service';
 import { Dm } from './dm.entity';
 import { DmsRepository } from './dms.repository';
@@ -11,9 +12,11 @@ export class DmsService {
     private readonly usersService: UsersService,
     @InjectRepository(DmsRepository)
     private readonly dmsRepository: DmsRepository,
+    @InjectRepository(UsersRepository)
+    private readonly usersRepository: UsersRepository,
   ) {}
 
-  async createDm(sender: User, name?: string, content?: string): Promise<Dm> {
+  async createDM(sender: User, name?: string, content?: string): Promise<Dm> {
     if (sender.name === name) {
       throw new ConflictException('Cannot send dm to you');
     }
@@ -28,7 +31,7 @@ export class DmsService {
     return dm;
   }
 
-  async getDmsByOpposite(
+  async getDMsByOppositeName(
     user: User,
     oppositeName: string,
     search?: string,
@@ -41,6 +44,16 @@ export class DmsService {
 
     const opposite: User = await this.usersService.getUserByName(oppositeName);
 
-    return this.dmsRepository.getDms(user, opposite, search, perPage, page);
+    return this.dmsRepository.getDMsByOpposite(
+      user,
+      opposite,
+      search,
+      perPage,
+      page,
+    );
+  }
+
+  getDMers(user: User, perPage?: number, page?: number): Promise<User[]> {
+    return this.usersRepository.getDMers(user, perPage, page);
   }
 }

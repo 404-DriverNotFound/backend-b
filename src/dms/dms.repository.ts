@@ -4,16 +4,14 @@ import { Dm } from './dm.entity';
 
 @EntityRepository(Dm)
 export class DmsRepository extends Repository<Dm> {
-  async getDms(
+  async getDMsByOpposite(
     user: User,
     opposite: User,
     search?: string,
     perPage?: number,
     page?: number,
   ): Promise<Dm[]> {
-    const qb = this.createQueryBuilder('dm');
-
-    qb.where(
+    const qb = this.createQueryBuilder('dm').where(
       new Brackets((qb) => {
         const parameters: ObjectLiteral = {
           userId: user.id,
