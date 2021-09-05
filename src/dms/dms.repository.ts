@@ -1,5 +1,5 @@
 import { User } from 'src/users/user.entity';
-import { Brackets, EntityRepository, ObjectLiteral, Repository } from 'typeorm';
+import { Brackets, EntityRepository, Repository } from 'typeorm';
 import { Dm } from './dm.entity';
 
 @EntityRepository(Dm)
@@ -13,10 +13,7 @@ export class DmsRepository extends Repository<Dm> {
   ): Promise<Dm[]> {
     const qb = this.createQueryBuilder('dm').where(
       new Brackets((qb) => {
-        const parameters: ObjectLiteral = {
-          userId: user.id,
-          oppositeId: opposite.id,
-        };
+        const parameters = { userId: user.id, oppositeId: opposite.id };
         qb.where(
           'dm.senderId = :userId AND dm.receiverId = :oppositeId',
           parameters,
@@ -34,9 +31,37 @@ export class DmsRepository extends Repository<Dm> {
     if (perPage) {
       qb.take(perPage);
     }
+
     if (page) {
       qb.skip(perPage * (page - 1));
     }
     return await qb.getMany();
+  }
+
+  async getDMsByOppositeNameCount(
+    user: User,
+    opposite: User,
+    after?: Date,
+  ): Promise<number> {
+    const qb = this.createQueryBuilder('dm');
+
+    qb.where(
+      new Brackets((qb) => {
+        const parameters = { userId: user.id, oppositeId: opposite.id };
+        qb.where(
+          'dm.senderId = :userId AND dm.receiverId = :oppositeId',
+          parameters,
+        ).orWhere(
+          'dm.senderId = :oppositeId AND dm.receiverId = :userId',
+          parameters,
+        );
+      }),
+    );
+
+    if (after) {
+      qb.andWhere('dm.createdAt > :after', { after });
+    }
+
+    return await qb.getCount();
   }
 }

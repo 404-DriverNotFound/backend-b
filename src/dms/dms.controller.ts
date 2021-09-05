@@ -15,6 +15,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-authenticated.guard';
+import { GetChannelChatsCountDto } from 'src/channels/dto/get-channel-chats-count.dto';
 import { PaginationFilterDto } from 'src/channels/dto/pagination-filter.dto';
 import { GetUser } from 'src/users/get-user.decorator';
 import { User } from 'src/users/user.entity';
@@ -56,6 +57,19 @@ export class DmsController {
       perPage,
       page,
     );
+  }
+
+  @ApiOperation({
+    summary: '특정 시점 이후에 특정 유저와 나눈 DM의 갯수를 가져옵니다.',
+  })
+  @ApiResponse({ status: 200, description: '성공' })
+  @Get('dms/opposite/:name/count')
+  getDMsByOppositeNameCount(
+    @GetUser() user: User,
+    @Param('name') oppositeName: string,
+    @Query() { after }: GetChannelChatsCountDto,
+  ): Promise<number> {
+    return this.dmsService.getDMsByOppositeNameCount(user, oppositeName, after);
   }
 
   @ApiOperation({ summary: '나와 DM을 나눈 유저 목록을 가져옵니다.' })

@@ -53,6 +53,20 @@ export class DmsService {
     );
   }
 
+  async getDMsByOppositeNameCount(
+    user: User,
+    oppositeName: string,
+    after?: Date,
+  ): Promise<number> {
+    if (user.name === oppositeName) {
+      throw new ConflictException('Cannot send dm to you');
+    }
+
+    const opposite: User = await this.usersService.getUserByName(oppositeName);
+
+    return this.dmsRepository.getDMsByOppositeNameCount(user, opposite, after);
+  }
+
   getDMers(user: User, perPage?: number, page?: number): Promise<User[]> {
     return this.usersRepository.getDMers(user, perPage, page);
   }
