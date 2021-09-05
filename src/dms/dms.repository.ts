@@ -11,18 +11,20 @@ export class DmsRepository extends Repository<Dm> {
     perPage?: number,
     page?: number,
   ): Promise<Dm[]> {
-    const qb = this.createQueryBuilder('dm').where(
-      new Brackets((qb) => {
-        const parameters = { userId: user.id, oppositeId: opposite.id };
-        qb.where(
-          'dm.senderId = :userId AND dm.receiverId = :oppositeId',
-          parameters,
-        ).orWhere(
-          'dm.senderId = :oppositeId AND dm.receiverId = :userId',
-          parameters,
-        );
-      }),
-    );
+    const qb = this.createQueryBuilder('dm')
+      .where(
+        new Brackets((qb) => {
+          const parameters = { userId: user.id, oppositeId: opposite.id };
+          qb.where(
+            'dm.senderId = :userId AND dm.receiverId = :oppositeId',
+            parameters,
+          ).orWhere(
+            'dm.senderId = :oppositeId AND dm.receiverId = :userId',
+            parameters,
+          );
+        }),
+      )
+      .orderBy('dm.createdAt', 'DESC');
 
     if (search) {
       qb.andWhere('dm.content LIKE :search', { search: `%${search}%` });
