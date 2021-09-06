@@ -97,7 +97,7 @@ export class ChannelsController {
     @Param('name') name: string,
     @Body() { memberName, password }: CreateChannelMemberDto,
   ) {
-    return this.channelsService.createChannelMember(name, password, memberName);
+    return this.channelsService.createChannelMember(name, memberName, password);
   }
 
   @ApiOperation({ summary: '특정 채널의 유저목록을 가져옵니다.' })

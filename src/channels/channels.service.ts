@@ -137,15 +137,24 @@ export class ChannelsService {
 
   async createChannelMember(
     name: string,
-    password: string,
     memberName: string,
+    password?: string,
   ) {
     const channel: Channel = await this.getChannelByName(name);
 
-    const isCorrect: boolean = await bcrypt.compare(password, channel.password);
+    if (channel.password) {
+      if (!password) {
+        throw new UnauthorizedException('Password is required.');
+      }
 
-    if (!isCorrect) {
-      throw new UnauthorizedException('Invalid password.');
+      const isCorrect: boolean = await bcrypt.compare(
+        password,
+        channel.password,
+      );
+
+      if (!isCorrect) {
+        throw new UnauthorizedException('Invalid password.');
+      }
     }
 
     const user: User = await this.usersService.getUserByName(memberName);
