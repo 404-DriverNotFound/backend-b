@@ -116,10 +116,11 @@ export class ChannelsController {
   @ApiResponse({ status: 404, description: '채널, 유저 없음' })
   @Delete(':name/members/:memberName')
   deleteChannelMember(
+    @GetUser() user: User,
     @Param('name') name: string,
     @Param('memberName') memberName: string,
   ): Promise<void> {
-    return this.channelsService.deleteChannelMember(name, memberName);
+    return this.channelsService.deleteChannelMember(user, name, memberName);
   }
 
   @ApiOperation({ summary: '특정 채널의 채팅을 추가합니다.' })

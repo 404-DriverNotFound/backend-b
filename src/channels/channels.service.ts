@@ -194,15 +194,49 @@ export class ChannelsService {
     );
   }
 
-  async deleteChannelMember(name: string, memberName: string): Promise<void> {
+  async deleteChannelMember(
+    user: User,
+    name: string,
+    memberName: string,
+  ): Promise<void> {
     const channel: Channel = await this.getChannelByName(name);
-    const user: User = await this.usersService.getUserByName(memberName);
-    const membership: Membership = await this.membershipsRepository.findOne({
-      channel,
-      user,
-    });
 
-    const result = await this.membershipsRepository.delete({ channel, user });
+    const membershipOfRequester: Membership =
+      await this.membershipsRepository.findOne({ channel, user });
+
+    const member: User = await this.usersService.getUserByName(memberName);
+    const membershipOfMember: Membership =
+      await this.membershipsRepository.findOne({
+        channel,
+        user: member,
+      });
+
+    if (user.name !== memberName) {
+      switch (membershipOfMember.role) {
+        case MembershipRole.OWNER:
+          // NOTE OWNER일 경우, 강퇴 불가
+          throw new ForbiddenException('You do not have permission.');
+
+        case MembershipRole.ADMIN:
+          // NOTE ADMIN일 경우, OWNER만 강퇴 가능
+          if (membershipOfRequester.role !== MembershipRole.OWNER) {
+            throw new ForbiddenException('You do not have permission.');
+          }
+          break;
+
+        case MembershipRole.MEMBER:
+          // NOTE MEMBER일 경우, OWNER, ADMIN만 강퇴 가능
+          if (membershipOfRequester.role === MembershipRole.MEMBER) {
+            throw new ForbiddenException('You do not have permission.');
+          }
+          break;
+      }
+    }
+    // NOTE 삭제
+    const result = await this.membershipsRepository.delete({
+      channel,
+      user: member,
+    });
 
     if (!result.affected) {
       throw new NotFoundException(
@@ -210,12 +244,12 @@ export class ChannelsService {
       );
     }
 
-    if (membership.role === MembershipRole.OWNER) {
+    // NOTE 권한 위임
+    if (membershipOfMember.role === MembershipRole.OWNER) {
       const admin: Membership = await this.membershipsRepository.findOne({
         where: { channel, role: MembershipRole.ADMIN },
         relations: ['user'],
       });
-
       if (admin) {
         // NOTE 위임 to admin
         await this.membershipsRepository.save({
@@ -228,7 +262,6 @@ export class ChannelsService {
           where: { channel, role: MembershipRole.MEMBER },
           relations: ['user'],
         });
-
         if (member) {
           // NOTE 위임
           await this.membershipsRepository.save({
@@ -238,9 +271,7 @@ export class ChannelsService {
           });
         } else {
           // NOTE 채널삭제
-          console.log(channel);
           const result = await this.channelsRepository.delete(channel.id);
-
           if (!result.affected) {
             throw new NotFoundException('Cannot delete Channel');
           }
