@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -254,6 +255,16 @@ export class ChannelsService {
     content: string,
   ): Promise<Chat> {
     const channel: Channel = await this.getChannelByName(name);
+
+    const isMember: Membership = await this.membershipsRepository.findOne({
+      user,
+      channel,
+    });
+
+    if (!isMember) {
+      throw new ForbiddenException('You are not a member of this channel.');
+    }
+
     const chat = this.chatsRepository.create({ channel, user, content });
     await this.chatsRepository.save(chat);
     // TODO socket.io 설정 추가
@@ -264,12 +275,22 @@ export class ChannelsService {
   }
 
   async getChannelChats(
+    user: User,
     name: string,
     search?: string,
     perPage?: number,
     page?: number,
   ): Promise<Chat[]> {
     const channel: Channel = await this.getChannelByName(name);
+
+    const isMember: Membership = await this.membershipsRepository.findOne({
+      user,
+      channel,
+    });
+
+    if (!isMember) {
+      throw new ForbiddenException('You are not a member of this channel.');
+    }
 
     const options: any = {
       where: { channel },

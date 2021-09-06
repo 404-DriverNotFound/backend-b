@@ -139,10 +139,17 @@ export class ChannelsController {
   @ApiResponse({ status: 404, description: '채널 없음' })
   @Get(':name/chats')
   getChannelChats(
+    @GetUser() user: User,
     @Param('name') name: string,
     @Query() { search, perPage, page }: PaginationFilterDto,
   ): Promise<Chat[]> {
-    return this.channelsService.getChannelChats(name, search, perPage, page);
+    return this.channelsService.getChannelChats(
+      user,
+      name,
+      search,
+      perPage,
+      page,
+    );
   }
 
   @ApiOperation({
