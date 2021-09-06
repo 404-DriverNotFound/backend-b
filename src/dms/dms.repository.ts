@@ -12,14 +12,16 @@ export class DmsRepository extends Repository<Dm> {
     page?: number,
   ): Promise<Dm[]> {
     const qb = this.createQueryBuilder('dm')
+      .leftJoinAndSelect('dm.sender', 'sender')
+      .leftJoinAndSelect('dm.receiver', 'receiver')
       .where(
         new Brackets((qb) => {
           const parameters = { userId: user.id, oppositeId: opposite.id };
           qb.where(
-            'dm.senderId = :userId AND dm.receiverId = :oppositeId',
+            'sender.id = :userId AND receiver.id = :oppositeId',
             parameters,
           ).orWhere(
-            'dm.senderId = :oppositeId AND dm.receiverId = :userId',
+            'sender.id = :oppositeId AND receiver.id = :userId',
             parameters,
           );
         }),
