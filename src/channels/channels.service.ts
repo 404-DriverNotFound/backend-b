@@ -262,7 +262,11 @@ export class ChannelsService {
   ): Promise<Chat[]> {
     const channel: Channel = await this.getChannelByName(name);
 
-    const options: any = { where: { channel }, order: { createdAt: 'DESC' } };
+    const options: any = {
+      where: { channel },
+      relations: ['user'],
+      order: { createdAt: 'DESC' },
+    };
 
     //REVIEW 채팅 내용 검색 테스트 필요
     if (search) {
@@ -276,8 +280,8 @@ export class ChannelsService {
     if (page) {
       options.skip = perPage * (page - 1);
     }
-
     const [data] = await this.chatsRepository.findAndCount(options);
+    console.log(data);
 
     return data;
   }
