@@ -18,6 +18,7 @@ import { UsersService } from 'src/users/users.service';
 import { MembershipRole } from './membership-role.enum';
 import { Chat } from './entities/chat.entity';
 import { ChatsRepository } from './repositories/chats.repository';
+import { EventsGateway } from 'src/events/events.gateway';
 
 @Injectable()
 export class ChannelsService {
@@ -29,6 +30,7 @@ export class ChannelsService {
     private readonly membershipsRepository: MembershipsRepository,
     @InjectRepository(ChatsRepository)
     private readonly chatsRepository: ChatsRepository,
+    private readonly eventsGateway: EventsGateway,
   ) {}
 
   async getChannels(
@@ -343,10 +345,8 @@ export class ChannelsService {
 
     const chat = this.chatsRepository.create({ channel, user, content });
     await this.chatsRepository.save(chat);
-    // TODO socket.io 설정 추가
-    //this.eventsGateway.server
-    //.to(`/ws-${url}-${chatWithUser.ChannelId}`)
-    //.emit('message', chatWithUser);
+    // REVIEW socket.io 설정 추가
+    this.eventsGateway.server.to(chat.channel.id).emit('message', chat);
     return chat;
   }
 
