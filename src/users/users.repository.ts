@@ -125,7 +125,7 @@ export class UsersRepository extends Repository<User> {
   ): Promise<User[]> {
     const qb = this.createQueryBuilder('user');
 
-    qb.innerJoin(
+    qb.innerJoinAndSelect(
       'user.memberships',
       'memberships',
       'memberships.channelId = :id',
