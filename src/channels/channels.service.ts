@@ -188,6 +188,11 @@ export class ChannelsService {
 
     const membershipOfRequester: Membership =
       await this.membershipsRepository.findOne({ channel, user });
+    if (!membershipOfRequester) {
+      throw new NotFoundException(
+        `${user.name} is not a member of channel(${name}).`,
+      );
+    }
 
     const member: User = await this.usersService.getUserByName(memberName);
     const membershipOfMember: Membership =
@@ -195,6 +200,11 @@ export class ChannelsService {
         channel,
         user: member,
       });
+    if (!membershipOfMember) {
+      throw new NotFoundException(
+        `${member.name} is not a member of channel(${name}).`,
+      );
+    }
 
     if (user.name !== memberName) {
       switch (membershipOfMember.role) {
@@ -263,6 +273,56 @@ export class ChannelsService {
         }
       }
     }
+  }
+
+  async updateChannelMemberRole(
+    user: User,
+    name: string,
+    memberName: string,
+    role: MembershipRole,
+  ): Promise<Membership> {
+    if (user.name === memberName) {
+      throw new ForbiddenException('Cannot change yourself.');
+    }
+
+    if (role === MembershipRole.OWNER) {
+      throw new ForbiddenException(
+        `Cannot update ${memberName}'s role to ${role}.`,
+      );
+    }
+
+    const channel: Channel = await this.getChannelByName(name);
+
+    const membershipOfRequester: Membership =
+      await this.membershipsRepository.findOne({ channel, user });
+    if (!membershipOfRequester) {
+      throw new NotFoundException(
+        `${user.name} is not a member of channel(${name}).`,
+      );
+    }
+
+    if (membershipOfRequester.role !== MembershipRole.OWNER) {
+      throw new ForbiddenException('You are not the owner.');
+    }
+    const member: User = await this.usersService.getUserByName(memberName);
+
+    const membershipOfMember: Membership =
+      await this.membershipsRepository.findOne({
+        channel,
+        user: member,
+      });
+    if (!membershipOfMember) {
+      throw new NotFoundException(
+        `${member.name} is not a member of channel(${name}).`,
+      );
+    }
+
+    await this.membershipsRepository.update(
+      { channel, user: member },
+      { channel, user: member, role },
+    );
+
+    return membershipOfMember;
   }
 
   async createChannelChat(

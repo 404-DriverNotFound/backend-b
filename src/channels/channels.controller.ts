@@ -28,6 +28,8 @@ import { PaginationFilterDto } from './dto/pagination-filter.dto';
 import { Chat } from './entities/chat.entity';
 import { CreateChannelChatDto } from './dto/create-channel-chat.dto';
 import { GetChannelChatsCountDto } from './dto/get-channel-chats-count.dto';
+import { Membership } from './entities/membership.entity';
+import { UpdateChannelMemberRoleDto } from './dto/update-channel-member-role.dto';
 
 @ApiTags('Channels')
 @ApiCookieAuth()
@@ -122,6 +124,26 @@ export class ChannelsController {
     @Param('memberName') memberName: string,
   ): Promise<void> {
     return this.channelsService.deleteChannelMember(user, name, memberName);
+  }
+
+  @ApiOperation({
+    summary: '특정 채널에서 특정 유저의 role(권한)을 변경합니다.',
+  })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 404, description: '채널, 유저 없음' })
+  @Patch(':name/members/:memberName/role')
+  updateChannelMemberRole(
+    @GetUser() user: User,
+    @Param('name') name: string,
+    @Param('memberName') memberName: string,
+    @Body() { role }: UpdateChannelMemberRoleDto,
+  ): Promise<Membership> {
+    return this.channelsService.updateChannelMemberRole(
+      user,
+      name,
+      memberName,
+      role,
+    );
   }
 
   @ApiOperation({ summary: '특정 채널의 채팅을 추가합니다.' })
