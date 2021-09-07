@@ -1,4 +1,4 @@
-import { Exclude } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import {
   Column,
   CreateDateColumn,
@@ -18,8 +18,8 @@ export class Channel {
   @Column({ unique: true })
   name: string;
 
-  @Exclude()
   @Column({ default: null })
+  @Transform(({ value }) => (value ? 'HIDDEN' : null))
   password: string;
 
   @CreateDateColumn()
