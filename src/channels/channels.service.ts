@@ -32,27 +32,12 @@ export class ChannelsService {
   ) {}
 
   async getChannels(
+    user: User,
     search?: string,
     perPage?: number,
     page?: number,
   ): Promise<Channel[]> {
-    const options: any = { order: { createdAt: 'DESC' } };
-
-    if (search) {
-      options.where = { name: Like(`%${search}%`) };
-    }
-
-    if (perPage) {
-      options.take = perPage;
-    }
-
-    if (page) {
-      options.skip = perPage * (page - 1);
-    }
-
-    const [data] = await this.channelsRepository.findAndCount(options);
-
-    return data;
+    return this.channelsRepository.getChannels(user, search, perPage, page);
   }
 
   getChannelsByMe(

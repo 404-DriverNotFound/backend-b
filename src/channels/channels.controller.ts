@@ -41,9 +41,10 @@ export class ChannelsController {
   @ApiResponse({ status: 200, description: '성공' })
   @Get()
   getChannels(
+    @GetUser() user: User,
     @Query() { search, perPage, page }: PaginationFilterDto,
   ): Promise<Channel[]> {
-    return this.channelsService.getChannels(search, perPage, page);
+    return this.channelsService.getChannels(user, search, perPage, page);
   }
 
   @ApiOperation({ summary: '내가 속한 채널 목록을 가져옵니다.' })
