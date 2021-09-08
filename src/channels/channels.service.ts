@@ -103,13 +103,26 @@ export class ChannelsService {
   }
 
   async updateChannelPassword(
-    owner: User,
+    user: User,
     name: string,
     password?: string,
   ): Promise<Channel> {
     const channel: Channel = await this.channelsRepository.findOne({
       name,
     });
+
+    const membership: Membership = await this.membershipsRepository.findOne({
+      channel,
+      user,
+    });
+
+    if (!membership || membership.role === MembershipRole.BANNED) {
+      throw new ForbiddenException('You are not a member of this channel.');
+    }
+
+    if (membership.role !== MembershipRole.OWNER) {
+      throw new ForbiddenException('Only the owner can change the password.');
+    }
 
     if (password) {
       const salt: string = await bcrypt.genSalt();
@@ -127,7 +140,7 @@ export class ChannelsService {
     name: string,
     memberName: string,
     password?: string,
-  ) {
+  ): Promise<Membership> {
     const channel: Channel = await this.getChannelByName(name);
 
     if (channel.password) {
@@ -181,91 +194,44 @@ export class ChannelsService {
     );
   }
 
-  async deleteChannelMember(
-    user: User,
-    name: string,
-    memberName: string,
-  ): Promise<void> {
+  async deleteChannelMemberByMe(user: User, name: string): Promise<void> {
     const channel: Channel = await this.getChannelByName(name);
 
-    const membershipOfRequester: Membership =
-      await this.membershipsRepository.findOne({ channel, user });
-    if (!membershipOfRequester) {
+    const membership: Membership = await this.membershipsRepository.findOne({
+      where: { channel, user },
+    });
+
+    // NOTE 삭제
+    const result = await this.membershipsRepository.delete({ channel, user });
+    if (!result.affected) {
       throw new NotFoundException([
         `${user.name} is not a member of channel(${name}).`,
       ]);
     }
 
-    const member: User = await this.usersService.getUserByName(memberName);
-    const membershipOfMember: Membership =
-      await this.membershipsRepository.findOne({
-        channel,
-        user: member,
-      });
-    if (!membershipOfMember) {
-      throw new NotFoundException([
-        `${member.name} is not a member of channel(${name}).`,
-      ]);
-    }
-
-    if (user.name !== memberName) {
-      switch (membershipOfMember.role) {
-        case MembershipRole.OWNER:
-          // NOTE OWNER일 경우, 강퇴 불가
-          throw new ForbiddenException(['You do not have permission.']);
-
-        case MembershipRole.ADMIN:
-          // NOTE ADMIN일 경우, OWNER만 강퇴 가능
-          if (membershipOfRequester.role !== MembershipRole.OWNER) {
-            throw new ForbiddenException(['You do not have permission.']);
-          }
-          break;
-
-        case MembershipRole.MEMBER:
-          // NOTE MEMBER일 경우, OWNER, ADMIN만 강퇴 가능
-          if (membershipOfRequester.role === MembershipRole.MEMBER) {
-            throw new ForbiddenException(['You do not have permission.']);
-          }
-          break;
-      }
-    }
-    // NOTE 삭제
-    const result = await this.membershipsRepository.delete({
-      channel,
-      user: member,
-    });
-
-    if (!result.affected) {
-      throw new NotFoundException([
-        `${memberName} is not a member of channel(${name}).`,
-      ]);
-    }
-
     // NOTE 권한 위임
-    if (membershipOfMember.role === MembershipRole.OWNER) {
-      const admin: Membership = await this.membershipsRepository.findOne({
-        where: { channel, role: MembershipRole.ADMIN },
-        relations: ['user'],
-      });
-      if (admin) {
+    if (membership.role === MembershipRole.OWNER) {
+      const membershipOfAdmin: Membership =
+        await this.membershipsRepository.findOne({
+          where: { channel, role: MembershipRole.ADMIN },
+          relations: ['channel', 'user'],
+        });
+
+      if (membershipOfAdmin) {
         // NOTE 위임 to admin
-        await this.membershipsRepository.save({
-          channel,
-          user: admin.user,
-          role: MembershipRole.OWNER,
-        });
+        membershipOfAdmin.role = MembershipRole.OWNER;
+        await this.membershipsRepository.save(membershipOfAdmin);
       } else {
-        const member: Membership = await this.membershipsRepository.findOne({
-          where: { channel, role: MembershipRole.MEMBER },
-          relations: ['user'],
-        });
-        if (member) {
-          // NOTE 위임
-          await this.membershipsRepository.save({
-            channel,
-            user: member.user,
-            role: MembershipRole.OWNER,
+        const membershipOfMember: Membership =
+          await this.membershipsRepository.findOne({
+            where: { channel, role: MembershipRole.MEMBER },
+            relations: ['channel', 'user'],
           });
+
+        if (membershipOfMember) {
+          // NOTE 위임 to member
+          membershipOfMember.role = MembershipRole.OWNER;
+          await this.membershipsRepository.save(membershipOfMember);
         } else {
           // NOTE 채널삭제
           const result = await this.channelsRepository.delete(channel.id);
@@ -286,15 +252,7 @@ export class ChannelsService {
     if (user.name === memberName) {
       throw new ForbiddenException(['Cannot change yourself.']);
     }
-
-    if (role === MembershipRole.OWNER) {
-      throw new ForbiddenException([
-        `Cannot update ${memberName}'s role to ${role}.`,
-      ]);
-    }
-
     const channel: Channel = await this.getChannelByName(name);
-
     const membershipOfRequester: Membership =
       await this.membershipsRepository.findOne({ channel, user });
     if (!membershipOfRequester) {
@@ -303,27 +261,48 @@ export class ChannelsService {
       ]);
     }
 
-    if (membershipOfRequester.role !== MembershipRole.OWNER) {
-      throw new ForbiddenException(['You are not the owner.']);
+    if (
+      membershipOfRequester.role !== MembershipRole.OWNER &&
+      membershipOfRequester.role !== MembershipRole.ADMIN
+    ) {
+      throw new ForbiddenException(['You do not have permission.']);
     }
-    const member: User = await this.usersService.getUserByName(memberName);
 
+    const member: User = await this.usersService.getUserByName(memberName);
     const membershipOfMember: Membership =
-      await this.membershipsRepository.findOne({
-        channel,
-        user: member,
-      });
+      await this.membershipsRepository.findOne({ channel, user: member });
     if (!membershipOfMember) {
       throw new NotFoundException([
-        `${member.name} is not a member of channel(${name}).`,
+        `${memberName} is not a member of channel(${name}).`,
       ]);
+    }
+
+    switch (role) {
+      case MembershipRole.BANNED:
+        switch (membershipOfMember.role) {
+          case MembershipRole.OWNER:
+            // NOTE 상대가 OWNER일 경우, 강퇴 불가
+            throw new ForbiddenException(['You do not have permission.']);
+
+          case MembershipRole.ADMIN:
+            // NOTE 상대가 ADMIN일 경우, OWNER만 강퇴 가능
+            if (membershipOfRequester.role !== MembershipRole.OWNER) {
+              throw new ForbiddenException(['You do not have permission.']);
+            }
+            break;
+        }
+        break;
+
+      case MembershipRole.OWNER:
+        throw new ForbiddenException([
+          `Cannot update ${memberName}'s role to ${role}.`,
+        ]);
     }
 
     await this.membershipsRepository.update(
       { channel, user: member },
       { channel, user: member, role },
     );
-
     return membershipOfMember;
   }
 
@@ -339,7 +318,7 @@ export class ChannelsService {
       channel,
     });
 
-    if (!isMember) {
+    if (!isMember || isMember.role === MembershipRole.BANNED) {
       throw new ForbiddenException(['You are not a member of this channel.']);
     }
 
@@ -364,7 +343,7 @@ export class ChannelsService {
       channel,
     });
 
-    if (!isMember) {
+    if (!isMember || isMember.role === MembershipRole.BANNED) {
       throw new ForbiddenException(['You are not a member of this channel.']);
     }
 

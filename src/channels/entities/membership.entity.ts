@@ -10,7 +10,10 @@ export class Membership {
   })
   user: User;
 
-  @ManyToOne(() => Channel, (channel) => channel.memberships, { primary: true })
+  @ManyToOne(() => Channel, (channel) => channel.memberships, {
+    primary: true,
+    onDelete: 'CASCADE',
+  })
   channel: Channel;
 
   @CreateDateColumn()

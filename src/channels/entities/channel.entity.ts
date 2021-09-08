@@ -28,9 +28,7 @@ export class Channel {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Membership, (membership) => membership.channel, {
-    cascade: true,
-  })
+  @OneToMany(() => Membership, (membership) => membership.channel)
   // REVIEW @Transform(({ value }) => (value.length === 1 ? value[0] : value))
   memberships: Membership[];
 

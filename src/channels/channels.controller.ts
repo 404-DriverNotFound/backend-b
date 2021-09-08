@@ -99,7 +99,7 @@ export class ChannelsController {
   createChannelMember(
     @Param('name') name: string,
     @Body() { memberName, password }: CreateChannelMemberDto,
-  ) {
+  ): Promise<Membership> {
     return this.channelsService.createChannelMember(name, memberName, password);
   }
 
@@ -114,20 +114,19 @@ export class ChannelsController {
     return this.channelsService.getChannelMembers(name, search, perPage, page);
   }
 
-  @ApiOperation({ summary: '특정 채널에서 유저를 제거(강퇴, 퇴장)합니다.' })
+  @ApiOperation({ summary: '특정 채널에서 퇴장합니다.' })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 404, description: '채널, 유저 없음' })
-  @Delete(':name/members/:memberName')
-  deleteChannelMember(
+  @Delete(':name/members/me')
+  deleteChannelMemberByMe(
     @GetUser() user: User,
     @Param('name') name: string,
-    @Param('memberName') memberName: string,
   ): Promise<void> {
-    return this.channelsService.deleteChannelMember(user, name, memberName);
+    return this.channelsService.deleteChannelMemberByMe(user, name);
   }
 
   @ApiOperation({
-    summary: '특정 채널에서 특정 유저의 role(권한)을 변경합니다.',
+    summary: '특정 채널에서 특정 유저의 role(권한)을 변경(강퇴)합니다.',
   })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 404, description: '채널, 유저 없음' })

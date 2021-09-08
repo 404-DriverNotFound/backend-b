@@ -1,6 +1,7 @@
 import { User } from 'src/users/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
 import { Channel } from '../entities/channel.entity';
+import { MembershipRole } from '../membership-role.enum';
 
 @EntityRepository(Channel)
 export class ChannelsRepository extends Repository<Channel> {
@@ -15,8 +16,8 @@ export class ChannelsRepository extends Repository<Channel> {
     qb.leftJoinAndSelect(
       'channel.memberships',
       'memberships',
-      'memberships.userId = :myId',
-      { myId: user.id },
+      'memberships.userId = :myId AND memberships.role != :role',
+      { myId: user.id, role: MembershipRole.BANNED },
     );
 
     if (search) {
@@ -45,8 +46,8 @@ export class ChannelsRepository extends Repository<Channel> {
     qb.innerJoinAndSelect(
       'channel.memberships',
       'memberships',
-      'memberships.userId = :myId',
-      { myId: user.id },
+      'memberships.userId = :myId AND memberships.role != :role',
+      { myId: user.id, role: MembershipRole.BANNED },
     );
 
     if (search) {
