@@ -12,13 +12,13 @@ import {
 export class CreateChannelDto {
   @ApiProperty({
     example: '채팅하실분',
-    description: '채팅 제목',
+    description: '채팅 제목 3~18글자',
     required: true,
   })
   @IsNotEmpty()
   @IsString()
   @MinLength(3)
-  @MaxLength(30)
+  @MaxLength(18)
   @Transform(({ value }) => value.trim())
   readonly name!: string;
 
