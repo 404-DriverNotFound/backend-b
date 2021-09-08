@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
@@ -19,7 +18,9 @@ export class CreateChannelDto {
   @IsString()
   @MinLength(3)
   @MaxLength(18)
-  @Transform(({ value }) => value.trim())
+  @Matches(/^[^\s]+(\s+[^\s]+)*$/, {
+    message: 'No spaces are allowed before or after the title.',
+  })
   readonly name!: string;
 
   @ApiProperty({
