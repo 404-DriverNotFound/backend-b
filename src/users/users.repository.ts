@@ -49,14 +49,14 @@ export class UsersRepository extends Repository<User> {
       const users: User[] = await qb.getMany();
       return users;
     } catch (error) {
-      throw new InternalServerErrorException('Server error in getUsers');
+      throw new InternalServerErrorException(['Server error in getUsers']);
     }
   }
 
   async getUserByName(name: string): Promise<User> {
     const found: User = await this.findOne({ name });
     if (!found) {
-      throw new NotFoundException(`User with ${name} not found`);
+      throw new NotFoundException([`User with ${name} not found`]);
     }
     return found;
   }
@@ -77,9 +77,9 @@ export class UsersRepository extends Repository<User> {
     } catch (error) {
       if (error.code === '23505') {
         // NOTE someting duplicated ftId or name
-        throw new ConflictException('User is already exists');
+        throw new ConflictException(['User is already exists']);
       } else {
-        throw new InternalServerErrorException('Error in createUser');
+        throw new InternalServerErrorException(['Error in createUser']);
       }
     }
     return user;
@@ -107,11 +107,11 @@ export class UsersRepository extends Repository<User> {
     } catch (error) {
       if (error.code === '23505') {
         // NOTE someting duplicated ftId or name
-        throw new ConflictException(
+        throw new ConflictException([
           'someting duplicated in databases(maybe name?)',
-        );
+        ]);
       } else {
-        throw new InternalServerErrorException('Error in updateUser');
+        throw new InternalServerErrorException(['Error in updateUser']);
       }
     }
     return user;

@@ -35,16 +35,16 @@ export class FriendshipsService {
   ): Promise<Friendship> {
     const { addresseeName, status } = createFriendshipDto;
     if (requester.name === addresseeName) {
-      throw new ConflictException("You can't add yourself.");
+      throw new ConflictException(["You can't add yourself."]);
     }
 
     const addressee: User = await this.usersRepository.findOne({
       name: addresseeName,
     });
     if (!addressee) {
-      throw new NotFoundException(
+      throw new NotFoundException([
         `Addressee with name: ${addresseeName} not found.`,
-      );
+      ]);
     }
 
     return this.friendshipsRepository.createFriendship(
@@ -61,29 +61,29 @@ export class FriendshipsService {
   ): Promise<Friendship> {
     const friendship: Friendship = await this.friendshipsRepository.findOne(id);
     if (!friendship) {
-      throw new NotFoundException(`Friendship with id: ${id} not found.`);
+      throw new NotFoundException([`Friendship with id: ${id} not found.`]);
     }
 
     if (
       friendship.addressee.id !== user.id &&
       friendship.requester.id !== user.id
     ) {
-      throw new ConflictException(
+      throw new ConflictException([
         "You can't update a friendship status not yours.",
-      );
+      ]);
     }
     if (friendship.status === FriendshipStatus.DECLINE) {
-      throw new ConflictException(
+      throw new ConflictException([
         ` ${friendship.status} satus can not be updated.`,
-      );
+      ]);
     }
     friendship.status = status;
     try {
       await this.friendshipsRepository.save(friendship);
     } catch (error) {
-      throw new InternalServerErrorException(
+      throw new InternalServerErrorException([
         'Someting wrong while updating a friendship data in updateFriendshipStatus.',
-      );
+      ]);
     }
     return friendship;
   }

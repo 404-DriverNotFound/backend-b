@@ -20,7 +20,7 @@ export class DmsService {
 
   async createDM(sender: User, name?: string, content?: string): Promise<Dm> {
     if (sender.name === name) {
-      throw new ConflictException('Cannot send dm to you');
+      throw new ConflictException(['Cannot send dm to you']);
     }
 
     const receiver: User = await this.usersService.getUserByName(name);
@@ -41,7 +41,7 @@ export class DmsService {
     page?: number,
   ): Promise<Dm[]> {
     if (user.name === oppositeName) {
-      throw new ConflictException('Cannot send dm to you');
+      throw new ConflictException(['Cannot send dm to you']);
     }
 
     const opposite: User = await this.usersService.getUserByName(oppositeName);
@@ -61,7 +61,7 @@ export class DmsService {
     after?: Date,
   ): Promise<number> {
     if (user.name === oppositeName) {
-      throw new ConflictException('Cannot send dm to you');
+      throw new ConflictException(['Cannot send dm to you']);
     }
 
     const opposite: User = await this.usersService.getUserByName(oppositeName);

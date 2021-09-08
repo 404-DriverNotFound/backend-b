@@ -37,31 +37,31 @@ export class FriendshipsRepository extends Repository<Friendship> {
         // NOTE requseter req.user
         switch (friendship.status) {
           case FriendshipStatus.REQUESTED:
-            throw new ConflictException(
+            throw new ConflictException([
               `You already requested to ${addressee.name}.`,
-            );
+            ]);
           case FriendshipStatus.ACCEPTED:
-            throw new ConflictException(
+            throw new ConflictException([
               `You are already friends of ${addressee.name}.`,
-            );
+            ]);
           case FriendshipStatus.BLOCKED:
-            throw new ConflictException(`You blocked ${addressee.name}.`);
+            throw new ConflictException([`You blocked ${addressee.name}.`]);
         }
       } else {
         // NOTE addressee req.user
         switch (friendship.status) {
           case FriendshipStatus.REQUESTED:
-            throw new ConflictException(
+            throw new ConflictException([
               `Accept request of ${addressee.name} first.`,
-            );
+            ]);
           case FriendshipStatus.ACCEPTED:
-            throw new ConflictException(
+            throw new ConflictException([
               `You are already friends of ${addressee.name}.`,
-            );
+            ]);
           case FriendshipStatus.BLOCKED:
-            throw new ConflictException(
+            throw new ConflictException([
               `You are blocked by ${addressee.name}.`,
-            );
+            ]);
         }
       }
     }
@@ -75,9 +75,9 @@ export class FriendshipsRepository extends Repository<Friendship> {
     try {
       await this.save(friendship);
     } catch (error) {
-      throw new InternalServerErrorException(
+      throw new InternalServerErrorException([
         'Someting wrong while saving a friendship data in createFriendship.',
-      );
+      ]);
     }
 
     return friendship;
@@ -93,9 +93,9 @@ export class FriendshipsRepository extends Repository<Friendship> {
     try {
       await this.save(friendship);
     } catch (error) {
-      throw new InternalServerErrorException(
+      throw new InternalServerErrorException([
         'Someting wrong while saving a friendship data in createBlack.',
-      );
+      ]);
     }
 
     const found: Friendship = await this.findOne({

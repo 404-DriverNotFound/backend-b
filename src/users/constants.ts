@@ -15,7 +15,7 @@ export const localOptions: MulterOptions = {
   fileFilter: (req, file, cb) => {
     const type: string = file.mimetype.split('/')[0];
     if (type !== 'image') {
-      return cb(new BadRequestException(`not a image file!`), false);
+      return cb(new BadRequestException([`not a image file!`]), false);
     }
     return cb(null, true);
   },

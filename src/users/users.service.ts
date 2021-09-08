@@ -28,7 +28,7 @@ export class UsersService {
   async isDuplicated(name: string): Promise<User> {
     const found: User = await this.usersRepository.findOne({ name });
     if (!found) {
-      throw new NotFoundException(`User with ${name} not found`);
+      throw new NotFoundException([`User with ${name} not found`]);
     }
     return found;
   }
@@ -36,7 +36,7 @@ export class UsersService {
   async getUserByName(/*user: User,*/ name: string): Promise<User> {
     const found: User = await this.usersRepository.findOne({ name });
     if (!found) {
-      throw new NotFoundException(`User with ${name} not found`);
+      throw new NotFoundException([`User with ${name} not found`]);
     }
 
     //const friendship: Friendship =
@@ -65,9 +65,9 @@ export class UsersService {
     try {
       await this.usersRepository.save(user);
     } catch (error) {
-      throw new InternalServerErrorException(
+      throw new InternalServerErrorException([
         'server error in updateUserStatus',
-      );
+      ]);
     }
     return user;
   }
@@ -77,9 +77,9 @@ export class UsersService {
     try {
       await this.usersRepository.save(user);
     } catch (error) {
-      throw new InternalServerErrorException(
+      throw new InternalServerErrorException([
         'server error in updateUserIsSecondFactorUnauthenticated',
-      );
+      ]);
     }
     return user;
   }
@@ -92,9 +92,9 @@ export class UsersService {
     try {
       await this.usersRepository.save(user);
     } catch (error) {
-      throw new InternalServerErrorException(
+      throw new InternalServerErrorException([
         'server error in updateUserAuthenticatorSecret',
-      );
+      ]);
     }
     return user;
   }

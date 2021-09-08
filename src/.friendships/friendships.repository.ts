@@ -53,9 +53,9 @@ export class FriendshipsRepository extends Repository<Friendship> {
         friendship.status === FriendshipStatus.BLOCK ||
         status !== FriendshipStatus.BLOCK
       ) {
-        throw new ConflictException(
+        throw new ConflictException([
           `There is a friendship between ${requester.name} and ${addressee.name}.`,
-        );
+        ]);
       }
       friendship.status = status;
     } else {
@@ -69,9 +69,9 @@ export class FriendshipsRepository extends Repository<Friendship> {
     try {
       await this.save(friendship);
     } catch (error) {
-      throw new InternalServerErrorException(
+      throw new InternalServerErrorException([
         'Someting wrong while saving a friendship data in createFriendship.',
-      );
+      ]);
     }
     return friendship;
   }
@@ -90,7 +90,7 @@ export class FriendshipsRepository extends Repository<Friendship> {
       })
       .execute();
     if (result.affected === 0) {
-      throw new NotFoundException(`Friendship with id: ${id} not found.`);
+      throw new NotFoundException([`Friendship with id: ${id} not found.`]);
     }
   }
 }

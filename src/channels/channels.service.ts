@@ -54,7 +54,7 @@ export class ChannelsService {
   async getChannelByName(name: string): Promise<Channel> {
     const channel: Channel = await this.channelsRepository.findOne({ name });
     if (!channel) {
-      throw new NotFoundException('Channel you requested is not found!');
+      throw new NotFoundException(['Channel you requested is not found!']);
     }
     return channel;
   }
@@ -76,7 +76,7 @@ export class ChannelsService {
     } catch (error) {
       if (error.code === '23505') {
         // duplicate channel
-        throw new ConflictException('Channel is already exists');
+        throw new ConflictException(['Channel is already exists']);
       } else {
         throw new InternalServerErrorException();
       }
@@ -94,7 +94,7 @@ export class ChannelsService {
       console.log(error);
       if (error.code === '23505') {
         // duplicate channel
-        throw new ConflictException('Membership is already exists');
+        throw new ConflictException(['Membership is already exists']);
       } else {
         throw new InternalServerErrorException();
       }
@@ -132,7 +132,7 @@ export class ChannelsService {
 
     if (channel.password) {
       if (!password) {
-        throw new UnauthorizedException('Password is required.');
+        throw new UnauthorizedException(['Password is required.']);
       }
 
       const isCorrect: boolean = await bcrypt.compare(
@@ -141,7 +141,7 @@ export class ChannelsService {
       );
 
       if (!isCorrect) {
-        throw new UnauthorizedException('Invalid password.');
+        throw new UnauthorizedException(['Invalid password.']);
       }
     }
 
@@ -156,7 +156,7 @@ export class ChannelsService {
       await this.membershipsRepository.insert(membership);
     } catch (error) {
       if (error.code === '23505') {
-        throw new ConflictException('Membership is already exists');
+        throw new ConflictException(['Membership is already exists']);
       } else {
         throw new InternalServerErrorException();
       }
@@ -191,9 +191,9 @@ export class ChannelsService {
     const membershipOfRequester: Membership =
       await this.membershipsRepository.findOne({ channel, user });
     if (!membershipOfRequester) {
-      throw new NotFoundException(
+      throw new NotFoundException([
         `${user.name} is not a member of channel(${name}).`,
-      );
+      ]);
     }
 
     const member: User = await this.usersService.getUserByName(memberName);
@@ -203,28 +203,28 @@ export class ChannelsService {
         user: member,
       });
     if (!membershipOfMember) {
-      throw new NotFoundException(
+      throw new NotFoundException([
         `${member.name} is not a member of channel(${name}).`,
-      );
+      ]);
     }
 
     if (user.name !== memberName) {
       switch (membershipOfMember.role) {
         case MembershipRole.OWNER:
           // NOTE OWNER일 경우, 강퇴 불가
-          throw new ForbiddenException('You do not have permission.');
+          throw new ForbiddenException(['You do not have permission.']);
 
         case MembershipRole.ADMIN:
           // NOTE ADMIN일 경우, OWNER만 강퇴 가능
           if (membershipOfRequester.role !== MembershipRole.OWNER) {
-            throw new ForbiddenException('You do not have permission.');
+            throw new ForbiddenException(['You do not have permission.']);
           }
           break;
 
         case MembershipRole.MEMBER:
           // NOTE MEMBER일 경우, OWNER, ADMIN만 강퇴 가능
           if (membershipOfRequester.role === MembershipRole.MEMBER) {
-            throw new ForbiddenException('You do not have permission.');
+            throw new ForbiddenException(['You do not have permission.']);
           }
           break;
       }
@@ -236,9 +236,9 @@ export class ChannelsService {
     });
 
     if (!result.affected) {
-      throw new NotFoundException(
+      throw new NotFoundException([
         `${memberName} is not a member of channel(${name}).`,
-      );
+      ]);
     }
 
     // NOTE 권한 위임
@@ -270,7 +270,7 @@ export class ChannelsService {
           // NOTE 채널삭제
           const result = await this.channelsRepository.delete(channel.id);
           if (!result.affected) {
-            throw new NotFoundException('Cannot delete Channel');
+            throw new NotFoundException(['Cannot delete Channel']);
           }
         }
       }
@@ -284,13 +284,13 @@ export class ChannelsService {
     role: MembershipRole,
   ): Promise<Membership> {
     if (user.name === memberName) {
-      throw new ForbiddenException('Cannot change yourself.');
+      throw new ForbiddenException(['Cannot change yourself.']);
     }
 
     if (role === MembershipRole.OWNER) {
-      throw new ForbiddenException(
+      throw new ForbiddenException([
         `Cannot update ${memberName}'s role to ${role}.`,
-      );
+      ]);
     }
 
     const channel: Channel = await this.getChannelByName(name);
@@ -298,13 +298,13 @@ export class ChannelsService {
     const membershipOfRequester: Membership =
       await this.membershipsRepository.findOne({ channel, user });
     if (!membershipOfRequester) {
-      throw new NotFoundException(
+      throw new NotFoundException([
         `${user.name} is not a member of channel(${name}).`,
-      );
+      ]);
     }
 
     if (membershipOfRequester.role !== MembershipRole.OWNER) {
-      throw new ForbiddenException('You are not the owner.');
+      throw new ForbiddenException(['You are not the owner.']);
     }
     const member: User = await this.usersService.getUserByName(memberName);
 
@@ -314,9 +314,9 @@ export class ChannelsService {
         user: member,
       });
     if (!membershipOfMember) {
-      throw new NotFoundException(
+      throw new NotFoundException([
         `${member.name} is not a member of channel(${name}).`,
-      );
+      ]);
     }
 
     await this.membershipsRepository.update(
@@ -340,7 +340,7 @@ export class ChannelsService {
     });
 
     if (!isMember) {
-      throw new ForbiddenException('You are not a member of this channel.');
+      throw new ForbiddenException(['You are not a member of this channel.']);
     }
 
     const chat = this.chatsRepository.create({ channel, user, content });
@@ -365,7 +365,7 @@ export class ChannelsService {
     });
 
     if (!isMember) {
-      throw new ForbiddenException('You are not a member of this channel.');
+      throw new ForbiddenException(['You are not a member of this channel.']);
     }
 
     const options: any = {

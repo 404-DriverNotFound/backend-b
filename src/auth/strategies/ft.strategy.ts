@@ -30,7 +30,7 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
     const { id } = profile;
     const user: User = await this.usersRepository.findOne({ ftId: id });
     if (!user) {
-      throw new UnauthorizedException(id);
+      throw new UnauthorizedException([id]);
     }
     return cb(null, user);
   }
