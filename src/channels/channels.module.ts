@@ -7,7 +7,7 @@ import { MembershipsRepository } from './repositories/memberships.repository';
 import { UsersRepository } from 'src/users/users.repository';
 import { UsersService } from 'src/users/users.service';
 import { ChatsRepository } from './repositories/chats.repository';
-import { EventsGateway } from 'src/events/events.gateway';
+import { EventsModule } from 'src/events/events.module';
 
 @Module({
   imports: [
@@ -17,8 +17,9 @@ import { EventsGateway } from 'src/events/events.gateway';
       UsersRepository,
       ChatsRepository,
     ]),
+    EventsModule,
   ],
   controllers: [ChannelsController],
-  providers: [ChannelsService, UsersService, EventsGateway],
+  providers: [ChannelsService, UsersService],
 })
 export class ChannelsModule {}

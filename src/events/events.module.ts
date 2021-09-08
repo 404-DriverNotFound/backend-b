@@ -6,5 +6,6 @@ import { EventsGateway } from './events.gateway';
 @Module({
   imports: [TypeOrmModule.forFeature([ChannelsRepository])],
   providers: [EventsGateway],
+  exports: [EventsGateway],
 })
 export class EventsModule {}
