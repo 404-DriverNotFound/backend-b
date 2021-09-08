@@ -1,6 +1,13 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventsGateway } from 'src/events/events.gateway';
+import { FriendshipStatus } from 'src/friendships/friendship-status.enum';
+import { Friendship } from 'src/friendships/friendship.entity';
+import { FriendshipsService } from 'src/friendships/friendships.service';
 import { User } from 'src/users/user.entity';
 import { UsersRepository } from 'src/users/users.repository';
 import { UsersService } from 'src/users/users.service';
@@ -15,12 +22,20 @@ export class DmsService {
     private readonly dmsRepository: DmsRepository,
     @InjectRepository(UsersRepository)
     private readonly usersRepository: UsersRepository,
+    private readonly friendshipsService: FriendshipsService,
     private readonly eventsGateway: EventsGateway,
   ) {}
 
   async createDM(sender: User, name?: string, content?: string): Promise<Dm> {
     if (sender.name === name) {
       throw new ConflictException(['Cannot send dm to you']);
+    }
+
+    const frienship: Friendship =
+      await this.friendshipsService.getFriendshipByName(sender, name);
+
+    if (frienship.status === FriendshipStatus.BLOCKED) {
+      throw new ForbiddenException(['You are blocked.']);
     }
 
     const receiver: User = await this.usersService.getUserByName(name);
