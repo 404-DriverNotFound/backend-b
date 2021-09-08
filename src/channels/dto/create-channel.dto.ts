@@ -24,16 +24,13 @@ export class CreateChannelDto {
   readonly name!: string;
 
   @ApiProperty({
-    example: '1!qQ1!qQ',
-    description: '8~32 대소문자특문숫자',
+    example: '1234qwer',
+    description: '4 ~ 32 글자',
     required: true,
   })
   @IsOptional()
   @IsString()
-  @MinLength(8)
+  @MinLength(4)
   @MaxLength(32)
-  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'Password is too weak.',
-  })
   readonly password?: string;
 }
