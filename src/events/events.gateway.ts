@@ -37,6 +37,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() user: User,
   ) {
     console.log(user);
+    client.join(user.id);
     (await this.channelsRepository.getChannelsByMe(user)).forEach(
       (channel: Channel) => {
         client.join(channel.id);

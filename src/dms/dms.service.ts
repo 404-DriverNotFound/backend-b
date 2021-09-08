@@ -1,5 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { EventsGateway } from 'src/events/events.gateway';
 import { User } from 'src/users/user.entity';
 import { UsersRepository } from 'src/users/users.repository';
 import { UsersService } from 'src/users/users.service';
@@ -14,6 +15,7 @@ export class DmsService {
     private readonly dmsRepository: DmsRepository,
     @InjectRepository(UsersRepository)
     private readonly usersRepository: UsersRepository,
+    private readonly eventsGateway: EventsGateway,
   ) {}
 
   async createDM(sender: User, name?: string, content?: string): Promise<Dm> {
@@ -26,8 +28,8 @@ export class DmsService {
     const dm: Dm = this.dmsRepository.create({ sender, receiver, content });
 
     await this.dmsRepository.save(dm);
-    // TODO socket 설정
-
+    // REVIEW socket 설정
+    this.eventsGateway.server.to(receiver.id).emit('dm', dm);
     return dm;
   }
 
