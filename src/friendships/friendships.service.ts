@@ -38,6 +38,7 @@ export class FriendshipsService {
   async getFriendshipByName(
     user: User,
     opponentName: string,
+    exception: boolean,
   ): Promise<Friendship> {
     if (opponentName === user.name) {
       throw new ConflictException(['Cannot get yours.']);
@@ -53,6 +54,9 @@ export class FriendshipsService {
     ).sort((a: Friendship) => (a.requester.id === user.id ? -1 : 1));
 
     if (!friendships.length) {
+      if (exception === false) {
+        return undefined;
+      }
       throw new NotFoundException([
         `Friendhip between ${user.name} and ${opponentName} not found.`,
       ]);

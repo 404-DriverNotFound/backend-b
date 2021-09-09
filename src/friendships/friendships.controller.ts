@@ -62,7 +62,11 @@ export class FriendshipsController {
     @GetUser() user: User,
     @Param('name') opponentName: string,
   ): Promise<Friendship> {
-    return this.friendshipsService.getFriendshipByName(user, opponentName);
+    return this.friendshipsService.getFriendshipByName(
+      user,
+      opponentName,
+      true,
+    );
   }
 
   @ApiOperation({ summary: '친구 요청을 취소(삭제)합니다.' })
