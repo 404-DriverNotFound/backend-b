@@ -8,6 +8,10 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
 import { FriendshipsModule } from './friendships/friendships.module';
+import { FriendshipsRepository } from './friendships/friendships.repository';
+import { UsersRepository } from './users/users.repository';
+import { UsersService } from './users/users.service';
+import { FriendshipsService } from './friendships/friendships.service';
 
 @Module({
   imports: [
@@ -33,8 +37,9 @@ import { FriendshipsModule } from './friendships/friendships.module';
     UsersModule,
     FilesModule,
     FriendshipsModule,
+    TypeOrmModule.forFeature([FriendshipsRepository, UsersRepository]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, UsersService, FriendshipsService],
 })
 export class AppModule {}
