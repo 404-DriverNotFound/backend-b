@@ -47,6 +47,7 @@ export class DmsService {
     await this.dmsRepository.save(dm);
     // REVIEW socket 설정
     this.eventsGateway.server.to(receiver.id).emit('dm', dm);
+    this.eventsGateway.server.to(sender.id).emit('dm', dm);
     return dm;
   }
 
