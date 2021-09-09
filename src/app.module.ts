@@ -6,7 +6,6 @@ import { AppService } from './app.service';
 import { configValidationSchema } from './config.schema';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { FilesModule } from './files/files.module';
 import { FriendshipsModule } from './friendships/friendships.module';
 import { FriendshipsRepository } from './friendships/friendships.repository';
 import { UsersRepository } from './users/users.repository';
@@ -35,7 +34,6 @@ import { FriendshipsService } from './friendships/friendships.service';
     }),
     AuthModule,
     UsersModule,
-    FilesModule,
     FriendshipsModule,
     TypeOrmModule.forFeature([FriendshipsRepository, UsersRepository]),
   ],
