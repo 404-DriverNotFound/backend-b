@@ -35,7 +35,9 @@ export class DmsService {
       await this.friendshipsService.getFriendshipByName(sender, name, false);
 
     if (frienship?.status === FriendshipStatus.BLOCKED) {
-      throw new ForbiddenException(['You are blocked.']);
+      throw frienship.requester.id === sender.id
+        ? new ForbiddenException([`You are blocking ${name}.`])
+        : new ForbiddenException([`You are blocked by ${name}.`]);
     }
 
     const receiver: User = await this.usersService.getUserByName(name);
