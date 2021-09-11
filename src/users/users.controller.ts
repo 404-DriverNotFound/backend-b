@@ -90,10 +90,10 @@ export class UsersController {
   @Post()
   @UseInterceptors(FileInterceptor('avatar', localOptions))
   createUser(
-    @Body() createUserDto: CreateUserDto,
+    @Body() { ftId, name, enable2FA }: CreateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<User> {
-    return this.usersService.createUser(createUserDto, file);
+    return this.usersService.createUser(ftId, name, enable2FA, file?.path);
   }
 
   @ApiCookieAuth()

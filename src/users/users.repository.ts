@@ -4,7 +4,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { EntityRepository, Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './user.entity';
 
@@ -19,15 +18,16 @@ export class UsersRepository extends Repository<User> {
   }
 
   async createUser(
-    createUserDto: CreateUserDto,
-    file: Express.Multer.File,
+    ftId: number,
+    name: string,
+    enable2FA: boolean,
+    avatar?: string,
   ): Promise<User> {
-    const { ftId, name, enable2FA } = createUserDto;
     const user: User = this.create({
       ftId,
       name,
-      avatar: file?.path,
-      enable2FA: enable2FA === 'true',
+      avatar,
+      enable2FA,
     });
     try {
       await this.save(user);

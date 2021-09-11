@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserStatus } from './user-status.enum';
 import { User } from './user.entity';
@@ -59,10 +58,12 @@ export class UsersService {
   }
 
   createUser(
-    createUserDto: CreateUserDto,
-    file: Express.Multer.File,
+    ftId: number,
+    name: string,
+    enable2FA: boolean,
+    avatar?: string,
   ): Promise<User> {
-    return this.usersRepository.createUser(createUserDto, file);
+    return this.usersRepository.createUser(ftId, name, enable2FA, avatar);
   }
 
   updateUser(
