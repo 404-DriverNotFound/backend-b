@@ -31,19 +31,21 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log('disconnected client.id: ', client.id);
   }
 
-  @SubscribeMessage('join')
-  async handleJoin(
+  @SubscribeMessage('joinRoom')
+  handleJoinRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() user: User,
-  ) {
-    console.log(user);
-    client.join(user.id);
-    (await this.channelsRepository.getChannelsByMe(user)).forEach(
-      (channel: Channel) => {
-        client.join(channel.id);
-      },
-    );
-    console.log(client.rooms);
-    return 'joined';
+    @MessageBody() channel: Channel,
+  ): string {
+    client.join(channel.id);
+    return 'Joined the channel.';
+  }
+
+  @SubscribeMessage('leaveRoom')
+  handleLeaveRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() channel: Channel,
+  ): string {
+    client.leave(channel.id);
+    return 'Leaved the channel.';
   }
 }
