@@ -12,6 +12,8 @@ import { Server, Socket } from 'socket.io';
 import { Channel } from 'src/channels/entities/channel.entity';
 import { ChannelsRepository } from 'src/channels/repositories/channels.repository';
 import { User } from 'src/users/user.entity';
+import { UserStatus } from 'src/users/user-status.enum';
+import { UsersRepository } from 'src/users/users.repository';
 
 @WebSocketGateway()
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -21,14 +23,45 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     @InjectRepository(ChannelsRepository)
     private readonly channelsRepository: ChannelsRepository,
+    @InjectRepository(UsersRepository)
+    private readonly usersRepository: UsersRepository,
   ) {}
 
-  handleConnection(@ConnectedSocket() client: Socket) {
-    console.log('connected client.id: ', client.id);
+  async handleConnection(@ConnectedSocket() client: Socket): Promise<string> {
+    console.log('connected');
+
+    const userId: string = client.handshake.query.userId as string;
+    const user: User = await this.usersRepository.findOne({ id: userId });
+    if (!user) {
+      return 'User not found.';
+    }
+
+    user.status = UserStatus.ONLINE;
+    await this.usersRepository.save(user);
+
+    client.join(user.id);
+
+    const channel: Channel[] = await this.channelsRepository.getChannelsByMe(
+      user,
+    );
+    channel.forEach((channel: Channel) => client.join(channel.id));
+
+    return `${user.name} connected.`;
   }
 
-  handleDisconnect(@ConnectedSocket() client: Socket) {
-    console.log('disconnected client.id: ', client.id);
+  async handleDisconnect(@ConnectedSocket() client: Socket): Promise<string> {
+    console.log('disconnected');
+
+    const userId: string = client.handshake.query.userId as string;
+    const user: User = await this.usersRepository.findOne({ id: userId });
+    if (!user) {
+      return 'user not found.';
+    }
+
+    user.status = UserStatus.OFFLINE;
+    await this.usersRepository.save(user);
+
+    return `${user.name} disconnected.`;
   }
 
   @SubscribeMessage('join')
