@@ -26,4 +26,10 @@ export class Membership {
     default: MembershipRole.MEMBER,
   })
   role: MembershipRole;
+
+  @Column({
+    nullable: true,
+    default: null,
+  })
+  mutedAt: Date;
 }

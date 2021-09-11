@@ -145,6 +145,20 @@ export class ChannelsController {
     );
   }
 
+  @ApiOperation({
+    summary: '특정 채널에서 특정 유저를 음소거합니다.',
+  })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 404, description: '채널, 유저 없음' })
+  @Patch(':name/members/:memberName/mute')
+  updateChannelMemberMute(
+    @GetUser() user: User,
+    @Param('name') name: string,
+    @Param('memberName') memberName: string,
+  ): Promise<Membership> {
+    return this.channelsService.updateChannelMemberMute(user, name, memberName);
+  }
+
   @ApiOperation({ summary: '특정 채널의 채팅을 추가합니다.' })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 404, description: '채널 없음' })
