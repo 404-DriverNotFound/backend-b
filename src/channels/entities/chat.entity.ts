@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Channel } from './channel.entity';
 
-@Entity()
+@Entity('channel_chat_user')
 export class Chat {
   @PrimaryGeneratedColumn('uuid')
   id: string;
