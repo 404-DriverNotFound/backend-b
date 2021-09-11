@@ -110,9 +110,9 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('avatar', localOptions))
   updateUser(
     @GetUser() user: User,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() { name, enable2FA }: UpdateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<User> {
-    return this.usersService.updateUser(user, updateUserDto, file);
+    return this.usersService.updateUser(user, name, enable2FA, file?.path);
   }
 }

@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like } from 'typeorm';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { UserStatus } from './user-status.enum';
 import { User } from './user.entity';
 import { UsersRepository } from './users.repository';
@@ -68,10 +67,11 @@ export class UsersService {
 
   updateUser(
     user: User,
-    updateUserDto: UpdateUserDto,
-    file: Express.Multer.File,
+    name?: string,
+    enable2FA?: boolean,
+    avatar?: string,
   ): Promise<User> {
-    return this.usersRepository.updateUser(user, updateUserDto, file);
+    return this.usersRepository.updateUser(user, name, enable2FA, avatar);
   }
 
   async updateUserStatus(user: User, status: UserStatus): Promise<User> {
