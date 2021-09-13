@@ -355,7 +355,7 @@ export class ChannelsService {
         }
         break;
       case MembershipRole.BANNED:
-        throw new ForbiddenException(['You cannot mute an banned user.']);
+        throw new NotFoundException([`${memberName} not found.`]);
     }
 
     membershipOfMember.mutedAt = new Date();
@@ -364,6 +364,15 @@ export class ChannelsService {
       { channel, user: member },
       { channel, user: member, mutedAt: membershipOfMember.mutedAt },
     );
+
+    setTimeout(async () => {
+      membershipOfMember.mutedAt = null;
+      await this.membershipsRepository.update(
+        { channel, user: member },
+        { channel, user: member, mutedAt: membershipOfMember.mutedAt },
+      );
+    }, 60000 * 1);
+
     return membershipOfMember;
   }
 
