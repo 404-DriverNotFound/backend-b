@@ -466,9 +466,9 @@ export class ChannelsService {
 
       const left = isMember.unmutedAt.valueOf() - now.valueOf();
       if (left > 0) {
-        throw new ForbiddenException(
+        throw new ForbiddenException([
           `Mute ends ${Math.floor(left / 1000)} seconds later.`,
-        );
+        ]);
       }
     }
 
