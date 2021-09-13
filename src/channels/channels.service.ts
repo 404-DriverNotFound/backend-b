@@ -358,20 +358,24 @@ export class ChannelsService {
         throw new NotFoundException([`${memberName} not found.`]);
     }
 
-    membershipOfMember.mutedAt = new Date();
+    const muteMinutes = 1;
+    const unmutedAt: Date = new Date();
+    unmutedAt.setMinutes(unmutedAt.getMinutes() + muteMinutes); // NOTE add muteMinutes
+
+    membershipOfMember.unmutedAt = unmutedAt;
 
     await this.membershipsRepository.update(
       { channel, user: member },
-      { channel, user: member, mutedAt: membershipOfMember.mutedAt },
+      { channel, user: member, unmutedAt: membershipOfMember.unmutedAt },
     );
 
     setTimeout(async () => {
-      membershipOfMember.mutedAt = null;
+      membershipOfMember.unmutedAt = null;
       await this.membershipsRepository.update(
         { channel, user: member },
-        { channel, user: member, mutedAt: membershipOfMember.mutedAt },
+        { channel, user: member, unmutedAt: membershipOfMember.unmutedAt },
       );
-    }, 60000 * 1);
+    }, 60000 * muteMinutes);
 
     return membershipOfMember;
   }
@@ -424,11 +428,11 @@ export class ChannelsService {
         throw new NotFoundException([`${memberName} not found.`]);
     }
 
-    membershipOfMember.mutedAt = null;
+    membershipOfMember.unmutedAt = null;
 
     await this.membershipsRepository.update(
       { channel, user: member },
-      { channel, user: member, mutedAt: membershipOfMember.mutedAt },
+      { channel, user: member, unmutedAt: membershipOfMember.unmutedAt },
     );
 
     return membershipOfMember;
@@ -446,13 +450,10 @@ export class ChannelsService {
       channel,
     });
 
-    if (isMember.mutedAt) {
+    if (isMember.unmutedAt) {
       const now: Date = new Date();
 
-      const unmutedAt: Date = isMember.mutedAt;
-      unmutedAt.setMinutes(unmutedAt.getMinutes() + 1); // NOTE add 1 minute
-
-      const left = unmutedAt.valueOf() - now.valueOf();
+      const left = isMember.unmutedAt.valueOf() - now.valueOf();
       if (left > 0) {
         throw new ForbiddenException(
           `Mute ends ${Math.floor(left / 1000)} seconds later.`,

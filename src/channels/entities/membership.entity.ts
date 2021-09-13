@@ -31,5 +31,5 @@ export class Membership {
     nullable: true,
     default: null,
   })
-  mutedAt: Date;
+  unmutedAt: Date;
 }
