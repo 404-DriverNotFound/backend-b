@@ -26,11 +26,9 @@ export class AppService {
         name += charSet[Math.floor(Math.random() * charSet.length)];
       }
       const user: User = await this.usersService.createUser(
-        {
-          ftId: Math.floor(Math.random() * 10 ** 5),
-          name,
-          enable2FA: 'false',
-        },
+        Math.floor(Math.random() * 10 ** 5),
+        name,
+        false,
         undefined,
       );
       switch (user.ftId % 5) {
