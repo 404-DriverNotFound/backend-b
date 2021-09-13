@@ -160,7 +160,18 @@ export class ChannelsService {
 
     const user: User = await this.usersService.getUserByName(memberName);
 
-    const membership: Membership = this.membershipsRepository.create({
+    let membership: Membership = await this.membershipsRepository.findOne({
+      channel,
+      user,
+    });
+
+    if (membership) {
+      throw new ConflictException([
+        `You are ${membership.role} in this channel.`,
+      ]);
+    }
+
+    membership = this.membershipsRepository.create({
       channel,
       user,
     });
