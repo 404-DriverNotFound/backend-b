@@ -61,6 +61,13 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     user.status = UserStatus.OFFLINE;
     await this.usersRepository.save(user);
 
+    client.leave(user.id);
+
+    const channel: Channel[] = await this.channelsRepository.getChannelsByMe(
+      user,
+    );
+    channel.forEach((channel: Channel) => client.leave(channel.id));
+
     return `${user.name} disconnected.`;
   }
 

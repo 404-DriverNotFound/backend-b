@@ -270,7 +270,10 @@ export class ChannelsService {
 
     const member: User = await this.usersService.getUserByName(memberName);
     const membershipOfMember: Membership =
-      await this.membershipsRepository.findOne({ channel, user: member });
+      await this.membershipsRepository.findOne({
+        where: { channel, user: member },
+        relations: ['channel'],
+      });
     if (!membershipOfMember) {
       throw new NotFoundException([
         `${memberName} is not a member of channel(${name}).`,
@@ -298,11 +301,12 @@ export class ChannelsService {
           `Cannot update ${memberName}'s role to ${role}.`,
         ]);
     }
-
+    membershipOfMember.role = role;
     await this.membershipsRepository.update(
       { channel, user: member },
-      { channel, user: member, role },
+      membershipOfMember,
     );
+    this.eventsGateway.server.to(member.id).emit('banned', membershipOfMember);
     return membershipOfMember;
   }
 
