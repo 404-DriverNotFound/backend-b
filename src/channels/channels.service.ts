@@ -376,6 +376,64 @@ export class ChannelsService {
     return membershipOfMember;
   }
 
+  async updateChannelMemberUnmute(
+    user: User,
+    name: string,
+    memberName: string,
+  ): Promise<Membership> {
+    if (user.name === memberName) {
+      throw new ForbiddenException(['Cannot change yourself.']);
+    }
+    const channel: Channel = await this.getChannelByName(name);
+    const membershipOfRequester: Membership =
+      await this.membershipsRepository.findOne({ channel, user });
+    if (!membershipOfRequester) {
+      throw new NotFoundException([
+        `${user.name} is not a member of channel(${name}).`,
+      ]);
+    }
+
+    if (
+      membershipOfRequester.role !== MembershipRole.OWNER &&
+      membershipOfRequester.role !== MembershipRole.ADMIN
+    ) {
+      throw new ForbiddenException(['You do not have permission.']);
+    }
+
+    const member: User = await this.usersService.getUserByName(memberName);
+    const membershipOfMember: Membership =
+      await this.membershipsRepository.findOne({ channel, user: member });
+    if (!membershipOfMember) {
+      throw new NotFoundException([
+        `${memberName} is not a member of channel(${name}).`,
+      ]);
+    }
+
+    switch (membershipOfMember.role) {
+      case MembershipRole.OWNER:
+        // NOTE 상대가 OWNER일 경우, 강퇴 불가
+        throw new ForbiddenException(['You do not have permission.']);
+
+      case MembershipRole.ADMIN:
+        // NOTE 상대가 ADMIN일 경우, OWNER만 강퇴 가능
+        if (membershipOfRequester.role !== MembershipRole.OWNER) {
+          throw new ForbiddenException(['You do not have permission.']);
+        }
+        break;
+      case MembershipRole.BANNED:
+        throw new NotFoundException([`${memberName} not found.`]);
+    }
+
+    membershipOfMember.mutedAt = null;
+
+    await this.membershipsRepository.update(
+      { channel, user: member },
+      { channel, user: member, mutedAt: membershipOfMember.mutedAt },
+    );
+
+    return membershipOfMember;
+  }
+
   async createChannelChat(
     name: string,
     user: User,
