@@ -117,12 +117,13 @@ export class ChannelsController {
   @ApiOperation({ summary: '특정 채널에서 퇴장합니다.' })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 404, description: '채널, 유저 없음' })
-  @Delete(':name/members/me')
-  deleteChannelMemberByMe(
+  @Delete(':name/members/:memberName')
+  deleteChannelMember(
     @GetUser() user: User,
     @Param('name') name: string,
+    @Param('memberName') memberName: string,
   ): Promise<void> {
-    return this.channelsService.deleteChannelMemberByMe(user, name);
+    return this.channelsService.deleteChannelMember(user, name, memberName);
   }
 
   @ApiOperation({
