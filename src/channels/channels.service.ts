@@ -205,12 +205,51 @@ export class ChannelsService {
     );
   }
 
-  async deleteChannelMemberByMe(user: User, name: string): Promise<void> {
+  async deleteChannelMember(
+    user: User,
+    name: string,
+    memberName: string,
+  ): Promise<void> {
     const channel: Channel = await this.getChannelByName(name);
 
-    const membership: Membership = await this.membershipsRepository.findOne({
-      where: { channel, user },
-    });
+    const membershipOfRequester: Membership =
+      await this.membershipsRepository.findOne({
+        where: { channel, user },
+      });
+    if (!membershipOfRequester) {
+      throw new NotFoundException([
+        `${user.name} is not a member of channel(${name}).`,
+      ]);
+    }
+
+    if (user.name !== memberName) {
+      const member: User = await this.usersService.getUserByName(memberName);
+
+      const membershipOfMember: Membership =
+        await this.membershipsRepository.findOne({ channel, user: member });
+
+      if (
+        !(
+          (membershipOfRequester.role === MembershipRole.OWNER ||
+            membershipOfRequester.role === MembershipRole.ADMIN) &&
+          membershipOfMember?.role === MembershipRole.BANNED
+        )
+      ) {
+        throw new ForbiddenException(['You do not have permission.']);
+      }
+
+      // NOTE 삭제
+      const result = await this.membershipsRepository.delete({
+        channel,
+        user: member,
+      });
+      if (!result.affected) {
+        throw new NotFoundException([
+          `${member.name} is not a banned user of this channel(${name}).`,
+        ]);
+      }
+      return;
+    }
 
     // NOTE 삭제
     const result = await this.membershipsRepository.delete({ channel, user });
@@ -221,7 +260,7 @@ export class ChannelsService {
     }
 
     // NOTE 권한 위임
-    if (membership.role === MembershipRole.OWNER) {
+    if (membershipOfRequester.role === MembershipRole.OWNER) {
       const membershipOfAdmin: Membership =
         await this.membershipsRepository.findOne({
           where: { channel, role: MembershipRole.ADMIN },
