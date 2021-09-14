@@ -272,13 +272,6 @@ export class ChannelsService {
       ]);
     }
 
-    if (
-      membershipOfRequester.role !== MembershipRole.OWNER &&
-      membershipOfRequester.role !== MembershipRole.ADMIN
-    ) {
-      throw new ForbiddenException(['You do not have permission.']);
-    }
-
     const member: User = await this.usersService.getUserByName(memberName);
     const membershipOfMember: Membership =
       await this.membershipsRepository.findOne({
@@ -291,87 +284,46 @@ export class ChannelsService {
       ]);
     }
 
-    if (role === MembershipRole.OWNER)
-      throw new ForbiddenException(['You do not have permission.']);
+    if (
+      !(
+        (membershipOfRequester.role === MembershipRole.OWNER &&
+          membershipOfMember.role === MembershipRole.ADMIN &&
+          (role === MembershipRole.MEMBER || role === MembershipRole.BANNED)) ||
+        (membershipOfRequester.role === MembershipRole.OWNER &&
+          membershipOfMember.role === MembershipRole.MEMBER &&
+          (role === MembershipRole.ADMIN || role === MembershipRole.BANNED)) ||
+        (membershipOfRequester.role === MembershipRole.OWNER &&
+          membershipOfMember.role === MembershipRole.BANNED &&
+          role === MembershipRole.MEMBER) ||
+        (membershipOfRequester.role === MembershipRole.ADMIN &&
+          membershipOfMember.role === MembershipRole.MEMBER &&
+          role === MembershipRole.BANNED) ||
+        (membershipOfRequester.role === MembershipRole.ADMIN &&
+          membershipOfMember.role === MembershipRole.BANNED &&
+          role === MembershipRole.MEMBER)
+      )
+    ) {
+      throw new ForbiddenException([
+        `You do not have permission(${user.name}(${membershipOfRequester.role}) cannot change ${member.name}(${membershipOfMember.role})'s role to ${role}).`,
+      ]);
+    }
 
-    switch (membershipOfRequester.role) {
-      case MembershipRole.OWNER:
-        switch (membershipOfMember.role) {
-          case MembershipRole.ADMIN:
-            if (role === MembershipRole.ADMIN)
-              throw new ForbiddenException(['You do not change same role.']);
-            membershipOfMember.role = role;
-            await this.membershipsRepository.update(
-              { channel, user: member },
-              membershipOfMember,
-            );
-            if (membershipOfMember.role === MembershipRole.BANNED)
-              this.eventsGateway.server
-                .to(member.id)
-                .emit('banned', membershipOfMember);
-            break;
-          case MembershipRole.MEMBER:
-            if (role === MembershipRole.MEMBER)
-              throw new ForbiddenException(['You do not change same role.']);
-            membershipOfMember.role = role;
-            await this.membershipsRepository.update(
-              { channel, user: member },
-              membershipOfMember,
-            );
-            if (membershipOfMember.role === MembershipRole.BANNED)
-              this.eventsGateway.server
-                .to(member.id)
-                .emit('banned', membershipOfMember);
-            break;
-          case MembershipRole.BANNED:
-            if (role === MembershipRole.ADMIN)
-              throw new ForbiddenException(['You do not change same role.']);
-            membershipOfMember.role = role;
-            await this.membershipsRepository.update(
-              { channel, user: member },
-              membershipOfMember,
-            );
-            if (membershipOfMember.role === MembershipRole.BANNED)
-              this.eventsGateway.server
-                .to(member.id)
-                .emit('banned', membershipOfMember);
-            break;
-          default:
-            throw new ForbiddenException(['You do not have permission.']);
-        }
-        break;
-      case MembershipRole.ADMIN:
-        if (role === MembershipRole.ADMIN)
-          throw new ForbiddenException(['You do not change same role.']);
-        switch (membershipOfMember.role) {
-          case MembershipRole.MEMBER:
-            if (role === MembershipRole.MEMBER)
-              throw new ForbiddenException(['You do not change same role.']);
-            membershipOfMember.role = role;
-            await this.membershipsRepository.update(
-              { channel, user: member },
-              membershipOfMember,
-            );
-            if (membershipOfMember.role === MembershipRole.BANNED)
-              this.eventsGateway.server
-                .to(member.id)
-                .emit('banned', membershipOfMember);
-            break;
-          case MembershipRole.BANNED:
-            if (role === MembershipRole.BANNED)
-              throw new ForbiddenException(['You do not change same role.']);
-            membershipOfMember.role = role;
-            await this.membershipsRepository.update(
-              { channel, user: member },
-              membershipOfMember,
-            );
-            break;
-          default:
-            throw new ForbiddenException(['You do not have permission.']);
-        }
-        break;
-      default:
-        throw new ForbiddenException(['You do not have permission.']);
+    await this.membershipsRepository.update(
+      { channel, user: member },
+      { channel, user: member, role },
+    );
+
+    let event: string = null;
+    if (role === MembershipRole.BANNED) {
+      event = 'banned';
+    } else if (membershipOfMember.role == MembershipRole.ADMIN) {
+      event = 'adminToMember';
+    }
+
+    membershipOfMember.role = role;
+
+    if (event) {
+      this.eventsGateway.server.to(member.id).emit(event, membershipOfMember);
     }
     return membershipOfMember;
   }
