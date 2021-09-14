@@ -338,13 +338,6 @@ export class ChannelsService {
       ]);
     }
 
-    if (
-      membershipOfRequester.role !== MembershipRole.OWNER &&
-      membershipOfRequester.role !== MembershipRole.ADMIN
-    ) {
-      throw new ForbiddenException(['You do not have permission.']);
-    }
-
     const member: User = await this.usersService.getUserByName(memberName);
     const membershipOfMember: Membership =
       await this.membershipsRepository.findOne({ channel, user: member });
@@ -354,19 +347,18 @@ export class ChannelsService {
       ]);
     }
 
-    switch (membershipOfMember.role) {
-      case MembershipRole.OWNER:
-        // NOTE 상대가 OWNER일 경우, 강퇴 불가
-        throw new ForbiddenException(['You do not have permission.']);
-
-      case MembershipRole.ADMIN:
-        // NOTE 상대가 ADMIN일 경우, OWNER만 강퇴 가능
-        if (membershipOfRequester.role !== MembershipRole.OWNER) {
-          throw new ForbiddenException(['You do not have permission.']);
-        }
-        break;
-      case MembershipRole.BANNED:
-        throw new NotFoundException([`${memberName} not found.`]);
+    if (
+      !(
+        (membershipOfRequester.role === MembershipRole.OWNER &&
+          (membershipOfMember.role === MembershipRole.ADMIN ||
+            membershipOfMember.role === MembershipRole.MEMBER)) ||
+        (membershipOfRequester.role === MembershipRole.ADMIN &&
+          membershipOfMember.role === MembershipRole.MEMBER)
+      )
+    ) {
+      throw new ForbiddenException([
+        `${user.name}(${membershipOfRequester.role}) cannot mute ${member.name}(${membershipOfMember.role}).`,
+      ]);
     }
 
     const muteMinutes = 1;
@@ -377,14 +369,14 @@ export class ChannelsService {
 
     await this.membershipsRepository.update(
       { channel, user: member },
-      { channel, user: member, unmutedAt: membershipOfMember.unmutedAt },
+      membershipOfMember,
     );
 
     setTimeout(async () => {
       membershipOfMember.unmutedAt = null;
       await this.membershipsRepository.update(
         { channel, user: member },
-        { channel, user: member, unmutedAt: membershipOfMember.unmutedAt },
+        membershipOfMember,
       );
     }, 60000 * muteMinutes);
 
@@ -408,13 +400,6 @@ export class ChannelsService {
       ]);
     }
 
-    if (
-      membershipOfRequester.role !== MembershipRole.OWNER &&
-      membershipOfRequester.role !== MembershipRole.ADMIN
-    ) {
-      throw new ForbiddenException(['You do not have permission.']);
-    }
-
     const member: User = await this.usersService.getUserByName(memberName);
     const membershipOfMember: Membership =
       await this.membershipsRepository.findOne({ channel, user: member });
@@ -424,26 +409,24 @@ export class ChannelsService {
       ]);
     }
 
-    switch (membershipOfMember.role) {
-      case MembershipRole.OWNER:
-        // NOTE 상대가 OWNER일 경우, 강퇴 불가
-        throw new ForbiddenException(['You do not have permission.']);
-
-      case MembershipRole.ADMIN:
-        // NOTE 상대가 ADMIN일 경우, OWNER만 강퇴 가능
-        if (membershipOfRequester.role !== MembershipRole.OWNER) {
-          throw new ForbiddenException(['You do not have permission.']);
-        }
-        break;
-      case MembershipRole.BANNED:
-        throw new NotFoundException([`${memberName} not found.`]);
+    if (
+      !(
+        (membershipOfRequester.role === MembershipRole.OWNER &&
+          (membershipOfMember.role === MembershipRole.ADMIN ||
+            membershipOfMember.role === MembershipRole.MEMBER)) ||
+        (membershipOfRequester.role === MembershipRole.ADMIN &&
+          membershipOfMember.role === MembershipRole.MEMBER)
+      )
+    ) {
+      throw new ForbiddenException([
+        `${user.name}(${membershipOfRequester.role}) cannot mute ${member.name}(${membershipOfMember.role}).`,
+      ]);
     }
 
     membershipOfMember.unmutedAt = null;
-
     await this.membershipsRepository.update(
       { channel, user: member },
-      { channel, user: member, unmutedAt: membershipOfMember.unmutedAt },
+      membershipOfMember,
     );
 
     return membershipOfMember;
