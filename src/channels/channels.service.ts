@@ -117,11 +117,11 @@ export class ChannelsService {
     });
 
     if (!membership || membership.role === MembershipRole.BANNED) {
-      throw new ForbiddenException('You are not a member of this channel.');
+      throw new ForbiddenException(['You are not a member of this channel.']);
     }
 
     if (membership.role !== MembershipRole.OWNER) {
-      throw new ForbiddenException('Only the owner can change the password.');
+      throw new ForbiddenException(['Only the owner can change the password.']);
     }
 
     if (password) {
