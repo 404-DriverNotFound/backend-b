@@ -10,7 +10,6 @@ import { User } from './user.entity';
 import { buildPaginator, PagingQuery } from 'typeorm-cursor-pagination';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 import { Channel } from 'src/channels/entities/channel.entity';
-import { MembershipRole } from 'src/channels/membership-role.enum';
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
@@ -129,8 +128,8 @@ export class UsersRepository extends Repository<User> {
     qb.innerJoinAndSelect(
       'user.memberships',
       'memberships',
-      'memberships.channelId = :id AND memberships.role != :role',
-      { id: channel.id, role: MembershipRole.BANNED },
+      'memberships.channelId = :id',
+      { id: channel.id },
     );
 
     if (search) {
