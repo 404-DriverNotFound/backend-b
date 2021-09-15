@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
+import { MatchStatus } from './match-status.enum';
 import { Match } from './match.entity';
 import { MatchesRepository } from './matches.repository';
 
@@ -13,10 +14,13 @@ export class MatchesService {
     private readonly usersService: UsersService,
   ) {}
 
-  async getMatches(user: User): Promise<Match[]> {
+  async getMatches(user: User, status: MatchStatus): Promise<Match[]> {
     // TODO PAGINATION
     const matches: Match[] = await this.matchesRepository.find({
-      where: [{ user1: user }, { user2: user }],
+      where: [
+        { user1: user, status },
+        { user2: user, status },
+      ],
     });
     return matches;
   }

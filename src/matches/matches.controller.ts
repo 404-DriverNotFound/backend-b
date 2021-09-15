@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiCookieAuth,
   ApiOperation,
@@ -10,6 +10,7 @@ import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-au
 import { GetUser } from 'src/users/get-user.decorator';
 import { User } from 'src/users/user.entity';
 import { CreateMatchDto } from './dto/create-match.dto';
+import { GetMatchesFilterDto } from './dto/get-matches-filter.dto';
 import { Match } from './match.entity';
 import { MatchesService } from './matches.service';
 
@@ -24,9 +25,12 @@ export class MatchesController {
   @ApiOperation({ summary: '나의 모든 매치 정보를 가져옵니다.' })
   @ApiResponse({ status: 200, description: '성공' })
   @Get()
-  getMatches(@GetUser() user: User): Promise<Match[]> {
+  getMatches(
+    @GetUser() user: User,
+    @Query() { status }: GetMatchesFilterDto,
+  ): Promise<Match[]> {
     // TODO PAGINATION
-    return this.matchesService.getMatches(user);
+    return this.matchesService.getMatches(user, status);
   }
 
   @ApiOperation({ summary: '매치를 추가합니다.' })
