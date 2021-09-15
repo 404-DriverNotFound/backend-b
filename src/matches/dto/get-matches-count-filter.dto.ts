@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional } from 'class-validator';
-import { MatchResult } from '../match-result.enum';
+import { MatchResult } from '../constants/match-result.enum';
 
 export class GetMatchesCountFilterDto {
   @ApiProperty({

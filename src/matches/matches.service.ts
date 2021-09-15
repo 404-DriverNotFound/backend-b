@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
-import { MatchResult } from './match-result.enum';
-import { MatchStatus } from './match-status.enum';
-import { MatchType } from './match-type.enum';
+import { MatchResult } from './constants/match-result.enum';
+import { MatchStatus } from './constants/match-status.enum';
+import { MatchType } from './constants/match-type.enum';
 import { Match } from './match.entity';
 import { MatchesRepository } from './matches.repository';
 

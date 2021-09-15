@@ -6,8 +6,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { MatchStatus } from './match-status.enum';
-import { MatchType } from './match-type.enum';
+import { MatchStatus } from './constants/match-status.enum';
+import { MatchType } from './constants/match-type.enum';
 
 @Entity('user_match_user')
 export class Match {
