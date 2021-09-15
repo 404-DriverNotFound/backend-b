@@ -2,7 +2,7 @@ import {
   ConflictException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { User } from 'src/users/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
 import { FriendshipStatus } from './friendship-status.enum';
 import { Friendship } from './friendship.entity';

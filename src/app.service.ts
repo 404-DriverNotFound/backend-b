@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FriendshipStatus } from './friendships/friendship-status.enum';
 import { FriendshipsService } from './friendships/friendships.service';
-import { User } from './users/user.entity';
+import { User } from './users/entities/user.entity';
 import { UsersService } from './users/users.service';
 
 @Injectable()

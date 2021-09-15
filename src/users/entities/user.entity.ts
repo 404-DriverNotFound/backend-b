@@ -1,7 +1,6 @@
 import { Exclude, Transform } from 'class-transformer';
-//import { Friendship } from 'src/friendships/friendship.entity';
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
-import { UserStatus } from './user-status.enum';
+import { UserStatus } from '../constants/user-status.enum';
 
 @Entity()
 export class User {

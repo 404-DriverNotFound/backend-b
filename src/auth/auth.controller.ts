@@ -16,7 +16,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { GetUser } from 'src/users/get-user.decorator';
-import { User } from 'src/users/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { AuthenticatedGuard } from './guards/authenticated.guard';
 import { FtOauthGuard } from './guards/ft-oauth.guard';
 import { Request, Response } from 'express';
@@ -26,7 +26,7 @@ import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
 import { FtOauthUnauthorizedExceptionFilter } from './filters/ft-oauth-unauthorized-exception.filter';
 import { UsersService } from 'src/users/users.service';
-import { UserStatus } from 'src/users/user-status.enum';
+import { UserStatus } from 'src/users/constants/user-status.enum';
 import { SecondFactorAuthenticatedGuard } from './guards/second-factor-authenticated.guard';
 
 @ApiTags('Auth')

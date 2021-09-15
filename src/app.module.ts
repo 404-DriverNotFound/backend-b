@@ -8,7 +8,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { FriendshipsModule } from './friendships/friendships.module';
 import { FriendshipsRepository } from './friendships/friendships.repository';
-import { UsersRepository } from './users/users.repository';
+import { UsersRepository } from './users/repositories/users.repository';
 import { UsersService } from './users/users.service';
 import { FriendshipsService } from './friendships/friendships.service';
 import { MatchesModule } from './matches/matches.module';
