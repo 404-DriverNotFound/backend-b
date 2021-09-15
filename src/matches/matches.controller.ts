@@ -10,6 +10,7 @@ import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-au
 import { GetUser } from 'src/users/get-user.decorator';
 import { User } from 'src/users/user.entity';
 import { CreateMatchDto } from './dto/create-match.dto';
+import { GetMatchesCountFilterDto } from './dto/get-matches-count-filter.dto';
 import { GetMatchesFilterDto } from './dto/get-matches-filter.dto';
 import { Match } from './match.entity';
 import { MatchesService } from './matches.service';
@@ -31,6 +32,16 @@ export class MatchesController {
   ): Promise<Match[]> {
     // TODO PAGINATION
     return this.matchesService.getMatches(user, status, type);
+  }
+
+  @ApiOperation({ summary: '나의 종료된 매치 갯수를 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @Get('count')
+  getMatchesCount(
+    @GetUser() user: User,
+    @Query() { result }: GetMatchesCountFilterDto,
+  ): Promise<number> {
+    return this.matchesService.getMatchesCount(user, result);
   }
 
   @ApiOperation({ summary: '매치를 추가합니다.' })
