@@ -27,10 +27,10 @@ export class MatchesController {
   @Get()
   getMatches(
     @GetUser() user: User,
-    @Query() { status }: GetMatchesFilterDto,
+    @Query() { status, type }: GetMatchesFilterDto,
   ): Promise<Match[]> {
     // TODO PAGINATION
-    return this.matchesService.getMatches(user, status);
+    return this.matchesService.getMatches(user, status, type);
   }
 
   @ApiOperation({ summary: '매치를 추가합니다.' })

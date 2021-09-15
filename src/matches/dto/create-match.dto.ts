@@ -1,5 +1,5 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { IsEnum, IsOptional } from 'class-validator';
+import { IsEnum, IsNotEmpty } from 'class-validator';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { MatchType } from '../match-type.enum';
 
@@ -9,7 +9,7 @@ export class CreateMatchDto extends PickType(CreateUserDto, ['name'] as const) {
     required: true,
     enum: MatchType,
   })
-  @IsOptional()
+  @IsNotEmpty()
   @IsEnum(MatchType)
   readonly type!: MatchType;
 }

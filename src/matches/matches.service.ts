@@ -15,15 +15,13 @@ export class MatchesService {
     private readonly usersService: UsersService,
   ) {}
 
-  async getMatches(user: User, status: MatchStatus): Promise<Match[]> {
+  getMatches(
+    user: User,
+    status?: MatchStatus,
+    type?: MatchType,
+  ): Promise<Match[]> {
     // TODO PAGINATION
-    const matches: Match[] = await this.matchesRepository.find({
-      where: [
-        { user1: user, status },
-        { user2: user, status },
-      ],
-    });
-    return matches;
+    return this.matchesRepository.getMatches(user, status, type);
   }
 
   async createMatch(
