@@ -3,56 +3,12 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Brackets, EntityRepository, Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './user.entity';
-import { buildPaginator, PagingQuery } from 'typeorm-cursor-pagination';
-import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 import { Channel } from 'src/channels/entities/channel.entity';
+import { Brackets, EntityRepository, Repository } from 'typeorm';
+import { User } from './user.entity';
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
-  async getUsers({
-    search,
-    limit,
-    beforeCursor,
-    afterCursor,
-  }: GetUsersFilterDto) {
-    const qb = this.createQueryBuilder('user');
-
-    if (search) {
-      qb.andWhere('user.name LIKE :search', { search: `%${search}%` });
-    }
-
-    if (limit) {
-      let query: PagingQuery = { limit: +limit, order: 'ASC' };
-
-      if (afterCursor) {
-        query = { afterCursor, ...query };
-      }
-
-      if (beforeCursor) {
-        query = { beforeCursor, ...query };
-      }
-
-      const paginator = buildPaginator({
-        entity: User,
-        paginationKeys: ['name'],
-        query,
-      });
-
-      return await paginator.paginate(qb);
-    }
-
-    try {
-      const users: User[] = await qb.getMany();
-      return users;
-    } catch (error) {
-      throw new InternalServerErrorException(['Server error in getUsers']);
-    }
-  }
-
   async getUserByName(name: string): Promise<User> {
     const found: User = await this.findOne({ name });
     if (!found) {
@@ -62,15 +18,16 @@ export class UsersRepository extends Repository<User> {
   }
 
   async createUser(
-    createUserDto: CreateUserDto,
-    file: Express.Multer.File,
+    ftId: number,
+    name: string,
+    enable2FA: boolean,
+    avatar?: string,
   ): Promise<User> {
-    const { ftId, name, enable2FA } = createUserDto;
     const user: User = this.create({
       ftId,
       name,
-      avatar: file?.path,
-      enable2FA: enable2FA === 'true',
+      avatar,
+      enable2FA,
     });
     try {
       await this.save(user);
@@ -87,21 +44,24 @@ export class UsersRepository extends Repository<User> {
 
   async updateUser(
     user: User,
-    updateUserDto: UpdateUserDto,
-    file: Express.Multer.File,
+    name?: string,
+    enable2FA?: boolean,
+    avatar?: string,
   ): Promise<User> {
-    const { name, enable2FA } = updateUserDto;
     if (name) {
       user.name = name;
     }
-    if (file) {
-      user.avatar = file.path;
+
+    if (avatar) {
+      user.avatar = avatar;
     }
+
     if (enable2FA) {
-      user.enable2FA = enable2FA === 'true';
+      user.enable2FA = enable2FA;
       user.isSecondFactorAuthenticated = true; // REVIEW 업데이트하고 바로 인증으로 넘어가지 않고, 재로그인시 검사
       user.authenticatorSecret = null;
     }
+
     try {
       await this.save(user);
     } catch (error) {

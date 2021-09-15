@@ -6,11 +6,14 @@ import { AppService } from './app.service';
 import { configValidationSchema } from './config.schema';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { FilesModule } from './files/files.module';
 import { FriendshipsModule } from './friendships/friendships.module';
 import { ChannelsModule } from './channels/channels.module';
 import { DmsModule } from './dms/dms.module';
 import { EventsModule } from './events/events.module';
+import { FriendshipsRepository } from './friendships/friendships.repository';
+import { UsersRepository } from './users/users.repository';
+import { UsersService } from './users/users.service';
+import { FriendshipsService } from './friendships/friendships.service';
 
 @Module({
   imports: [
@@ -32,15 +35,15 @@ import { EventsModule } from './events/events.module';
         synchronize: true,
       }),
     }),
+    TypeOrmModule.forFeature([FriendshipsRepository, UsersRepository]),
     AuthModule,
     UsersModule,
-    FilesModule,
     FriendshipsModule,
     ChannelsModule,
     DmsModule,
     EventsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, UsersService, FriendshipsService],
 })
 export class AppModule {}

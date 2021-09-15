@@ -41,8 +41,10 @@ export class UsersController {
   @Get()
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  getUsers(@Query() filterDto: GetUsersFilterDto) {
-    return this.usersService.getUsers(filterDto);
+  getUsers(
+    @Query() { search, perPage, page }: GetUsersFilterDto,
+  ): Promise<User[]> {
+    return this.usersService.getUsers(search, +perPage, +page);
   }
 
   @ApiCookieAuth()
@@ -88,10 +90,10 @@ export class UsersController {
   @Post()
   @UseInterceptors(FileInterceptor('avatar', localOptions))
   createUser(
-    @Body() createUserDto: CreateUserDto,
+    @Body() { ftId, name, enable2FA }: CreateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<User> {
-    return this.usersService.createUser(createUserDto, file);
+    return this.usersService.createUser(ftId, name, enable2FA, file?.path);
   }
 
   @ApiCookieAuth()
@@ -108,9 +110,9 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('avatar', localOptions))
   updateUser(
     @GetUser() user: User,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() { name, enable2FA }: UpdateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<User> {
-    return this.usersService.updateUser(user, updateUserDto, file);
+    return this.usersService.updateUser(user, name, enable2FA, file?.path);
   }
 }

@@ -1,5 +1,5 @@
 import { User } from 'src/users/user.entity';
-import { Column, Entity, ManyToOne, UpdateDateColumn } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, UpdateDateColumn } from 'typeorm';
 import { FriendshipStatus } from './friendship-status.enum';
 
 @Entity('user_friendship_user')
@@ -18,5 +18,6 @@ export class Friendship {
   status: FriendshipStatus;
 
   @UpdateDateColumn()
+  @Index()
   updatedAt: Date;
 }

@@ -155,7 +155,11 @@ export class FriendshipsService {
     user: User,
     me?: FriendshipRole,
     status?: FriendshipStatus,
+    perPage?: number,
+    page?: number,
   ): Promise<User[]> {
+    const options: any = { order: { updatedAt: 'DESC' } };
+
     let where = [
       { requester: user, status: FriendshipStatus.ACCEPTED },
       { addressee: user, status: FriendshipStatus.ACCEPTED },
@@ -174,19 +178,29 @@ export class FriendshipsService {
       where = where.map((e: any) => ({ ...e, status }));
     }
 
-    const friendships: Friendship[] = await this.friendshipsRepository.find({
-      where,
-    });
-    const users: User[] = [];
-    for (const friendship of friendships) {
-      if (friendship.requester.id === user.id) {
-        users.push(friendship.addressee);
-      }
-      if (friendship.addressee.id === user.id) {
-        users.push(friendship.requester);
-      }
+    options.where = where;
+
+    if (perPage) {
+      options.take = perPage;
     }
-    // REVIEW 서로 수락한 경우, 친구 중복이 발생할 수 있다. 서로 수락한 경우가 안생기게 확인하기
+
+    if (page) {
+      options.skip = perPage * (page - 1);
+    }
+
+    const [data] = await this.friendshipsRepository.findAndCount(options);
+
+    // REVIEW 서로 수락한 경우, 친구 중복이 발생할 수 있다. 서로 수락한 경우가 안생기게 확인하기, DB를 임의조작하지 않는 이상 생기는 케이스는 아님.
+    const users: User[] = data.reduce((acc: User[], cur: Friendship) => {
+      if (cur.requester.id === user.id) {
+        acc.push(cur.addressee);
+      }
+      if (cur.addressee.id === user.id) {
+        acc.push(cur.requester);
+      }
+      return acc;
+    }, []);
+
     return users;
   }
 
@@ -225,17 +239,29 @@ export class FriendshipsService {
     }
   }
 
-  async getBlocks(requester: User): Promise<User[]> {
-    const friendships: Friendship[] = await this.friendshipsRepository.find({
-      requester,
-      status: FriendshipStatus.BLOCKED,
-    });
+  async getBlocks(
+    requester: User,
+    perPage?: number,
+    page?: number,
+  ): Promise<User[]> {
+    const options: any = { order: { updatedAt: 'DESC' } };
 
-    const users: User[] = [];
+    options.where = { requester, status: FriendshipStatus.BLOCKED };
 
-    for (const friendship of friendships) {
-      users.push(friendship.addressee);
+    if (perPage) {
+      options.take = perPage;
     }
+
+    if (page) {
+      options.skip = perPage * (page - 1);
+    }
+
+    const [data] = await this.friendshipsRepository.findAndCount(options);
+
+    const users: User[] = data.reduce((acc, cur) => {
+      acc.push(cur.addressee);
+      return acc;
+    }, []);
 
     return users;
   }

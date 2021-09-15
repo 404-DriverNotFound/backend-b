@@ -5,11 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from 'src/channels/entities/channel.entity';
-//import { Friendship } from 'src/friendships/friendship.entity';
-//import { FriendshipsRepository } from 'src/friendships/friendships.repository';
-import { CreateUserDto } from './dto/create-user.dto';
-import { GetUsersFilterDto } from './dto/get-users-filter.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { Like } from 'typeorm';
 import { UserStatus } from './user-status.enum';
 import { User } from './user.entity';
 import { UsersRepository } from './users.repository';
@@ -21,8 +17,28 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  async getUsers(filterDto: GetUsersFilterDto) {
-    return this.usersRepository.getUsers(filterDto);
+  async getUsers(
+    search?: string,
+    perPage?: number,
+    page?: number,
+  ): Promise<User[]> {
+    const options: any = { order: { name: 'ASC' } };
+
+    if (search) {
+      options.where = { name: Like(`%${search}%`) };
+    }
+
+    if (perPage) {
+      options.take = perPage;
+    }
+
+    if (page) {
+      options.skip = perPage * (page - 1);
+    }
+
+    const [data] = await this.usersRepository.findAndCount(options);
+
+    return data;
   }
 
   async isDuplicated(name: string): Promise<User> {
@@ -33,31 +49,30 @@ export class UsersService {
     return found;
   }
 
-  async getUserByName(/*user: User,*/ name: string): Promise<User> {
+  async getUserByName(name: string): Promise<User> {
     const found: User = await this.usersRepository.findOne({ name });
     if (!found) {
       throw new NotFoundException([`User with ${name} not found`]);
     }
-
-    //const friendship: Friendship =
-    //await this.friendshipsRepository.getFriendshipsByUsers(user, found);
-    //found.friendship = friendship;
     return found;
   }
 
   createUser(
-    createUserDto: CreateUserDto,
-    file: Express.Multer.File,
+    ftId: number,
+    name: string,
+    enable2FA: boolean,
+    avatar?: string,
   ): Promise<User> {
-    return this.usersRepository.createUser(createUserDto, file);
+    return this.usersRepository.createUser(ftId, name, enable2FA, avatar);
   }
 
   updateUser(
     user: User,
-    updateUserDto: UpdateUserDto,
-    file: Express.Multer.File,
+    name?: string,
+    enable2FA?: boolean,
+    avatar?: string,
   ): Promise<User> {
-    return this.usersRepository.updateUser(user, updateUserDto, file);
+    return this.usersRepository.updateUser(user, name, enable2FA, avatar);
   }
 
   async updateUserStatus(user: User, status: UserStatus): Promise<User> {
