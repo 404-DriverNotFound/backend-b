@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { MatchStatus } from './match-status.enum';
+import { MatchType } from './match-type.enum';
 import { Match } from './match.entity';
 import { MatchesRepository } from './matches.repository';
 
@@ -25,9 +26,13 @@ export class MatchesService {
     return matches;
   }
 
-  async createMatch(user1: User, name: string): Promise<Match> {
+  async createMatch(
+    user1: User,
+    name: string,
+    type: MatchType,
+  ): Promise<Match> {
     const user2: User = await this.usersService.getUserByName(name);
-    const match: Match = this.matchesRepository.create({ user1, user2 });
+    const match: Match = this.matchesRepository.create({ user1, user2, type });
     await this.matchesRepository.save(match);
     return match;
   }

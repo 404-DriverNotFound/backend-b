@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { MatchStatus } from './match-status.enum';
+import { MatchType } from './match-type.enum';
 
 @Entity('user_match_user')
 export class Match {
@@ -30,4 +31,7 @@ export class Match {
 
   @Column({ type: 'enum', enum: MatchStatus, default: MatchStatus.IN_PROGRESS })
   status: MatchStatus;
+
+  @Column({ type: 'enum', enum: MatchType, default: MatchType.LADDER })
+  type: MatchType;
 }

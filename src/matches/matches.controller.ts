@@ -38,9 +38,9 @@ export class MatchesController {
   @Post()
   createMatch(
     @GetUser() user: User,
-    @Body() { name }: CreateMatchDto,
+    @Body() { name, type }: CreateMatchDto,
   ): Promise<Match> {
     // TODO PAGINATION
-    return this.matchesService.createMatch(user, name);
+    return this.matchesService.createMatch(user, name, type);
   }
 }
