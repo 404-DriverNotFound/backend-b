@@ -11,6 +11,7 @@ import { FriendshipsRepository } from './friendships/friendships.repository';
 import { UsersRepository } from './users/users.repository';
 import { UsersService } from './users/users.service';
 import { FriendshipsService } from './friendships/friendships.service';
+import { MatchesModule } from './matches/matches.module';
 
 @Module({
   imports: [
@@ -32,10 +33,11 @@ import { FriendshipsService } from './friendships/friendships.service';
         synchronize: true,
       }),
     }),
+    TypeOrmModule.forFeature([FriendshipsRepository, UsersRepository]),
     AuthModule,
     UsersModule,
     FriendshipsModule,
-    TypeOrmModule.forFeature([FriendshipsRepository, UsersRepository]),
+    MatchesModule,
   ],
   controllers: [AppController],
   providers: [AppService, UsersService, FriendshipsService],
