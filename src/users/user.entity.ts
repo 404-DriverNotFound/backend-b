@@ -31,4 +31,7 @@ export class User {
 
   @Column({ default: false })
   isSecondFactorAuthenticated: boolean;
+
+  @Column({ default: 0 })
+  score: number;
 }
