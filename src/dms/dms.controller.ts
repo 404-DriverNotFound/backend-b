@@ -18,7 +18,7 @@ import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-au
 import { GetChannelChatsCountDto } from 'src/channels/dto/get-channel-chats-count.dto';
 import { PaginationFilterDto } from 'src/channels/dto/pagination-filter.dto';
 import { GetUser } from 'src/users/get-user.decorator';
-import { User } from 'src/users/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { Dm } from './dm.entity';
 import { DmsService } from './dms.service';
 import { CreateDmDto } from './dto/create-dm.dto';

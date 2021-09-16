@@ -1,4 +1,4 @@
-import { User } from 'src/users/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
 import { Channel } from '../entities/channel.entity';
 import { MembershipRole } from '../membership-role.enum';

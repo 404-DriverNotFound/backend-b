@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from './entities/channel.entity';
 import { ChannelsRepository } from './repositories/channels.repository';
 import * as bcrypt from 'bcrypt';
-import { User } from 'src/users/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { Like, MoreThan } from 'typeorm';
 import { Membership } from './entities/membership.entity';
 import { MembershipsRepository } from './repositories/memberships.repository';

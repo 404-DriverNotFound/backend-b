@@ -9,7 +9,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UserStatus } from './user-status.enum';
+import { UserStatus } from '../constants/user-status.enum';
 
 @Entity()
 export class User {

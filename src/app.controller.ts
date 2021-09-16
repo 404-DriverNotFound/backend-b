@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { AuthenticatedGuard } from './auth/guards/authenticated.guard';
 import { SecondFactorAuthenticatedGuard } from './auth/guards/second-factor-authenticated.guard';
 import { GetUser } from './users/get-user.decorator';
-import { User } from './users/user.entity';
+import { User } from './users/entities/user.entity';
 
 @ApiTags('Default')
 @Controller()

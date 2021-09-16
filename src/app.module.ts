@@ -11,7 +11,7 @@ import { ChannelsModule } from './channels/channels.module';
 import { DmsModule } from './dms/dms.module';
 import { EventsModule } from './events/events.module';
 import { FriendshipsRepository } from './friendships/friendships.repository';
-import { UsersRepository } from './users/users.repository';
+import { UsersRepository } from './users/repositories/users.repository';
 import { UsersService } from './users/users.service';
 import { FriendshipsService } from './friendships/friendships.service';
 

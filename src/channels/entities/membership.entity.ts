@@ -1,4 +1,4 @@
-import { User } from 'src/users/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { Column, CreateDateColumn, Entity, Index, ManyToOne } from 'typeorm';
 import { MembershipRole } from '../membership-role.enum';
 import { Channel } from './channel.entity';

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersRepository } from 'src/users/users.repository';
+import { UsersRepository } from 'src/users/repositories/users.repository';
 import { UsersService } from 'src/users/users.service';
 import { FriendshipsController } from './friendships.controller';
 import { FriendshipsRepository } from './friendships.repository';
