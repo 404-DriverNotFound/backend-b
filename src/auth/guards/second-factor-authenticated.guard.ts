@@ -19,13 +19,13 @@ export class SecondFactorAuthenticatedGuard implements CanActivate {
     if (user?.enable2FA) {
       if (!user.isSecondFactorAuthenticated) {
         if (!user.authenticatorSecret) {
-          throw new ForbiddenException(
+          throw new ForbiddenException([
             'You must get a QR code to access this request.',
-          );
+          ]);
         }
-        throw new ForbiddenException(
+        throw new ForbiddenException([
           'You must validate your OTP(from google authenticator) first.',
-        );
+        ]);
       }
     }
     return request.isAuthenticated();

@@ -7,6 +7,9 @@ import { configValidationSchema } from './config.schema';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { FriendshipsModule } from './friendships/friendships.module';
+import { ChannelsModule } from './channels/channels.module';
+import { DmsModule } from './dms/dms.module';
+import { EventsModule } from './events/events.module';
 import { FriendshipsRepository } from './friendships/friendships.repository';
 import { UsersRepository } from './users/users.repository';
 import { UsersService } from './users/users.service';
@@ -32,10 +35,13 @@ import { FriendshipsService } from './friendships/friendships.service';
         synchronize: true,
       }),
     }),
+    TypeOrmModule.forFeature([FriendshipsRepository, UsersRepository]),
     AuthModule,
     UsersModule,
     FriendshipsModule,
-    TypeOrmModule.forFeature([FriendshipsRepository, UsersRepository]),
+    ChannelsModule,
+    DmsModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService, UsersService, FriendshipsService],

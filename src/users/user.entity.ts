@@ -1,6 +1,14 @@
 import { Exclude, Transform } from 'class-transformer';
-//import { Friendship } from 'src/friendships/friendship.entity';
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { Chat } from 'src/channels/entities/chat.entity';
+import { Membership } from 'src/channels/entities/membership.entity';
+import { Dm } from 'src/dms/dm.entity';
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { UserStatus } from './user-status.enum';
 
 @Entity()
@@ -31,4 +39,18 @@ export class User {
 
   @Column({ default: false })
   isSecondFactorAuthenticated: boolean;
+
+  @OneToMany(() => Membership, (membership) => membership.user, {
+    cascade: true,
+  })
+  memberships: Membership[];
+
+  @OneToMany(() => Chat, (chat) => chat.user, { cascade: true })
+  chats: Chat[];
+
+  @OneToMany(() => Dm, (dm) => dm.sender, { cascade: true })
+  senderDms: Dm[];
+
+  @OneToMany(() => Dm, (dm) => dm.receiver, { cascade: true })
+  receiverDms: Dm[];
 }

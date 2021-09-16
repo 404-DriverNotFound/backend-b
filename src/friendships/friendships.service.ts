@@ -26,7 +26,7 @@ export class FriendshipsService {
     addresseeName: string,
   ): Promise<Friendship> {
     if (addresseeName === requester.name) {
-      throw new ConflictException('Cannot add yourself');
+      throw new ConflictException(['Cannot add yourself']);
     }
 
     const addressee: User = await this.usersService.getUserByName(
@@ -38,9 +38,10 @@ export class FriendshipsService {
   async getFriendshipByName(
     user: User,
     opponentName: string,
+    exception: boolean,
   ): Promise<Friendship> {
     if (opponentName === user.name) {
-      throw new ConflictException('Cannot get yours.');
+      throw new ConflictException(['Cannot get yours.']);
     }
 
     const opponent: User = await this.usersService.getUserByName(opponentName);
@@ -53,9 +54,12 @@ export class FriendshipsService {
     ).sort((a: Friendship) => (a.requester.id === user.id ? -1 : 1));
 
     if (!friendships.length) {
-      throw new NotFoundException(
+      if (exception === false) {
+        return undefined;
+      }
+      throw new NotFoundException([
         `Friendhip between ${user.name} and ${opponentName} not found.`,
-      );
+      ]);
     }
 
     for (const friendship of friendships) {
@@ -90,7 +94,7 @@ export class FriendshipsService {
     addresseeName: string,
   ): Promise<void> {
     if (addresseeName === requester.name) {
-      throw new ConflictException('Cannot delete yourself');
+      throw new ConflictException(['Cannot delete yourself']);
     }
 
     const addressee: User = await this.usersService.getUserByName(
@@ -104,9 +108,9 @@ export class FriendshipsService {
     });
 
     if (result.affected === 0) {
-      throw new NotFoundException(
+      throw new NotFoundException([
         `Friendship with ${addresseeName} which status is ${FriendshipStatus.REQUESTED} not found.`,
-      );
+      ]);
     }
   }
 
@@ -116,7 +120,7 @@ export class FriendshipsService {
     status: FriendshipStatus,
   ): Promise<Friendship> {
     if (requesterName === addressee.name) {
-      throw new ConflictException('Cannot delete yourself');
+      throw new ConflictException(['Cannot delete yourself']);
     }
 
     const requester: User = await this.usersService.getUserByName(
@@ -129,9 +133,9 @@ export class FriendshipsService {
     });
 
     if (!friendship || friendship.status !== FriendshipStatus.REQUESTED) {
-      throw new NotFoundException(
+      throw new NotFoundException([
         'There is no friendship that you are requested.',
-      );
+      ]);
     }
 
     friendship.status = status;
@@ -139,9 +143,9 @@ export class FriendshipsService {
     try {
       await this.friendshipsRepository.save(friendship);
     } catch (error) {
-      throw new InternalServerErrorException(
+      throw new InternalServerErrorException([
         'Something wrong while saving friendship in updateFriendshipStatus',
-      );
+      ]);
     }
 
     return friendship;
@@ -164,9 +168,9 @@ export class FriendshipsService {
     if (me) {
       where = where.filter((e: any) => Object.keys(e)[0] === me.toLowerCase());
       if (!status) {
-        throw new BadRequestException(
+        throw new BadRequestException([
           'me query must need follwing status query.',
-        );
+        ]);
       }
     }
 
@@ -202,7 +206,7 @@ export class FriendshipsService {
 
   async deleteFriend(user: User, opponentName: string): Promise<void> {
     if (opponentName === user.name) {
-      throw new ConflictException('Cannot delete yourself');
+      throw new ConflictException(['Cannot delete yourself']);
     }
 
     const opponent: User = await this.usersService.getUserByName(opponentName);
@@ -215,9 +219,9 @@ export class FriendshipsService {
     ).filter((e: Friendship) => e.status === FriendshipStatus.ACCEPTED);
 
     if (!friendships.length) {
-      throw new NotFoundException(
+      throw new NotFoundException([
         `Friendhip between ${user.name} and ${opponentName} not found.`,
-      );
+      ]);
     }
 
     // REVIEW 둘 사이의 친구 관계가 2개 이상이면 모두 삭제된다.
@@ -228,9 +232,9 @@ export class FriendshipsService {
       });
 
       if (!result.affected) {
-        throw new NotFoundException(
+        throw new NotFoundException([
           `Friendhip between ${user.name} and ${opponentName} not found.`,
-        );
+        ]);
       }
     }
   }
@@ -267,7 +271,7 @@ export class FriendshipsService {
     addresseeName: string,
   ): Promise<Friendship> {
     if (addresseeName === requester.name) {
-      throw new ConflictException('Cannot block yourself');
+      throw new ConflictException(['Cannot block yourself']);
     }
 
     const addressee: User = await this.usersService.getUserByName(
@@ -278,7 +282,7 @@ export class FriendshipsService {
 
   async deleteBlack(requester: User, addresseeName: string): Promise<void> {
     if (addresseeName === requester.name) {
-      throw new ConflictException('Cannot unblock yourself');
+      throw new ConflictException(['Cannot unblock yourself']);
     }
 
     const addressee: User = await this.usersService.getUserByName(
@@ -292,9 +296,9 @@ export class FriendshipsService {
     });
 
     if (result.affected === 0) {
-      throw new NotFoundException(
+      throw new NotFoundException([
         `Friendship with ${addresseeName} which status is ${FriendshipStatus.BLOCKED} not found.`,
-      );
+      ]);
     }
   }
 }
