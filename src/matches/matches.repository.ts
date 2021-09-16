@@ -7,7 +7,16 @@ import { Match } from './match.entity';
 
 @EntityRepository(Match)
 export class MatchesRepository extends Repository<Match> {
-  async getMatches(
+  async getMatches(type: MatchType): Promise<Match[]> {
+    const qb = this.createQueryBuilder('match');
+
+    qb.where('match.status = :status', { status: MatchStatus.IN_PROGRESS });
+    qb.andWhere('match.type = :type', { type });
+
+    return qb.getMany();
+  }
+
+  async getMyMatches(
     user: User,
     status?: MatchStatus,
     type?: MatchType,

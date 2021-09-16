@@ -12,6 +12,7 @@ import { User } from 'src/users/entities/user.entity';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { GetMatchesCountFilterDto } from './dto/get-matches-count-filter.dto';
 import { GetMatchesFilterDto } from './dto/get-matches-filter.dto';
+import { GetSpectateFilterDto } from './dto/get-spectate-filter.dto';
 import { Match } from './match.entity';
 import { MatchesService } from './matches.service';
 
@@ -23,15 +24,23 @@ import { MatchesService } from './matches.service';
 export class MatchesController {
   constructor(private readonly matchesService: MatchesService) {}
 
-  @ApiOperation({ summary: '나의 모든 매치 정보를 가져옵니다.' })
+  @ApiOperation({ summary: '관전 가능한 모든 매치 정보를 가져옵니다.' })
   @ApiResponse({ status: 200, description: '성공' })
   @Get()
-  getMatches(
+  getMatches(@Query() { type }: GetSpectateFilterDto): Promise<Match[]> {
+    // TODO PAGINATION
+    return this.matchesService.getMatches(type);
+  }
+
+  @ApiOperation({ summary: '나의 모든 매치 정보를 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @Get('me')
+  getMyMatches(
     @GetUser() user: User,
     @Query() { status, type }: GetMatchesFilterDto,
   ): Promise<Match[]> {
     // TODO PAGINATION
-    return this.matchesService.getMatches(user, status, type);
+    return this.matchesService.getMyMatches(user, status, type);
   }
 
   @ApiOperation({ summary: '나의 종료된 매치 갯수를 가져옵니다.' })

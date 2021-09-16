@@ -16,13 +16,18 @@ export class MatchesService {
     private readonly usersService: UsersService,
   ) {}
 
-  getMatches(
+  getMatches(type: MatchType): Promise<Match[]> {
+    // TODO PAGINATION
+    return this.matchesRepository.getMatches(type);
+  }
+
+  getMyMatches(
     user: User,
     status?: MatchStatus,
     type?: MatchType,
   ): Promise<Match[]> {
     // TODO PAGINATION
-    return this.matchesRepository.getMatches(user, status, type);
+    return this.matchesRepository.getMyMatches(user, status, type);
   }
 
   getMatchesCount(user: User, result?: MatchResult): Promise<number> {
