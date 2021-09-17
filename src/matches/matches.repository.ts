@@ -21,13 +21,11 @@ export class MatchesRepository extends Repository<Match> {
   ): Promise<Match[]> {
     const qb = this.createQueryBuilder('match');
 
-    qb.leftJoinAndSelect('match.user1', 'users1');
-    qb.leftJoinAndSelect('match.user2', 'users2');
-    qb.leftJoinAndSelect('match.winner', 'users3');
-    qb.leftJoinAndSelect('match.loser', 'users4');
+    qb.leftJoinAndSelect('match.user1', 'user1');
+    qb.leftJoinAndSelect('match.user2', 'user2');
     qb.where('match.status = :status', { status: MatchStatus.IN_PROGRESS });
 
-    if (type !== undefined) {
+    if (type) {
       qb.andWhere('match.type = :type', { type });
     }
 
