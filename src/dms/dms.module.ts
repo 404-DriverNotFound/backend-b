@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AchievementsModule } from 'src/achievements/achievements.module';
 import { EventsModule } from 'src/events/events.module';
 import { FriendshipsRepository } from 'src/friendships/friendships.repository';
 import { FriendshipsService } from 'src/friendships/friendships.service';
-import { UsersRepository } from 'src/users/users.repository';
+import { UsersRepository } from 'src/users/repositories/users.repository';
 import { UsersService } from 'src/users/users.service';
 import { DmsController } from './dms.controller';
 import { DmsRepository } from './dms.repository';
@@ -17,6 +18,7 @@ import { DmsService } from './dms.service';
       FriendshipsRepository,
     ]),
     EventsModule,
+    AchievementsModule,
   ],
   controllers: [DmsController],
   providers: [DmsService, UsersService, FriendshipsService],

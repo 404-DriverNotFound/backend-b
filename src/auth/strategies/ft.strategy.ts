@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Strategy, Profile, VerifyCallback } from 'passport-42';
-import { User } from 'src/users/user.entity';
-import { UsersRepository } from 'src/users/users.repository';
+import { User } from 'src/users/entities/user.entity';
+import { UsersRepository } from 'src/users/repositories/users.repository';
 
 @Injectable()
 export class FtStrategy extends PassportStrategy(Strategy, '42') {
