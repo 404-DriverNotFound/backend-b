@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Seeder } from 'nestjs-seeder';
 import { AchievementDescription } from 'src/achievements/constants/achievement-description.enum';
 import { AchievementName } from 'src/achievements/constants/achievement-name.enum';
-import { Achievement } from 'src/achievements/entities/achievement.entity';
 import { AchievementsRepository } from 'src/achievements/repositories/achievement.repository';
 
 @Injectable()
@@ -13,7 +12,7 @@ export class AchievementsSeeder implements Seeder {
     private readonly achievementsRepository: AchievementsRepository,
   ) {}
 
-  private readonly achievements: Achievement[] = [
+  private readonly achievements = [
     {
       name: AchievementName.FIRST_BLOCK,
       description: AchievementDescription.FIRST_BLOCK,

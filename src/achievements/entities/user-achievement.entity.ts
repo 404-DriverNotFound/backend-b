@@ -7,9 +7,12 @@ export class UserAchievement {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => User, { primary: true })
+  @ManyToOne(() => User, (user) => user.userAchievements, { primary: true })
   user: User;
 
-  @ManyToOne(() => Achievement, { primary: true })
+  // NOTE 원래는 userAchievements 였는데, 응답을 맞춰주기 위해 createdAt으로 변경함.
+  @ManyToOne(() => Achievement, (achievement) => achievement.createdAt, {
+    primary: true,
+  })
   achievement: Achievement;
 }

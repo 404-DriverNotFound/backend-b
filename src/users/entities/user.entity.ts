@@ -1,4 +1,5 @@
 import { Exclude, Transform } from 'class-transformer';
+import { UserAchievement } from 'src/achievements/entities/user-achievement.entity';
 import { Chat } from 'src/channels/entities/chat.entity';
 import { Membership } from 'src/channels/entities/membership.entity';
 import { Dm } from 'src/dms/dm.entity';
@@ -53,4 +54,10 @@ export class User {
 
   @OneToMany(() => Dm, (dm) => dm.receiver, { cascade: true })
   receiverDms: Dm[];
+
+  @OneToMany(
+    () => UserAchievement,
+    (userAchievement) => userAchievement.achievement,
+  )
+  userAchievements: UserAchievement[];
 }

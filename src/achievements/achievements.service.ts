@@ -16,6 +16,10 @@ export class AchievementsService {
     private readonly userAchievementsRepository: UserAchievementsRepository,
   ) {}
 
+  getAchievements(user: User): Promise<Achievement[]> {
+    return this.achievementsRepository.getAchievements(user);
+  }
+
   async createUserAchievement(
     user: User,
     name: AchievementName,
