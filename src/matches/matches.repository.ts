@@ -49,6 +49,11 @@ export class MatchesRepository extends Repository<Match> {
   ): Promise<Match[]> {
     const qb = this.createQueryBuilder('match');
 
+    qb.leftJoinAndSelect('match.user1', 'user1');
+    qb.leftJoinAndSelect('match.user2', 'user2');
+    qb.leftJoinAndSelect('match.winner', 'winner');
+    qb.leftJoinAndSelect('match.loser', 'loser');
+
     qb.where(
       new Brackets((qb) => {
         qb.where('match.user1Id = :id', { id: user.id });
