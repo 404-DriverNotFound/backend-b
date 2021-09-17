@@ -43,10 +43,6 @@ export class MatchesService {
     );
   }
 
-  getMatchesCount(user: User, result?: MatchResult): Promise<number> {
-    return this.matchesRepository.getMatchesCount(user, result);
-  }
-
   async createMatch(
     user1: User,
     name: string,

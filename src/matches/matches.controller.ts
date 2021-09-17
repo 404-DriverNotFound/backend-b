@@ -53,16 +53,6 @@ export class MatchesController {
     return this.matchesService.getMyMatches(user, status, type, perPage, page);
   }
 
-  @ApiOperation({ summary: '나의 종료된 매치 갯수를 가져옵니다.' })
-  @ApiResponse({ status: 200, description: '성공' })
-  @Get('count')
-  getMatchesCount(
-    @GetUser() user: User,
-    @Query() { result }: GetMatchesCountFilterDto,
-  ): Promise<number> {
-    return this.matchesService.getMatchesCount(user, result);
-  }
-
   @ApiOperation({ summary: '매치를 추가합니다.' })
   @ApiResponse({ status: 201, description: '성공' })
   @Post()
@@ -70,7 +60,6 @@ export class MatchesController {
     @GetUser() user: User,
     @Body() { name, type }: CreateMatchDto,
   ): Promise<Match> {
-    // TODO PAGINATION
     return this.matchesService.createMatch(user, name, type);
   }
 }
