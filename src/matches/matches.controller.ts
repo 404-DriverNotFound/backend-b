@@ -12,8 +12,10 @@ import { User } from 'src/users/entities/user.entity';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { GetMatchesCountFilterDto } from './dto/get-matches-count-filter.dto';
 import { GetMatchesFilterDto } from './dto/get-matches-filter.dto';
+import { GetSpectatingFilterDto } from './dto/get-spectating-filter.dto';
 import { Match } from './match.entity';
 import { MatchesService } from './matches.service';
+import { PaginationMatchFilterDto } from './dto/pagination-match-filter.dto';
 
 @ApiCookieAuth()
 @ApiTags('Matches')
@@ -23,25 +25,32 @@ import { MatchesService } from './matches.service';
 export class MatchesController {
   constructor(private readonly matchesService: MatchesService) {}
 
-  @ApiOperation({ summary: '나의 모든 매치 정보를 가져옵니다.' })
+  @ApiOperation({ summary: '모든 매치 정보를 가져옵니다.' })
   @ApiResponse({ status: 200, description: '성공' })
   @Get()
   getMatches(
-    @GetUser() user: User,
-    @Query() { status, type }: GetMatchesFilterDto,
+    @Query() { perPage, page }: PaginationMatchFilterDto,
   ): Promise<Match[]> {
-    // TODO PAGINATION
-    return this.matchesService.getMatches(user, status, type);
+    return this.matchesService.getMatches(perPage, page);
   }
 
-  @ApiOperation({ summary: '나의 종료된 매치 갯수를 가져옵니다.' })
+  @ApiOperation({ summary: '관전 가능한 모든 매치 정보를 가져옵니다.' })
   @ApiResponse({ status: 200, description: '성공' })
-  @Get('count')
-  getMatchesCount(
+  @Get('spectating')
+  getSpectatingMatches(
+    @Query() { type, perPage, page }: GetSpectatingFilterDto,
+  ): Promise<Match[]> {
+    return this.matchesService.getSpectatingMatches(type, perPage, page);
+  }
+
+  @ApiOperation({ summary: '나의 모든 매치 정보를 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @Get('me')
+  getMyMatches(
     @GetUser() user: User,
-    @Query() { result }: GetMatchesCountFilterDto,
-  ): Promise<number> {
-    return this.matchesService.getMatchesCount(user, result);
+    @Query() { status, type, perPage, page }: GetMatchesFilterDto,
+  ): Promise<Match[]> {
+    return this.matchesService.getMyMatches(user, status, type, perPage, page);
   }
 
   @ApiOperation({ summary: '매치를 추가합니다.' })
@@ -51,7 +60,6 @@ export class MatchesController {
     @GetUser() user: User,
     @Body() { name, type }: CreateMatchDto,
   ): Promise<Match> {
-    // TODO PAGINATION
     return this.matchesService.createMatch(user, name, type);
   }
 }
