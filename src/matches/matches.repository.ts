@@ -7,11 +7,38 @@ import { Match } from './match.entity';
 
 @EntityRepository(Match)
 export class MatchesRepository extends Repository<Match> {
-  async getMatches(type: MatchType): Promise<Match[]> {
+  async getMatches(perPage?: number, page?: number): Promise<Match[]> {
+    return await this.find({
+      skip: (page - 1) * perPage,
+      take: perPage,
+      relations: ['user1', 'user2', 'winner', 'loser'],
+    });
+  }
+
+  async getSpectatingMatches(
+    type?: MatchType,
+    perPage?: number,
+    page?: number,
+  ): Promise<Match[]> {
     const qb = this.createQueryBuilder('match');
 
+    qb.leftJoinAndSelect('match.user1', 'users1');
+    qb.leftJoinAndSelect('match.user2', 'users2');
+    qb.leftJoinAndSelect('match.winner', 'users3');
+    qb.leftJoinAndSelect('match.loser', 'users4');
     qb.where('match.status = :status', { status: MatchStatus.IN_PROGRESS });
-    qb.andWhere('match.type = :type', { type });
+
+    if (type !== undefined) {
+      qb.andWhere('match.type = :type', { type });
+    }
+
+    if (perPage) {
+      qb.take(perPage);
+    }
+
+    if (page) {
+      qb.skip(perPage * (page - 1));
+    }
 
     return qb.getMany();
   }
@@ -20,6 +47,8 @@ export class MatchesRepository extends Repository<Match> {
     user: User,
     status?: MatchStatus,
     type?: MatchType,
+    perPage?: number,
+    page?: number,
   ): Promise<Match[]> {
     const qb = this.createQueryBuilder('match');
 
@@ -36,6 +65,14 @@ export class MatchesRepository extends Repository<Match> {
 
     if (type) {
       qb.andWhere('match.type = :type', { type });
+    }
+
+    if (perPage) {
+      qb.take(perPage);
+    }
+
+    if (page) {
+      qb.skip(perPage * (page - 1));
     }
 
     return qb.getMany();
