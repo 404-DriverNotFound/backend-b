@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Channel } from 'src/channels/entities/channel.entity';
 import { Like } from 'typeorm';
 import { UserStatus } from './constants/user-status.enum';
 import { User } from './entities/user.entity';
@@ -43,7 +44,7 @@ export class UsersService {
   async isDuplicated(name: string): Promise<User> {
     const found: User = await this.usersRepository.findOne({ name });
     if (!found) {
-      throw new NotFoundException(`User with ${name} not found`);
+      throw new NotFoundException([`User with ${name} not found`]);
     }
     return found;
   }
@@ -51,7 +52,7 @@ export class UsersService {
   async getUserByName(name: string): Promise<User> {
     const found: User = await this.usersRepository.findOne({ name });
     if (!found) {
-      throw new NotFoundException(`User with ${name} not found`);
+      throw new NotFoundException([`User with ${name} not found`]);
     }
     return found;
   }
@@ -79,9 +80,9 @@ export class UsersService {
     try {
       await this.usersRepository.save(user);
     } catch (error) {
-      throw new InternalServerErrorException(
+      throw new InternalServerErrorException([
         'server error in updateUserStatus',
-      );
+      ]);
     }
     return user;
   }
@@ -91,9 +92,9 @@ export class UsersService {
     try {
       await this.usersRepository.save(user);
     } catch (error) {
-      throw new InternalServerErrorException(
+      throw new InternalServerErrorException([
         'server error in updateUserIsSecondFactorUnauthenticated',
-      );
+      ]);
     }
     return user;
   }
@@ -106,10 +107,24 @@ export class UsersService {
     try {
       await this.usersRepository.save(user);
     } catch (error) {
-      throw new InternalServerErrorException(
+      throw new InternalServerErrorException([
         'server error in updateUserAuthenticatorSecret',
-      );
+      ]);
     }
     return user;
+  }
+
+  getChannelMembers(
+    channel: Channel,
+    search?: string,
+    perPage?: number,
+    page?: number,
+  ): Promise<User[]> {
+    return this.usersRepository.getChannelMembers(
+      channel,
+      search,
+      perPage,
+      page,
+    );
   }
 }

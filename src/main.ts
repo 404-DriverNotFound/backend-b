@@ -11,6 +11,7 @@ import {
   SwaggerCustomOptions,
   SwaggerModule,
 } from '@nestjs/swagger';
+import { RedisIoAdapter } from './adapters/redis-io.adapter';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
@@ -61,6 +62,10 @@ async function bootstrap() {
   );
   app.use(passport.initialize());
   app.use(passport.session());
+
+  // NOTE redis PUB/SUB
+  app.useWebSocketAdapter(new RedisIoAdapter(app));
+
   await app.listen(5000);
 }
 bootstrap();

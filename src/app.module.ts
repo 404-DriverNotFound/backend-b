@@ -7,6 +7,9 @@ import { configValidationSchema } from './config.schema';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { FriendshipsModule } from './friendships/friendships.module';
+import { ChannelsModule } from './channels/channels.module';
+import { DmsModule } from './dms/dms.module';
+import { EventsModule } from './events/events.module';
 import { FriendshipsRepository } from './friendships/friendships.repository';
 import { UsersRepository } from './users/repositories/users.repository';
 import { UsersService } from './users/users.service';
@@ -38,6 +41,9 @@ import { MatchesModule } from './matches/matches.module';
     UsersModule,
     FriendshipsModule,
     MatchesModule,
+    ChannelsModule,
+    DmsModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService, UsersService, FriendshipsService],

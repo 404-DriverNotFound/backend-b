@@ -23,12 +23,12 @@ export class AuthService {
 
   generateKeyUri(user: User): string {
     if (!user.enable2FA) {
-      throw new ForbiddenException(
+      throw new ForbiddenException([
         'You must enable second factor authentication to access this request.',
-      );
+      ]);
     }
     if (user.authenticatorSecret) {
-      throw new ForbiddenException('You already have an QR code.');
+      throw new ForbiddenException(['You already have an QR code.']);
     }
     const service = this.configService.get<string>('ISSUER');
     const secret = authenticator.generateSecret();
@@ -39,9 +39,9 @@ export class AuthService {
 
   async otpAuth(user: User, otpDto: OtpDto): Promise<User> {
     if (!user.enable2FA || !user.authenticatorSecret) {
-      throw new ForbiddenException(
+      throw new ForbiddenException([
         'You must get a QR code to access this request.',
-      );
+      ]);
     }
     const { token } = otpDto;
     const isValid: boolean = authenticator.verify({
@@ -52,12 +52,12 @@ export class AuthService {
     try {
       await this.usersRepository.save(user);
     } catch (err) {
-      throw new InternalServerErrorException(
+      throw new InternalServerErrorException([
         'Something wrong while saving user data in otpAuth',
-      );
+      ]);
     }
     if (!isValid) {
-      throw new UnauthorizedException(`${token} is not valid`);
+      throw new UnauthorizedException([`${token} is not valid`]);
     }
     return user;
   }
