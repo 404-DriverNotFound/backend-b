@@ -6,8 +6,13 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from 'src/channels/entities/channel.entity';
 import { Like } from 'typeorm';
+import { AchievementName } from './constants/achievement-name.enum';
 import { UserStatus } from './constants/user-status.enum';
+import { Achievement } from './entities/achievement.entity';
+import { UserAchievement } from './entities/user-achievement.entity';
 import { User } from './entities/user.entity';
+import { AchievementsRepository } from './repositories/achievement.repository';
+import { UserAchievementsRepository } from './repositories/user-achievement.repository';
 import { UsersRepository } from './repositories/users.repository';
 
 @Injectable()
@@ -15,6 +20,10 @@ export class UsersService {
   constructor(
     @InjectRepository(UsersRepository)
     private readonly usersRepository: UsersRepository,
+    @InjectRepository(AchievementsRepository)
+    private readonly achievementsRepository: AchievementsRepository,
+    @InjectRepository(UserAchievementsRepository)
+    private readonly userAchievementsRepository: UserAchievementsRepository,
   ) {}
 
   async getUsers(
@@ -126,5 +135,21 @@ export class UsersService {
       perPage,
       page,
     );
+  }
+
+  async createUserAchievement(
+    user: User,
+    name: AchievementName,
+  ): Promise<UserAchievement> {
+    const achievement: Achievement = await this.achievementsRepository.findOne({
+      name,
+    });
+
+    const userAchievement: UserAchievement =
+      this.userAchievementsRepository.create({ user, achievement });
+
+    await this.userAchievementsRepository.save(userAchievement);
+
+    return userAchievement;
   }
 }

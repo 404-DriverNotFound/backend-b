@@ -7,11 +7,16 @@ import { AuthController } from './auth.controller';
 import { SessionSerializer } from './session.serializer';
 import { FtStrategy } from './strategies/ft.strategy';
 import { AuthService } from './auth.service';
-//import { FriendshipsRepository } from 'src/friendships/friendships.repository';
+import { UserAchievementsRepository } from 'src/users/repositories/user-achievement.repository';
+import { AchievementsRepository } from 'src/users/repositories/achievement.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UsersRepository /*, FriendshipsRepository*/]),
+    TypeOrmModule.forFeature([
+      UsersRepository,
+      AchievementsRepository,
+      UserAchievementsRepository,
+    ]),
   ],
   controllers: [AuthController],
   providers: [

@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AchievementName } from 'src/users/constants/achievement-name.enum';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { FriendshipRole } from './friendship-role.enum';
@@ -277,7 +278,18 @@ export class FriendshipsService {
     const addressee: User = await this.usersService.getUserByName(
       addresseeName,
     );
-    return this.friendshipsRepository.createBlack(requester, addressee);
+
+    const friendship: Friendship = await this.friendshipsRepository.createBlack(
+      requester,
+      addressee,
+    );
+
+    await this.usersService.createUserAchievement(
+      requester,
+      AchievementName.FIRST_BLOCK,
+    );
+
+    return friendship;
   }
 
   async deleteBlack(requester: User, addresseeName: string): Promise<void> {

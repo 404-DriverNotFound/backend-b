@@ -14,6 +14,8 @@ import { FriendshipsRepository } from './friendships/friendships.repository';
 import { UsersRepository } from './users/repositories/users.repository';
 import { UsersService } from './users/users.service';
 import { FriendshipsService } from './friendships/friendships.service';
+import { UserAchievementsRepository } from './users/repositories/user-achievement.repository';
+import { AchievementsRepository } from './users/repositories/achievement.repository';
 
 @Module({
   imports: [
@@ -36,7 +38,12 @@ import { FriendshipsService } from './friendships/friendships.service';
         synchronize: true,
       }),
     }),
-    TypeOrmModule.forFeature([FriendshipsRepository, UsersRepository]),
+    TypeOrmModule.forFeature([
+      FriendshipsRepository,
+      UsersRepository,
+      AchievementsRepository,
+      UserAchievementsRepository,
+    ]),
     AuthModule,
     UsersModule,
     FriendshipsModule,
