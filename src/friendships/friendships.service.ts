@@ -266,7 +266,7 @@ export class FriendshipsService {
     return users;
   }
 
-  async createBlack(
+  async createBlock(
     requester: User,
     addresseeName: string,
   ): Promise<Friendship> {
@@ -277,10 +277,10 @@ export class FriendshipsService {
     const addressee: User = await this.usersService.getUserByName(
       addresseeName,
     );
-    return this.friendshipsRepository.createBlack(requester, addressee);
+    return this.friendshipsRepository.createBlock(requester, addressee);
   }
 
-  async deleteBlack(requester: User, addresseeName: string): Promise<void> {
+  async deleteBlock(requester: User, addresseeName: string): Promise<void> {
     if (addresseeName === requester.name) {
       throw new ConflictException(['Cannot unblock yourself']);
     }

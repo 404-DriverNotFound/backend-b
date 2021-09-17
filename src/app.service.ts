@@ -50,11 +50,11 @@ export class AppService {
           break;
 
         case 3:
-          await this.friendshipsService.createBlack(requester, user.name);
+          await this.friendshipsService.createBlock(requester, user.name);
           break;
 
         case 4:
-          await this.friendshipsService.createBlack(user, requester.name);
+          await this.friendshipsService.createBlock(user, requester.name);
           break;
       }
     }
