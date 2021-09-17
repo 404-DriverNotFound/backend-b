@@ -149,6 +149,17 @@ export class FriendshipsService {
       ]);
     }
 
+    if (friendship.status === FriendshipStatus.ACCEPTED) {
+      await this.usersService.createUserAchievement(
+        requester,
+        AchievementName.FIRST_FRIEND,
+      );
+      await this.usersService.createUserAchievement(
+        addressee,
+        AchievementName.FIRST_FRIEND,
+      );
+    }
+
     return friendship;
   }
 
