@@ -2,8 +2,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { seeder } from 'nestjs-seeder';
 import { configValidationSchema } from './config.schema';
-import { AchievementsSeeder } from './users/achievements.seeder';
-import { AchievementsRepository } from './users/repositories/achievement.repository';
+import { AchievementsSeeder } from './achievements/achievements.seeder';
+import { AchievementsRepository } from './achievements/repositories/achievement.repository';
 
 seeder({
   imports: [

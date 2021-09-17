@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Seeder } from 'nestjs-seeder';
-import { AchievementDescription } from './constants/achievement-description.enum';
-import { AchievementName } from './constants/achievement-name.enum';
-import { Achievement } from './entities/achievement.entity';
-import { AchievementsRepository } from './repositories/achievement.repository';
+import { AchievementDescription } from 'src/achievements/constants/achievement-description.enum';
+import { AchievementName } from 'src/achievements/constants/achievement-name.enum';
+import { Achievement } from 'src/achievements/entities/achievement.entity';
+import { AchievementsRepository } from 'src/achievements/repositories/achievement.repository';
 
 @Injectable()
 export class AchievementsSeeder implements Seeder {

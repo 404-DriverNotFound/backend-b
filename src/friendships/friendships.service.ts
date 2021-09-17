@@ -6,7 +6,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AchievementName } from 'src/users/constants/achievement-name.enum';
+import { AchievementsService } from 'src/achievements/achievements.service';
+import { AchievementName } from 'src/achievements/constants/achievement-name.enum';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { FriendshipRole } from './friendship-role.enum';
@@ -20,6 +21,7 @@ export class FriendshipsService {
     @InjectRepository(FriendshipsRepository)
     private readonly friendshipsRepository: FriendshipsRepository,
     private readonly usersService: UsersService,
+    private readonly achievementsService: AchievementsService,
   ) {}
 
   async createFriendship(
@@ -150,11 +152,11 @@ export class FriendshipsService {
     }
 
     if (friendship.status === FriendshipStatus.ACCEPTED) {
-      await this.usersService.createUserAchievement(
+      await this.achievementsService.createUserAchievement(
         requester,
         AchievementName.FIRST_FRIEND,
       );
-      await this.usersService.createUserAchievement(
+      await this.achievementsService.createUserAchievement(
         addressee,
         AchievementName.FIRST_FRIEND,
       );
@@ -295,7 +297,7 @@ export class FriendshipsService {
       addressee,
     );
 
-    await this.usersService.createUserAchievement(
+    await this.achievementsService.createUserAchievement(
       requester,
       AchievementName.FIRST_BLOCK,
     );
