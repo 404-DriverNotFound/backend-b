@@ -45,6 +45,7 @@ import { AchievementsModule } from './achievements/achievements.module';
     ChannelsModule,
     DmsModule,
     EventsModule,
+    //GamesModule,
   ],
   controllers: [AppController],
   providers: [AppService, UsersService, FriendshipsService],

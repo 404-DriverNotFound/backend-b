@@ -14,6 +14,9 @@ import { ChannelsRepository } from 'src/channels/repositories/channels.repositor
 import { User } from 'src/users/entities/user.entity';
 import { UserStatus } from 'src/users/constants/user-status.enum';
 import { UsersRepository } from 'src/users/repositories/users.repository';
+import { EventsService } from './events.service';
+import { LobbyManagerService } from './games/lobby-manager.service';
+//import { LobbyManagerService } from '../games/lobby-manager.service';
 
 @WebSocketGateway()
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -25,6 +28,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly channelsRepository: ChannelsRepository,
     @InjectRepository(UsersRepository)
     private readonly usersRepository: UsersRepository,
+    private readonly lobbyManagerService: LobbyManagerService,
   ) {}
 
   async handleConnection(@ConnectedSocket() client: Socket): Promise<string> {
@@ -87,5 +91,48 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ): string {
     client.leave(channel.id);
     return 'Leaved the channel.';
+  }
+
+  // NOTE events for Game below:
+
+  @SubscribeMessage('waiting')
+  handleWaiting(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: any,
+  ) {
+    this.lobbyManagerService.lobby.add(client);
+    this.lobbyManagerService.dispatch(this.server); // FIXME roommanager
+  }
+
+  @SubscribeMessage('ready')
+  handleReady(@ConnectedSocket() client: Socket) {
+    //
+  }
+
+  @SubscribeMessage('keydown')
+  handleKeyDown(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() keyCode: any,
+  ) {
+    //
+  }
+
+  @SubscribeMessage('keyup')
+  handlekeyUp(@ConnectedSocket() client: Socket, @MessageBody() keyCode: any) {
+    //
+  }
+
+  @SubscribeMessage('mousemove')
+  handleMouseMove(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: any, // NOTE x,y
+  ) {
+    //
+  }
+
+  @SubscribeMessage('click')
+  handleClick(@ConnectedSocket() client: Socket, @MessageBody() payload: any) {
+    // NOTE x,y
+    //
   }
 }
