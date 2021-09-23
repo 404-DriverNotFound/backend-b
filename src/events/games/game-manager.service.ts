@@ -8,9 +8,10 @@ export class GameManagerService {
 
   @Interval(10)
   update() {
-    //const keys = Object.keys(this.roomManager.rooms); // FIXME map.keys()
-    //keys.forEach((key) => {
-    //  this.roomManager.rooms[key].loop();
-    //});
+    const roomIds: string[] = Array.from(this.roomManagerService.rooms.keys());
+
+    roomIds.forEach((roomId: string) =>
+      this.roomManagerService.rooms[roomId].loop(),
+    );
   }
 }
