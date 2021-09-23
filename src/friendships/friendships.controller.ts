@@ -176,11 +176,11 @@ export class FriendshipsController {
   @Post('blocks')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  createBlack(
+  createBlock(
     @GetUser() requester: User,
     @Body() { addresseeName }: CreateFriendshipDto,
   ): Promise<Friendship> {
-    return this.friendshipsService.createBlack(requester, addresseeName);
+    return this.friendshipsService.createBlock(requester, addresseeName);
   }
 
   @ApiOperation({
@@ -196,10 +196,10 @@ export class FriendshipsController {
   @Delete('blocks/:name')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  deleteBlack(
+  deleteBlock(
     @GetUser() requester: User,
     @Param('name') addresseeName: string,
   ): Promise<void> {
-    return this.friendshipsService.deleteBlack(requester, addresseeName);
+    return this.friendshipsService.deleteBlock(requester, addresseeName);
   }
 }
