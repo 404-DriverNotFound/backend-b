@@ -1,4 +1,4 @@
-import { User } from 'src/users/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { Brackets, EntityRepository, Repository } from 'typeorm';
 import { Dm } from './dm.entity';
 

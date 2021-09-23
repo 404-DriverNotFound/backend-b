@@ -11,15 +11,17 @@ import { ChannelsModule } from './channels/channels.module';
 import { DmsModule } from './dms/dms.module';
 import { EventsModule } from './events/events.module';
 import { FriendshipsRepository } from './friendships/friendships.repository';
-import { UsersRepository } from './users/users.repository';
+import { UsersRepository } from './users/repositories/users.repository';
 import { UsersService } from './users/users.service';
 import { FriendshipsService } from './friendships/friendships.service';
+import { AchievementsModule } from './achievements/achievements.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: [`.env.stage.${process.env.STAGE}`],
       validationSchema: configValidationSchema,
+      isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -38,6 +40,7 @@ import { FriendshipsService } from './friendships/friendships.service';
     TypeOrmModule.forFeature([FriendshipsRepository, UsersRepository]),
     AuthModule,
     UsersModule,
+    AchievementsModule,
     FriendshipsModule,
     ChannelsModule,
     DmsModule,

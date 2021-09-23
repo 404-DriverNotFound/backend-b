@@ -6,7 +6,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/users/user.entity';
+import { AchievementsService } from 'src/achievements/achievements.service';
+import { AchievementName } from 'src/achievements/constants/achievement-name.enum';
+import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { FriendshipRole } from './friendship-role.enum';
 import { FriendshipStatus } from './friendship-status.enum';
@@ -19,6 +21,7 @@ export class FriendshipsService {
     @InjectRepository(FriendshipsRepository)
     private readonly friendshipsRepository: FriendshipsRepository,
     private readonly usersService: UsersService,
+    private readonly achievementsService: AchievementsService,
   ) {}
 
   async createFriendship(
@@ -146,6 +149,17 @@ export class FriendshipsService {
       throw new InternalServerErrorException([
         'Something wrong while saving friendship in updateFriendshipStatus',
       ]);
+    }
+
+    if (friendship.status === FriendshipStatus.ACCEPTED) {
+      await this.achievementsService.createUserAchievement(
+        requester,
+        AchievementName.FIRST_FRIEND,
+      );
+      await this.achievementsService.createUserAchievement(
+        addressee,
+        AchievementName.FIRST_FRIEND,
+      );
     }
 
     return friendship;
@@ -277,7 +291,18 @@ export class FriendshipsService {
     const addressee: User = await this.usersService.getUserByName(
       addresseeName,
     );
-    return this.friendshipsRepository.createBlock(requester, addressee);
+
+    const friendship: Friendship = await this.friendshipsRepository.createBlack(
+      requester,
+      addressee,
+    );
+
+    await this.achievementsService.createUserAchievement(
+      requester,
+      AchievementName.FIRST_BLOCK,
+    );
+
+    return friendship;
   }
 
   async deleteBlock(requester: User, addresseeName: string): Promise<void> {
