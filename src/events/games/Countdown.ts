@@ -1,18 +1,21 @@
 export class Countdown {
-  defaultCount = 10;
+  count = 10;
 
   createdAt: number = Date.now();
 
   action: () => void = null; // REVIEW what is it?
 
   constructor(count?: number) {
-    this.defaultCount = count || this.defaultCount;
+    if (count) {
+      this.count = count;
+    }
   }
 
   update(): void {
-    const count =
-      this.defaultCount - Math.floor((Date.now() - this.createdAt) / 1000);
-    if (count < 0) {
+    const left: number =
+      this.count - Math.floor((Date.now() - this.createdAt) / 1000);
+
+    if (left < 0) {
       this.action();
     }
   }
