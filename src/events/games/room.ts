@@ -1,9 +1,9 @@
 import { Server, Socket } from 'socket.io';
 import { Ball } from './ball';
 import { Countdown } from './Countdown';
-import { GameStatus } from './game-status.enum';
+import { GameStatus } from './constants/game-status.enum';
 import { Player } from './player';
-import { PlayerPosition } from './player-position.enum';
+import { PlayerPosition } from './constants/player-position.enum';
 import { RoomManagerService } from './room-manager.service';
 import { SETTINGS } from './SETTINGS';
 

@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { EventsGateway } from 'src/events/events.gateway';
 import { Room } from './room';
 
 @Injectable()
 export class RoomManagerService {
-  rooms: Map<string, Room>; // REVIEW
+  // NOTE key: roomId, value: Room object
+  // REVIEW map으로 수정함이 적절한가?
+  rooms: Map<string, Room> = new Map<string, Room>();
 
-  roomIndex: Map<string, string>;
+  roomIds: Map<string, string> = new Map<string, string>();
 
   createRoom(server: Server, socket0: Socket, socket1: Socket): void {
     const roomId: string = socket0.id + socket1.id; //FIXME 나중에 match id로
@@ -15,8 +16,8 @@ export class RoomManagerService {
     socket0.join(roomId);
     socket1.join(roomId);
     this.rooms[roomId] = room;
-    this.roomIndex[socket0.id] = roomId;
-    this.roomIndex[socket1.id] = roomId;
+    this.roomIds[socket0.id] = roomId;
+    this.roomIds[socket1.id] = roomId;
     //room.readyInit();
     server.to(socket0.id).emit('ready', 'left');
     server.to(socket1.id).emit('ready', 'right');

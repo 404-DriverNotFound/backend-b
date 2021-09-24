@@ -5,7 +5,7 @@ import { RoomManagerService } from './room-manager.service';
 
 @Injectable()
 export class LobbyManagerService {
-  lobby: Set<Socket>; // REVIEW 모드별 로비..?
+  lobby: Set<Socket> = new Set<Socket>(); // REVIEW 모드별 로비..?
 
   dispatching = false;
   // NOTE PUSH is add

@@ -1,4 +1,4 @@
-import { GameStatus } from './game-status.enum';
+import { GameStatus } from './constants/game-status.enum';
 import { Racket } from './racket';
 
 export class EmitStatus {

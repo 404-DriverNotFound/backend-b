@@ -1,5 +1,5 @@
 import { Base } from './base';
-import { GameStatus } from './game-status.enum';
+import { GameStatus } from './constants/game-status.enum';
 import { Point } from './point';
 import { Racket } from './racket';
 import { Room } from './room';

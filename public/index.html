@@ -1,4 +1,33 @@
-<!DOCTYPE html>
+<html>
+  <head>
+    <script
+      src="https://cdn.socket.io/4.1.2/socket.io.min.js"
+      integrity="sha384-toS6mmwu70G0fw54EGlWWeA4z3dyJ+dlXBtSURSKN4vyRFOcxd3Bzjj/AoOwY+Rg"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const socket = io('http://localhost:5000');
+      socket.on('connect', function () {
+        console.log('Connected');
+
+        socket.emit('click', 3, 4);
+      });
+      socket.on('events', function (data) {
+        console.log('event', data);
+      });
+      socket.on('exception', function (data) {
+        console.log('event', data);
+      });
+      socket.on('disconnect', function () {
+        console.log('Disconnected');
+      });
+    </script>
+  </head>
+
+  <body></body>
+</html>
+
+<!--<!DOCTYPE html>
 <html>
   <head>
     <link rel="icon" href="./favicon.ico" type="image/x-icon" />
@@ -6,11 +35,6 @@
     <title>SMASH PONG ONLINE</title>
   </head>
   <body>
-    <script
-      src="https://cdn.socket.io/4.1.2/socket.io.min.js"
-      integrity="sha384-toS6mmwu70G0fw54EGlWWeA4z3dyJ+dlXBtSURSKN4vyRFOcxd3Bzjj/AoOwY+Rg"
-      crossorigin="anonymous"
-    ></script>
     <script src="//code.jquery.com/jquery-1.11.1.js"></script>
     <span id="test"></span>
     <style>
@@ -974,4 +998,4 @@
       }
     </script>
   </body>
-</html>
+</html>-->

@@ -1,15 +1,10 @@
 import { Base } from './base';
-import { GameStatus } from './game-status.enum';
-import { PlayerPosition } from './player-position.enum';
+import { GameStatus } from './constants/game-status.enum';
+import { KeyCode } from './constants/key-code.enum';
+import { PlayerPosition } from './constants/player-position.enum';
 import { Room } from './room';
 import { SETTINGS } from './SETTINGS';
 
-enum KeypressType {
-  LEFT = 37,
-  UP,
-  RIGHT,
-  DOWN,
-}
 const UNIT = 2;
 
 export class Player extends Base {
@@ -20,15 +15,15 @@ export class Player extends Base {
   ready = false;
 
   keypress: {
-    [KeypressType.LEFT]: boolean;
-    [KeypressType.UP]: boolean;
-    [KeypressType.RIGHT]: boolean;
-    [KeypressType.DOWN]: boolean;
+    [KeyCode.LEFT]: boolean;
+    [KeyCode.UP]: boolean;
+    [KeyCode.RIGHT]: boolean;
+    [KeyCode.DOWN]: boolean;
   } = {
-    [KeypressType.LEFT]: false,
-    [KeypressType.UP]: false,
-    [KeypressType.RIGHT]: false,
-    [KeypressType.DOWN]: false,
+    [KeyCode.LEFT]: false,
+    [KeyCode.UP]: false,
+    [KeyCode.RIGHT]: false,
+    [KeyCode.DOWN]: false,
   };
 
   mouse: {
@@ -67,11 +62,11 @@ export class Player extends Base {
       room.status === GameStatus.COUNTDOWN ||
       room.status === GameStatus.PLAYING
     ) {
-      if (this.keypress[KeypressType.UP]) {
+      if (this.keypress[KeyCode.UP]) {
         this.moveUp();
         this.mouse.click = null;
       }
-      if (this.keypress[KeypressType.DOWN]) {
+      if (this.keypress[KeyCode.DOWN]) {
         this.moveDown();
         this.mouse.click = null;
       }
