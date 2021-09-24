@@ -16,7 +16,7 @@ export class Room {
 
   status: GameStatus = GameStatus.NONE;
 
-  sockets: Socket[]; // FIXME 룸에 속해있는 소켓목록을 알 수 있다면 수정해야함.
+  sockets: Socket[];
 
   players: Map<string, Player>;
 
@@ -41,7 +41,7 @@ export class Room {
     this.sockets = [socket0, socket1];
     this.players[socket0.id] = new Player(socket0.id, PlayerPosition.LEFT);
     this.players[socket1.id] = new Player(socket1.id, PlayerPosition.RIGHT);
-    //this.ball = new Ball(socket0.id, socket1.id);
+    this.ball = new Ball(socket0.id, socket1.id);
   }
 
   playInit(): void {
@@ -56,8 +56,8 @@ export class Room {
   }
 
   playLoop(): void {
-    const statuses = this.getStats();
-    this.server.to(this.id).emit('update', statuses);
+    const data = this.getEmitData();
+    this.server.to(this.id).emit('update', data);
     if (
       this.status === GameStatus.PLAYING &&
       (this.players[this.sockets[0].id].score >= SETTINGS.GOAL ||
@@ -71,9 +71,17 @@ export class Room {
         this.players[this.sockets[0].id].score >
         this.players[this.sockets[1].id].score
       ) {
-        this.roomManagerService.gameOverRoom(this.id, this.sockets[0].id);
+        this.roomManagerService.gameOverRoom(
+          this.server,
+          this.id,
+          this.sockets[0].id,
+        );
       } else {
-        this.roomManagerService.gameOverRoom(this.id, this.sockets[1].id);
+        this.roomManagerService.gameOverRoom(
+          this.server,
+          this.id,
+          this.sockets[1].id,
+        );
       }
     }
   }
@@ -89,25 +97,29 @@ export class Room {
   }
 
   readyLoop(): void {
-    const player0ready = this.players[this.players[0].id].ready;
-    const player1ready = this.players[this.players[1].id].ready;
+    const player0ready: boolean = this.players[this.players[0].id].ready;
+    const player1ready: boolean = this.players[this.players[1].id].ready;
     if (player0ready && player1ready) {
       this.playInit();
     }
-    const statuses = this.getStats();
-    this.server.to(this.id).emit('update', statuses);
+    const data = this.getEmitData();
+    this.server.to(this.id).emit('update', data);
   }
 
-  getStats(): any {
-    //  const statuses: EmitStatusType[] = [];
-    //  const keys = Object.keys(this.players);
-    //  keys.forEach((key) => {
-    //    const object = this.players[key];
-    //    object.update(this);
-    //    statuses.push({ status: object.status, object: object.object });
-    //  });
-    //  this.ball.update(this);
-    //  statuses.push({ status: this.ball.status, object: this.ball.object });
-    //  return statuses;
+  getEmitData(): Map<string, Countdown | Player | Ball> {
+    const data = new Map<string, Countdown | Player | Ball>();
+
+    this.countdown?.update();
+    data['countdown'] = this.countdown;
+
+    for (let i = 0; i < 2; i++) {
+      const player: Player = this.players[this.sockets[i].id];
+      player.update(this);
+      data['player' + i] = player;
+    }
+
+    this.ball.update(this);
+    data['ball'] = this.ball;
+    return data;
   }
 }

@@ -1,5 +1,5 @@
 export interface Serve {
   isOn: boolean;
-  player: string;
+  playerId: string;
   count: number;
 }

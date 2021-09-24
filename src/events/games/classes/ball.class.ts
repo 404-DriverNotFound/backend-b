@@ -1,7 +1,6 @@
 import { Base } from './base.class';
 import { GameStatus } from '../constants/game-status.enum';
 import { Point } from './point.class';
-import { Racket } from './racket.class';
 import { Room } from './room.class';
 import { SETTINGS } from '../constants/SETTINGS';
 import { Serve } from '../interfaces/serve.interface';
@@ -9,6 +8,7 @@ import { Dynamic } from '../interfaces/dynamic.interface';
 import { DirectionTo } from '../constants/direction-to.enum';
 import { Quadrant } from '../constants/quadrant.enum';
 import { CollisionType } from '../constants/collision-type.enum';
+import { Player } from './player.class';
 
 export class Ball extends Base {
   playerId: string[];
@@ -28,30 +28,26 @@ export class Ball extends Base {
 
     this.playerId = [leftPlayerId, rightPlayerId];
     this.serve = setServe(leftPlayerId, -1);
-    this.racket = {
-      x: SETTINGS.WIDTH / 2,
-      y: SETTINGS.HEIGHT / 2,
-      width: SETTINGS.BALL.WIDTH,
-      height: SETTINGS.BALL.HEIGHT,
-      color: '#000000',
-    };
-    super.update = this.setUpdate; // REVIEW this.update = this.setUpdate; 랑 무슨 차이지?
+    this.x = SETTINGS.WIDTH / 2;
+    this.y = SETTINGS.HEIGHT / 2;
+    this.width = SETTINGS.BALL.WIDTH;
+    this.height = SETTINGS.BALL.HEIGHT;
+    this.color = '#000000';
+    this.update = this.setUpdate; // REVIEW super.update = this.setUpdate; 랑 무슨 차이지?
   }
 
   setUpdate(room: Room): void {
-    const ball: Racket = this.racket;
-    const players: string[] = Array.from(room.players.keys());
-    let playerStat: Racket;
+    const playerIds: string[] = Array.from(room.players.keys());
+
     if (this.serve && this.serve.isOn) {
-      players.forEach((key) => {
-        const object = room.players[key];
-        if (object.id === this.serve.player) {
-          playerStat = room.players[object.id].object;
-          ball.y = playerStat.y;
-          if (playerStat.x < SETTINGS.WIDTH / 2) {
-            ball.x = playerStat.x + ball.width / 2 + playerStat.width / 2;
+      playerIds.forEach((playerId) => {
+        const player: Player = room.players[playerId];
+        if (player.id === this.serve.playerId) {
+          this.y = player.y;
+          if (player.x < SETTINGS.WIDTH / 2) {
+            this.x = player.x + this.width / 2 + player.width / 2;
           } else {
-            ball.x = playerStat.x - ball.width / 2 - playerStat.width / 2;
+            this.x = player.x - this.width / 2 - player.width / 2;
           }
           if (room.status === GameStatus.PLAYING) {
             this.serve.count -= 1;
@@ -60,33 +56,33 @@ export class Ball extends Base {
             this.serve.isOn = false;
             let newAngle: number;
             if (
-              playerStat.x < SETTINGS.WIDTH / 2 &&
-              playerStat.y < SETTINGS.HEIGHT / 2
+              player.x < SETTINGS.WIDTH / 2 &&
+              player.y < SETTINGS.HEIGHT / 2
             ) {
               newAngle = -SETTINGS.SERVE_ANGLE;
             } else if (
-              playerStat.x < SETTINGS.WIDTH / 2 &&
-              playerStat.y > SETTINGS.HEIGHT / 2
+              player.x < SETTINGS.WIDTH / 2 &&
+              player.y > SETTINGS.HEIGHT / 2
             ) {
               newAngle = +SETTINGS.SERVE_ANGLE;
             } else if (
-              playerStat.x < SETTINGS.WIDTH / 2 &&
-              playerStat.y === SETTINGS.HEIGHT / 2
+              player.x < SETTINGS.WIDTH / 2 &&
+              player.y === SETTINGS.HEIGHT / 2
             ) {
               newAngle = getRandomSign() * SETTINGS.SERVE_ANGLE;
             } else if (
-              playerStat.x > SETTINGS.WIDTH / 2 &&
-              playerStat.y < SETTINGS.HEIGHT / 2
+              player.x > SETTINGS.WIDTH / 2 &&
+              player.y < SETTINGS.HEIGHT / 2
             ) {
               newAngle = 180 + SETTINGS.SERVE_ANGLE;
             } else if (
-              playerStat.x > SETTINGS.WIDTH / 2 &&
-              playerStat.y > SETTINGS.HEIGHT / 2
+              player.x > SETTINGS.WIDTH / 2 &&
+              player.y > SETTINGS.HEIGHT / 2
             ) {
               newAngle = 180 - SETTINGS.SERVE_ANGLE;
             } else if (
-              playerStat.x > SETTINGS.WIDTH / 2 &&
-              playerStat.y === SETTINGS.HEIGHT / 2
+              player.x > SETTINGS.WIDTH / 2 &&
+              player.y === SETTINGS.HEIGHT / 2
             ) {
               newAngle = 180 + getRandomSign() * SETTINGS.SERVE_ANGLE;
             }
@@ -99,44 +95,40 @@ export class Ball extends Base {
         this.boostCount -= 1;
         let boost: number;
         if (this.boostCount > this.boostCountMax / 2) {
-          this.racket.color = '#FF0000';
+          this.color = '#FF0000';
           boost = 2 * this.speed;
         } else {
-          this.racket.color = '#000000';
+          this.color = '#000000';
           boost = 2 * this.speed * ((this.boostCount * 2) / this.boostCountMax);
         }
-        ball.x += this.dynamic.xVel * (this.speed + boost);
-        ball.y += this.dynamic.yVel * (this.speed + boost);
+        this.x += this.dynamic.xVel * (this.speed + boost);
+        this.y += this.dynamic.yVel * (this.speed + boost);
       } else {
-        ball.x += this.dynamic.xVel * this.speed;
-        ball.y += this.dynamic.yVel * this.speed;
+        this.x += this.dynamic.xVel * this.speed;
+        this.y += this.dynamic.yVel * this.speed;
       }
-      if (ball.x <= 0 - ball.width * 2) {
+      if (this.x <= 0 - this.width * 2) {
         room.players[this.playerId[1]].score += 1;
         this.serve = setServe(this.playerId[0]);
-        ball.color = '#000000';
+        this.color = '#000000';
         this.boostCount = 0;
       }
-      if (ball.x >= SETTINGS.WIDTH + ball.width * 2) {
+      if (this.x >= SETTINGS.WIDTH + this.width * 2) {
         room.players[this.playerId[0]].score += 1;
         this.serve = setServe(this.playerId[1]);
-        ball.color = '#000000';
+        this.color = '#000000';
         this.boostCount = 0;
       }
-      if (ball.y - ball.height / 2 <= 0 + SETTINGS.BORDER_WIDTH) {
+      if (this.y - this.height / 2 <= 0 + SETTINGS.BORDER_WIDTH) {
         this.dynamic = bounce(0, this.dynamic.angle);
       }
-      if (ball.y + ball.height / 2 >= SETTINGS.HEIGHT - SETTINGS.BORDER_WIDTH) {
+      if (this.y + this.height / 2 >= SETTINGS.HEIGHT - SETTINGS.BORDER_WIDTH) {
         this.dynamic = bounce(0, this.dynamic.angle);
       }
 
-      players.forEach((key) => {
-        playerStat = room.players[key].object;
-        const collision = ballCollisionCheck(
-          ball,
-          playerStat,
-          this.dynamic.angle,
-        );
+      playerIds.forEach((playerId) => {
+        const player: Player = room.players[playerId];
+        const collision = ballCollisionCheck(this, player, this.dynamic.angle);
 
         switch (collision) {
           case CollisionType.NO_COLLISION:
@@ -211,7 +203,7 @@ function straight(angle: number) {
 function setServe(playerId: string, count?: number) {
   return {
     isOn: true,
-    player: playerId,
+    playerId,
     count: count || 100,
   };
 }
@@ -278,32 +270,20 @@ function angleToVelocity(angle: number): Dynamic {
 }
 
 function ballCollisionCheck(
-  ballStat: Racket,
-  playerStat: Racket,
+  ball: Ball,
+  player: Player,
   angle: number,
 ): CollisionType {
   const ballAngle: number = trimAngle(angle);
   const points: Point[] = [
-    new Point(
-      ballStat.x - ballStat.width / 2,
-      ballStat.y - ballStat.height / 2,
-    ),
-    new Point(
-      ballStat.x + ballStat.width / 2,
-      ballStat.y - ballStat.height / 2,
-    ),
-    new Point(
-      ballStat.x - ballStat.width / 2,
-      ballStat.y + ballStat.height / 2,
-    ),
-    new Point(
-      ballStat.x + ballStat.width / 2,
-      ballStat.y + ballStat.height / 2,
-    ),
+    new Point(ball.x - ball.width / 2, ball.y - ball.height / 2),
+    new Point(ball.x + ball.width / 2, ball.y - ball.height / 2),
+    new Point(ball.x - ball.width / 2, ball.y + ball.height / 2),
+    new Point(ball.x + ball.width / 2, ball.y + ball.height / 2),
   ];
   const collisions: Point[] = [];
   points.forEach((point) => {
-    if (pointSquareCollisionCheck(point.x, point.y, playerStat)) {
+    if (pointPlayerCollisionCheck(point, player)) {
       collisions.push(new Point(point.x, point.y));
     }
   });
@@ -314,7 +294,7 @@ function ballCollisionCheck(
   if (collisions.length === 0) {
     return type;
   }
-  const p2bAngle: number = getAngle(playerStat, ballStat);
+  const p2bAngle: number = getAngle(player, ball);
   const p2bLeftRight: DirectionTo = getLeftRight(p2bAngle);
   const p2bUpDown: DirectionTo = getUpDown(p2bAngle);
   const bLeftRight: DirectionTo = getLeftRight(ballAngle);
@@ -396,11 +376,11 @@ function getUpDown(argAngle: number): DirectionTo {
   return DirectionTo.DOWN;
 }
 
-function getAngle(racket: Racket, end: Point): number {
+function getAngle(player: Player, ball: Ball): number {
   let angle: number =
-    (Math.atan(-(end.y - racket.y) / (end.x - racket.x)) / Math.PI) * 180;
+    (Math.atan(-(ball.y - player.y) / (ball.x - player.x)) / Math.PI) * 180;
 
-  if (racket.x > end.x) {
+  if (player.x > ball.x) {
     angle += Math.sign(angle) * 180;
   }
 
@@ -415,16 +395,12 @@ function getRandomSign(): number {
   return Math.random() < 0.5 ? -1 : 1;
 }
 
-function pointSquareCollisionCheck(
-  x: number,
-  y: number,
-  racket: Racket,
-): boolean {
+function pointPlayerCollisionCheck(point: Point, player: Player): boolean {
   if (
-    x >= racket.x - racket.width / 2 &&
-    x <= racket.x + racket.width / 2 &&
-    y >= racket.y - racket.height / 2 &&
-    y <= racket.y + racket.height / 2
+    point.x >= player.x - player.width / 2 &&
+    point.x <= player.x + player.width / 2 &&
+    point.y >= player.y - player.height / 2 &&
+    point.y <= player.y + player.height / 2
   ) {
     return true;
   }

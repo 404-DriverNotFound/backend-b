@@ -3,7 +3,7 @@ export class Countdown {
 
   createdAt: number = Date.now();
 
-  action: () => void = null; // REVIEW what is it?
+  action: () => void = null;
 
   constructor(count?: number) {
     if (count) {

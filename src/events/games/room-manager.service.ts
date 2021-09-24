@@ -4,7 +4,6 @@ import { Room } from './classes/room.class';
 
 @Injectable()
 export class RoomManagerService {
-  // NOTE key: roomId, value: Room object
   // REVIEW map으로 수정함이 적절한가?
   rooms: Map<string, Room> = new Map<string, Room>();
 
@@ -18,7 +17,7 @@ export class RoomManagerService {
     this.rooms[roomId] = room;
     this.roomIds[socket0.id] = roomId;
     this.roomIds[socket1.id] = roomId;
-    //room.readyInit();
+    room.readyInit();
     server.to(socket0.id).emit('ready', 'left');
     server.to(socket1.id).emit('ready', 'right');
     console.log('Room Created :', roomId);
@@ -26,29 +25,29 @@ export class RoomManagerService {
 
   destroyRoom(server: Server, roomId: string): void {
     const room: Room = this.rooms[roomId];
-    // FIXME
-    //room.sockets.forEach((socket) => {
-    //  const message = (!room.players[socket.id].ready && !room.players.countdown) ? 'YOU ARE NOT PREPARED' : null;
-    //  delete this.roomIndex[socket.id];
-    //  this.io.to(socket.id).emit('destroy', message);
-    //});
 
-    //const clients = server.sockets.adapter.rooms.get(roomId);
-    // TODO loop clients
+    room.sockets.forEach((socket: Socket) => {
+      const message: string =
+        !room.players[socket.id].ready && !room.countdown
+          ? 'YOU ARE NOT PREPARED'
+          : null;
+      delete this.roomIds[socket.id];
+      server.to(socket.id).emit('destroy', message);
+    });
+
     delete this.rooms[roomId];
   }
 
-  gameOverRoom(roomId: string, winnerSocketId: string) {
+  gameOverRoom(server: Server, roomId: string, winnerSocketId: string) {
     const room: Room = this.rooms[roomId];
-    // FIXME
-    //room.sockets.forEach((socket) => {
-    //  const message = socket.id === winnerId ? 'YOU WIN!' : 'YOU LOSE!';
-    //  delete this.roomIndex[socket.id];
-    //  this.io.to(socket.id).emit('destroy', message);
-    //});
 
-    //const clients = server.sockets.adapter.rooms.get(roomId);
-    // TODO loop clients
+    room.sockets.forEach((socket: Socket) => {
+      const message: string =
+        socket.id === winnerSocketId ? 'YOU WIN!' : 'YOU LOSE!';
+      delete this.roomIds[socket.id];
+      server.to(socket.id).emit('destroy', message);
+    });
+
     delete this.rooms[roomId];
   }
 }

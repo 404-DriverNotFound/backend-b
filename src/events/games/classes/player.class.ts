@@ -36,28 +36,24 @@ export class Player extends Base {
 
     this.id = id;
 
+    this.x =
+      position === 'LEFT'
+        ? SETTINGS.PLAYER.GAP
+        : SETTINGS.WIDTH - SETTINGS.PLAYER.GAP;
+    this.y = SETTINGS.HEIGHT / 2;
+    this.width = SETTINGS.PLAYER.WIDTH;
+    this.height = SETTINGS.PLAYER.HEIGHT;
+
     let color = '#';
     for (let i = 0; i < 6; i++) {
       color += Math.floor(Math.random() * 16).toString(16);
     }
-
-    this.racket = {
-      x:
-        position === 'LEFT'
-          ? SETTINGS.PLAYER.GAP
-          : SETTINGS.WIDTH - SETTINGS.PLAYER.GAP,
-      y: SETTINGS.HEIGHT / 2,
-      width: SETTINGS.PLAYER.WIDTH,
-      height: SETTINGS.PLAYER.HEIGHT,
-      color,
-    };
+    this.color = color;
 
     this.update = this.setUpdate;
   }
 
   setUpdate(room: Room): void {
-    const player = this.racket;
-
     if (
       room.status === GameStatus.COUNTDOWN ||
       room.status === GameStatus.PLAYING
@@ -72,13 +68,13 @@ export class Player extends Base {
       }
       if (
         this.mouse.click &&
-        ((this.mouse.click.x < player.x + 50 &&
-          this.mouse.click.x > player.x - 50) ||
+        ((this.mouse.click.x < this.x + 50 &&
+          this.mouse.click.x > this.x - 50) ||
           this.mouse.click.x === null)
       ) {
-        if (this.mouse.click.y < player.y - 5) {
+        if (this.mouse.click.y < this.y - 5) {
           this.moveUp();
-        } else if (this.mouse.click.y > player.y + 5) {
+        } else if (this.mouse.click.y > this.y + 5) {
           this.moveDown();
         } else {
           this.mouse.click = null;
@@ -88,20 +84,17 @@ export class Player extends Base {
   }
 
   moveUp(): void {
-    if (
-      this.racket.y - this.racket.height / 2 - UNIT >=
-      0 + SETTINGS.BORDER_WIDTH
-    ) {
-      this.racket.y -= UNIT;
+    if (this.y - this.height / 2 - UNIT >= 0 + SETTINGS.BORDER_WIDTH) {
+      this.y -= UNIT;
     }
   }
 
   moveDown(): void {
     if (
-      this.racket.y + this.racket.height / 2 + UNIT <=
+      this.y + this.height / 2 + UNIT <=
       SETTINGS.HEIGHT - SETTINGS.BORDER_WIDTH
     ) {
-      this.racket.y += UNIT;
+      this.y += UNIT;
     }
   }
 }
