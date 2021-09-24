@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { Room } from './room';
+import { Room } from './classes/room.class';
 
 @Injectable()
 export class RoomManagerService {

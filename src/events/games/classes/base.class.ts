@@ -1,6 +1,6 @@
-import { GameStatus } from './constants/game-status.enum';
-import { Racket } from './racket';
-import { Room } from './room';
+import { GameStatus } from '../constants/game-status.enum';
+import { Racket } from './racket.class';
+import { Room } from './room.class';
 
 export class Base {
   status: GameStatus = GameStatus.NONE;

@@ -1,9 +1,9 @@
-import { Base } from './base';
-import { GameStatus } from './constants/game-status.enum';
-import { KeyCode } from './constants/key-code.enum';
-import { PlayerPosition } from './constants/player-position.enum';
-import { Room } from './room';
-import { SETTINGS } from './SETTINGS';
+import { Base } from './base.class';
+import { GameStatus } from '../constants/game-status.enum';
+import { KeyCode } from '../constants/key-code.enum';
+import { PlayerPosition } from '../constants/player-position.enum';
+import { Room } from './room.class';
+import { SETTINGS } from '../constants/SETTINGS';
 
 const UNIT = 2;
 

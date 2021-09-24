@@ -1,46 +1,14 @@
-import { Base } from './base';
-import { GameStatus } from './constants/game-status.enum';
-import { Point } from './point';
-import { Racket } from './racket';
-import { Room } from './room';
-import { SETTINGS } from './SETTINGS';
-
-enum CollisionType {
-  NO_COLLISION = -1,
-  UP,
-  RIGHT,
-  DOWN,
-  LEFT,
-  SMASH_TYPE_1,
-  SMASH_TYPE_2,
-  STRAIGHT,
-}
-
-enum Quadrant {
-  FIRST = 1,
-  SECOND,
-  THIRD,
-  FOURTH,
-}
-
-enum DIRECTION_TO {
-  RIGHT = 'RIGHT',
-  LEFT = 'LEFT',
-  UP = 'UP',
-  DOWN = 'DOWN',
-}
-
-interface Serve {
-  isOn: boolean;
-  player: string;
-  count: number;
-}
-
-interface Dynamic {
-  angle: number;
-  xVel: number;
-  yVel: number;
-}
+import { Base } from './base.class';
+import { GameStatus } from '../constants/game-status.enum';
+import { Point } from './point.class';
+import { Racket } from './racket.class';
+import { Room } from './room.class';
+import { SETTINGS } from '../constants/SETTINGS';
+import { Serve } from '../interfaces/serve.interface';
+import { Dynamic } from '../interfaces/dynamic.interface';
+import { DirectionTo } from '../constants/direction-to.enum';
+import { Quadrant } from '../constants/quadrant.enum';
+import { CollisionType } from '../constants/collision-type.enum';
 
 export class Ball extends Base {
   playerId: string[];
@@ -174,25 +142,25 @@ export class Ball extends Base {
           case CollisionType.NO_COLLISION:
             break;
           case CollisionType.UP:
-            if (getUpDown(this.dynamic.angle) === DIRECTION_TO.DOWN) {
+            if (getUpDown(this.dynamic.angle) === DirectionTo.DOWN) {
               this.dynamic = bounce(0, this.dynamic.angle);
             } else this.dynamic = angleToVelocity(this.dynamic.angle - 5);
             // console.log("UP");
             break;
           case CollisionType.DOWN:
-            if (getUpDown(this.dynamic.angle) === DIRECTION_TO.UP) {
+            if (getUpDown(this.dynamic.angle) === DirectionTo.UP) {
               this.dynamic = bounce(0, this.dynamic.angle);
             } else this.dynamic = angleToVelocity(this.dynamic.angle + 5);
             // console.log("DOWN");
             break;
           case CollisionType.LEFT:
-            if (getLeftRight(this.dynamic.angle) === DIRECTION_TO.RIGHT) {
+            if (getLeftRight(this.dynamic.angle) === DirectionTo.RIGHT) {
               this.dynamic = bounce(90, this.dynamic.angle);
             }
             // console.log("LEFT");
             break;
           case CollisionType.RIGHT:
-            if (getLeftRight(this.dynamic.angle) === DIRECTION_TO.LEFT) {
+            if (getLeftRight(this.dynamic.angle) === DirectionTo.LEFT) {
               this.dynamic = bounce(90, this.dynamic.angle);
             }
             // console.log("RIGHT");
@@ -347,15 +315,15 @@ function ballCollisionCheck(
     return type;
   }
   const p2bAngle: number = getAngle(playerStat, ballStat);
-  const p2bLeftRight: DIRECTION_TO = getLeftRight(p2bAngle);
-  const p2bUpDown: DIRECTION_TO = getUpDown(p2bAngle);
-  const bLeftRight: DIRECTION_TO = getLeftRight(ballAngle);
-  const bUpDown: DIRECTION_TO = getUpDown(ballAngle);
+  const p2bLeftRight: DirectionTo = getLeftRight(p2bAngle);
+  const p2bUpDown: DirectionTo = getUpDown(p2bAngle);
+  const bLeftRight: DirectionTo = getLeftRight(ballAngle);
+  const bUpDown: DirectionTo = getUpDown(ballAngle);
   switch (collisions.length) {
     case 1:
       if (bLeftRight === p2bLeftRight) {
         type =
-          p2bUpDown === DIRECTION_TO.UP ? CollisionType.UP : CollisionType.DOWN;
+          p2bUpDown === DirectionTo.UP ? CollisionType.UP : CollisionType.DOWN;
       } else if (
         (ballAngle > eAngle && ballAngle < 180 - eAngle) ||
         (ballAngle > 180 + eAngle && ballAngle < 360 - eAngle)
@@ -366,7 +334,7 @@ function ballCollisionCheck(
             : CollisionType.SMASH_TYPE_2;
       } else
         type =
-          p2bLeftRight === DIRECTION_TO.LEFT
+          p2bLeftRight === DirectionTo.LEFT
             ? CollisionType.LEFT
             : CollisionType.RIGHT;
       break;
@@ -380,12 +348,12 @@ function ballCollisionCheck(
           type = CollisionType.STRAIGHT;
         } else
           type =
-            p2bLeftRight === DIRECTION_TO.LEFT
+            p2bLeftRight === DirectionTo.LEFT
               ? CollisionType.LEFT
               : CollisionType.RIGHT;
       } else {
         type =
-          p2bUpDown === DIRECTION_TO.UP ? CollisionType.UP : CollisionType.DOWN;
+          p2bUpDown === DirectionTo.UP ? CollisionType.UP : CollisionType.DOWN;
       }
       break;
     case 3: // it will never happen
@@ -410,22 +378,22 @@ function getQuadrant(argAngle: number): Quadrant {
   return Quadrant.FOURTH;
 }
 
-function getLeftRight(argAngle: number): DIRECTION_TO {
+function getLeftRight(argAngle: number): DirectionTo {
   const angle: number = trimAngle(argAngle);
   if (angle < 90 || angle > 270) {
-    return DIRECTION_TO.RIGHT;
+    return DirectionTo.RIGHT;
   }
-  return DIRECTION_TO.LEFT;
+  return DirectionTo.LEFT;
 }
 
-function getUpDown(argAngle: number): DIRECTION_TO {
+function getUpDown(argAngle: number): DirectionTo {
   const angle: number = trimAngle(argAngle);
 
   if (angle > 0 && angle < 180) {
-    return DIRECTION_TO.UP;
+    return DirectionTo.UP;
   }
 
-  return DIRECTION_TO.DOWN;
+  return DirectionTo.DOWN;
 }
 
 function getAngle(racket: Racket, end: Point): number {

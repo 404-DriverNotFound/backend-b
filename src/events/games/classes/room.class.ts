@@ -1,11 +1,11 @@
 import { Server, Socket } from 'socket.io';
-import { Ball } from './ball';
-import { Countdown } from './Countdown';
-import { GameStatus } from './constants/game-status.enum';
-import { Player } from './player';
-import { PlayerPosition } from './constants/player-position.enum';
-import { RoomManagerService } from './room-manager.service';
-import { SETTINGS } from './SETTINGS';
+import { Ball } from './ball.class';
+import { Countdown } from './countdown.class';
+import { GameStatus } from '../constants/game-status.enum';
+import { Player } from './player.class';
+import { PlayerPosition } from '../constants/player-position.enum';
+import { RoomManagerService } from '../room-manager.service';
+import { SETTINGS } from '../constants/SETTINGS';
 
 export class Room {
   roomManagerService: RoomManagerService;
