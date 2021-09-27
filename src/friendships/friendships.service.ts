@@ -292,7 +292,7 @@ export class FriendshipsService {
       addresseeName,
     );
 
-    const friendship: Friendship = await this.friendshipsRepository.createBlack(
+    const friendship: Friendship = await this.friendshipsRepository.createBlock(
       requester,
       addressee,
     );
