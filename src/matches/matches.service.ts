@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
-import { MatchResult } from './constants/match-result.enum';
 import { MatchStatus } from './constants/match-status.enum';
 import { MatchType } from './constants/match-type.enum';
 import { Match } from './match.entity';
 import { MatchesRepository } from './matches.repository';
+import { MatchGameMode } from './constants/match-gameMode.enum';
 
 @Injectable()
 export class MatchesService {
@@ -47,9 +47,15 @@ export class MatchesService {
     user1: User,
     name: string,
     type: MatchType,
+    mode: MatchGameMode,
   ): Promise<Match> {
     const user2: User = await this.usersService.getUserByName(name);
-    const match: Match = this.matchesRepository.create({ user1, user2, type });
+    const match: Match = this.matchesRepository.create({
+      user1,
+      user2,
+      type,
+      mode,
+    });
     await this.matchesRepository.save(match);
     return match;
   }
