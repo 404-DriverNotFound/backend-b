@@ -1,6 +1,8 @@
 export class Countdown {
   count = 10;
 
+  left = 0;
+
   createdAt: number = Date.now();
 
   action: () => void = null;
@@ -12,10 +14,9 @@ export class Countdown {
   }
 
   update(): void {
-    const left: number =
-      this.count - Math.floor((Date.now() - this.createdAt) / 1000);
+    this.left = this.count - Math.floor((Date.now() - this.createdAt) / 1000);
 
-    if (left < 0) {
+    if (this.left < 0) {
       this.action();
     }
   }
