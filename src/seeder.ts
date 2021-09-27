@@ -4,6 +4,12 @@ import { seeder } from 'nestjs-seeder';
 import { configValidationSchema } from './config.schema';
 import { AchievementsSeeder } from './achievements/achievements.seeder';
 import { AchievementsRepository } from './achievements/repositories/achievement.repository';
+import { UserAchievementsRepository } from './achievements/repositories/user-achievement.repository';
+import { UsersRepository } from './users/repositories/users.repository';
+import { MembershipsRepository } from './channels/repositories/memberships.repository';
+import { ChannelsRepository } from './channels/repositories/channels.repository';
+import { ChatsRepository } from './channels/repositories/chats.repository';
+import { DmsRepository } from './dms/dms.repository';
 
 seeder({
   imports: [
@@ -25,6 +31,14 @@ seeder({
         synchronize: true,
       }),
     }),
-    TypeOrmModule.forFeature([AchievementsRepository]),
+    TypeOrmModule.forFeature([
+      AchievementsRepository,
+      UserAchievementsRepository,
+      UsersRepository,
+      MembershipsRepository,
+      ChannelsRepository,
+      ChatsRepository,
+      DmsRepository,
+    ]),
   ],
 }).run([AchievementsSeeder]);
