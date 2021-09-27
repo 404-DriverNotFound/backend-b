@@ -6,7 +6,7 @@ import { MatchStatus } from './constants/match-status.enum';
 import { MatchType } from './constants/match-type.enum';
 import { Match } from './match.entity';
 import { MatchesRepository } from './matches.repository';
-import { MatchGameMode } from './constants/match-gameMode.enum';
+import { MatchGameMode } from './constants/match-game-mode.enum';
 
 @Injectable()
 export class MatchesService {

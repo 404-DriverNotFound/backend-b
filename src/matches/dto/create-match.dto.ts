@@ -2,7 +2,7 @@ import { ApiProperty, PickType } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty } from 'class-validator';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { MatchType } from '../constants/match-type.enum';
-import { MatchGameMode } from '../constants/match-gameMode.enum';
+import { MatchGameMode } from '../constants/match-game-mode.enum';
 
 export class CreateMatchDto extends PickType(CreateUserDto, ['name'] as const) {
   @ApiProperty({

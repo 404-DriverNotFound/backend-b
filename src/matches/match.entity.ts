@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { MatchStatus } from './constants/match-status.enum';
 import { MatchType } from './constants/match-type.enum';
-import { MatchGameMode } from './constants/match-gameMode.enum';
+import { MatchGameMode } from './constants/match-game-mode.enum';
 
 @Entity('user_match_user')
 export class Match {
