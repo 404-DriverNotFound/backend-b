@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { MatchStatus } from './constants/match-status.enum';
 import { MatchType } from './constants/match-type.enum';
+import { MatchGameMode } from './constants/match-game-mode.enum';
 
 @Entity('user_match_user')
 export class Match {
@@ -34,4 +35,7 @@ export class Match {
 
   @Column({ type: 'enum', enum: MatchType, default: MatchType.LADDER })
   type: MatchType;
+
+  @Column({ type: 'enum', enum: MatchGameMode, default: MatchGameMode.CLASSIC })
+  mode: MatchGameMode;
 }

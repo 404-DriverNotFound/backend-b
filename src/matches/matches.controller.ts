@@ -58,8 +58,8 @@ export class MatchesController {
   @Post()
   createMatch(
     @GetUser() user: User,
-    @Body() { name, type }: CreateMatchDto,
+    @Body() { name, type, mode }: CreateMatchDto,
   ): Promise<Match> {
-    return this.matchesService.createMatch(user, name, type);
+    return this.matchesService.createMatch(user, name, type, mode);
   }
 }
