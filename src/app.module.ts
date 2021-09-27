@@ -15,6 +15,7 @@ import { UsersRepository } from './users/repositories/users.repository';
 import { UsersService } from './users/users.service';
 import { FriendshipsService } from './friendships/friendships.service';
 import { AchievementsModule } from './achievements/achievements.module';
+import { MatchesModule } from './matches/matches.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { AchievementsModule } from './achievements/achievements.module';
     UsersModule,
     AchievementsModule,
     FriendshipsModule,
+    MatchesModule,
     ChannelsModule,
     DmsModule,
     EventsModule,

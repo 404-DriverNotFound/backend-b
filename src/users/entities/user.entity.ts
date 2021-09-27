@@ -41,6 +41,8 @@ export class User {
   @Column({ default: false })
   isSecondFactorAuthenticated: boolean;
 
+  @Column({ default: 0 })
+  score: number;
   @OneToMany(() => Membership, (membership) => membership.user, {
     cascade: true,
   })
