@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { Room } from './classes/room.class';
+import { PlayerPosition } from './constants/player-position.enum';
+import { CLIENT_SETTINGS } from './constants/SETTINGS';
 
 @Injectable()
 export class RoomManagerService {
@@ -18,8 +20,8 @@ export class RoomManagerService {
     this.roomIds[socket0.id] = roomId;
     this.roomIds[socket1.id] = roomId;
     room.readyInit();
-    server.to(socket0.id).emit('ready', 'left');
-    server.to(socket1.id).emit('ready', 'right');
+    server.to(socket0.id).emit('ready', PlayerPosition.LEFT, CLIENT_SETTINGS);
+    server.to(socket1.id).emit('ready', PlayerPosition.RIGHT, CLIENT_SETTINGS);
     console.log('Room Created :', roomId);
   }
 
