@@ -12,6 +12,7 @@ export class RoomManagerService {
   roomIds: Map<string, string> = new Map<string, string>();
 
   createRoom(server: Server, socket0: Socket, socket1: Socket): void {
+    // TODO 회원 접속상태 온라인에서 게임으로 바꿔야함.
     const roomId: string = socket0.id + socket1.id; //FIXME 나중에 match id로
     const room: Room = new Room(this, server, roomId, socket0, socket1);
     socket0.join(roomId);
@@ -26,6 +27,7 @@ export class RoomManagerService {
   }
 
   destroyRoom(server: Server, roomId: string): void {
+    // TODO 회원 접속상태 게임에서 온라인으로 바꿔야함.
     const room: Room = this.rooms[roomId];
 
     room.sockets.forEach((socket: Socket) => {

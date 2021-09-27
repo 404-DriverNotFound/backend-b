@@ -74,8 +74,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     channel.forEach((channel: Channel) => client.leave(channel.id));
 
     return `${user.name} disconnected.`;
-
-    // TODO 소켓이 끊어지면 플레이어일때 게임 종료되는 로직 추가
   }
 
   @SubscribeMessage('joinRoom')
@@ -97,10 +95,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   // NOTE events for Game below:
-
-  // TODO 게임에 입장하는 event
-
-  // TODO 게임에서 나가는 event??
 
   @SubscribeMessage('waiting')
   handleWaiting(@ConnectedSocket() client: Socket) {
@@ -136,13 +130,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const roomId: string = this.roomManagerService.roomIds[client.id];
     if (roomId) {
-      //  delete this.roomManagerService.rooms[roomId].players[client.id].keypress[
-      //    keyCode
-      //  ];
-      // REVIEW delete or assign false
-      this.roomManagerService.rooms[roomId].players[client.id].keypress[
+      delete this.roomManagerService.rooms[roomId].players[client.id].keypress[
         keyCode
-      ] = false;
+      ];
     }
   }
 
@@ -169,5 +159,16 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
         y: mouse[1],
       };
     }
+  }
+
+  @SubscribeMessage('leaveGame')
+  handleLeaveGame(@ConnectedSocket() client: Socket): string {
+    // TODO 소켓이 끊어지면 플레이어일때 게임 종료되는 로직 추가
+    const roomId: string = this.roomManagerService.roomIds[client.id];
+    if (roomId) {
+      this.roomManagerService.destroyRoom(this.server, roomId);
+    }
+    this.lobbyManagerService.lobby.delete(client);
+    return 'You leave the game.';
   }
 }
