@@ -56,7 +56,7 @@ export class UsersRepository extends Repository<User> {
       user.avatar = avatar;
     }
 
-    if (enable2FA) {
+    if (enable2FA !== undefined) {
       user.enable2FA = enable2FA;
       user.isSecondFactorAuthenticated = true; // REVIEW 업데이트하고 바로 인증으로 넘어가지 않고, 재로그인시 검사
       user.authenticatorSecret = null;
