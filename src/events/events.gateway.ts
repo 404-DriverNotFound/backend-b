@@ -1,4 +1,3 @@
-import { InjectRepository } from '@nestjs/typeorm';
 import {
   ConnectedSocket,
   MessageBody,
@@ -10,70 +9,22 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Channel } from 'src/channels/entities/channel.entity';
-import { ChannelsRepository } from 'src/channels/repositories/channels.repository';
-import { User } from 'src/users/entities/user.entity';
-import { UserStatus } from 'src/users/constants/user-status.enum';
-import { UsersRepository } from 'src/users/repositories/users.repository';
-import { LobbyManagerService } from './games/lobby-manager.service';
-import { RoomManagerService } from './games/room-manager.service';
 import { KeyCode } from './games/constants/key-code.enum';
+import { EventsService } from './events.service';
 
 @WebSocketGateway()
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  constructor(
-    @InjectRepository(ChannelsRepository)
-    private readonly channelsRepository: ChannelsRepository,
-    @InjectRepository(UsersRepository)
-    private readonly usersRepository: UsersRepository,
-    private readonly lobbyManagerService: LobbyManagerService,
-    private readonly roomManagerService: RoomManagerService,
-  ) {}
+  constructor(private readonly eventsService: EventsService) {}
 
-  async handleConnection(@ConnectedSocket() client: Socket): Promise<string> {
-    console.log('connected');
-
-    const userId: string = client.handshake.query.userId as string;
-    const user: User = await this.usersRepository.findOne({ id: userId });
-    if (!user) {
-      return 'User not found.';
-    }
-
-    user.status = UserStatus.ONLINE;
-    await this.usersRepository.save(user);
-
-    client.join(user.id);
-
-    const channel: Channel[] = await this.channelsRepository.getChannelsByMe(
-      user,
-    );
-    channel.forEach((channel: Channel) => client.join(channel.id));
-
-    return `${user.name} connected.`;
+  handleConnection(@ConnectedSocket() client: Socket): Promise<string> {
+    return this.eventsService.handleConnection(client);
   }
 
-  async handleDisconnect(@ConnectedSocket() client: Socket): Promise<string> {
-    console.log('disconnected');
-
-    const userId: string = client.handshake.query.userId as string;
-    const user: User = await this.usersRepository.findOne({ id: userId });
-    if (!user) {
-      return 'user not found.';
-    }
-
-    user.status = UserStatus.OFFLINE;
-    await this.usersRepository.save(user);
-
-    client.leave(user.id);
-
-    const channel: Channel[] = await this.channelsRepository.getChannelsByMe(
-      user,
-    );
-    channel.forEach((channel: Channel) => client.leave(channel.id));
-
-    return `${user.name} disconnected.`;
+  handleDisconnect(@ConnectedSocket() client: Socket): Promise<string> {
+    return this.eventsService.handleDisconnect(client);
   }
 
   @SubscribeMessage('joinRoom')
@@ -81,8 +32,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() channel: Channel,
   ): string {
-    client.join(channel.id);
-    return 'Joined the channel.';
+    return this.eventsService.handleJoinRoom(client, channel);
   }
 
   @SubscribeMessage('leaveRoom')
@@ -90,85 +40,55 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() channel: Channel,
   ): string {
-    client.leave(channel.id);
-    return 'Leaved the channel.';
+    return this.eventsService.handleLeaveRoom(client, channel);
   }
 
   // NOTE events for Game below:
 
   @SubscribeMessage('waiting')
-  handleWaiting(@ConnectedSocket() client: Socket) {
-    this.lobbyManagerService.lobby.add(client);
-    this.lobbyManagerService.dispatch(this.server); // FIXME roommanager
+  handleWaiting(@ConnectedSocket() client: Socket): void {
+    return this.eventsService.handleWaiting(this.server, client);
   }
 
   @SubscribeMessage('ready')
-  handleReady(@ConnectedSocket() client: Socket) {
-    const roomId: string = this.roomManagerService.roomIds[client.id];
-    if (roomId) {
-      this.roomManagerService.rooms[roomId].players[client.id].ready = true;
-    }
+  handleReady(@ConnectedSocket() client: Socket): void {
+    return this.eventsService.handleReady(client);
   }
 
   @SubscribeMessage('keydown')
   handleKeyDown(
     @ConnectedSocket() client: Socket,
     @MessageBody() keyCode: KeyCode,
-  ) {
-    const roomId: string = this.roomManagerService.roomIds[client.id];
-    if (roomId) {
-      this.roomManagerService.rooms[roomId].players[client.id].keypress[
-        keyCode
-      ] = true;
-    }
+  ): void {
+    return this.eventsService.handleKeyDown(client, keyCode);
   }
 
-  @SubscribeMessage('keyup') // NOTE front에 알려야함 keypress로 바뀌었다고.
+  @SubscribeMessage('keyup')
   handlekeyUp(
     @ConnectedSocket() client: Socket,
     @MessageBody() keyCode: KeyCode,
-  ) {
-    const roomId: string = this.roomManagerService.roomIds[client.id];
-    if (roomId) {
-      delete this.roomManagerService.rooms[roomId].players[client.id].keypress[
-        keyCode
-      ];
-    }
+  ): void {
+    return this.eventsService.handlekeyUp(client, keyCode);
   }
 
   @SubscribeMessage('mousemove')
   handleMouseMove(
     @ConnectedSocket() client: Socket,
     @MessageBody() mouse: any,
-  ) {
-    const roomId: string = this.roomManagerService.roomIds[client.id];
-    if (roomId) {
-      this.roomManagerService.rooms[roomId].players[client.id].mouse.move = {
-        x: mouse[0],
-        y: mouse[1],
-      };
-    }
+  ): void {
+    return this.eventsService.handleMouseMove(client, mouse);
   }
 
   @SubscribeMessage('click')
-  handleClick(@ConnectedSocket() client: Socket, @MessageBody() mouse: any) {
-    const roomId: string = this.roomManagerService.roomIds[client.id];
-    if (roomId) {
-      this.roomManagerService.rooms[roomId].players[client.id].mouse.click = {
-        x: mouse[0],
-        y: mouse[1],
-      };
-    }
+  handleClick(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() mouse: any,
+  ): void {
+    return this.eventsService.handleClick(client, mouse);
   }
 
   @SubscribeMessage('leaveGame')
   handleLeaveGame(@ConnectedSocket() client: Socket): string {
-    // TODO 소켓이 끊어지면 플레이어일때 게임 종료되는 로직 추가
-    const roomId: string = this.roomManagerService.roomIds[client.id];
-    if (roomId) {
-      this.roomManagerService.destroyRoom(this.server, roomId);
-    }
-    this.lobbyManagerService.lobby.delete(client);
-    return 'You leave the game.';
+    return this.eventsService.handleLeaveGame(this.server, client);
   }
 }
