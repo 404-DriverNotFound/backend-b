@@ -10,7 +10,6 @@ import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-au
 import { GetUser } from 'src/users/get-user.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { CreateMatchDto } from './dto/create-match.dto';
-import { GetMatchesCountFilterDto } from './dto/get-matches-count-filter.dto';
 import { GetMatchesFilterDto } from './dto/get-matches-filter.dto';
 import { GetSpectatingFilterDto } from './dto/get-spectating-filter.dto';
 import { Match } from './match.entity';
