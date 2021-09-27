@@ -18,7 +18,6 @@ import {
 import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-authenticated.guard';
 import { GetUser } from 'src/users/get-user.decorator';
-import { User } from 'src/users/entities/user.entity';
 import { Channel } from './entities/channel.entity';
 import { ChannelsService } from './channels.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
@@ -30,6 +29,7 @@ import { CreateChannelChatDto } from './dto/create-channel-chat.dto';
 import { GetChannelChatsCountDto } from './dto/get-channel-chats-count.dto';
 import { Membership } from './entities/membership.entity';
 import { UpdateChannelMemberRoleDto } from './dto/update-channel-member-role.dto';
+import { User } from 'src/users/entities/user.entity';
 
 @ApiTags('Channels')
 @ApiCookieAuth()
