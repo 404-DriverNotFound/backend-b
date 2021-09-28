@@ -6,6 +6,7 @@ import { Player } from './player.class';
 import { PlayerPosition } from '../constants/player-position.enum';
 import { RoomManagerService } from '../room-manager.service';
 import { SETTINGS } from '../constants/SETTINGS';
+import { EmitDataDto } from '../dto/emit-data.dto';
 
 export class Room {
   roomManagerService: RoomManagerService;
@@ -106,20 +107,19 @@ export class Room {
     this.server.to(this.id).emit('update', data);
   }
 
-  getEmitData(): Map<string, Countdown | Player | Ball> {
-    const data = new Map<string, Countdown | Player | Ball>();
-
+  getEmitData(): EmitDataDto {
+    const data = new EmitDataDto();
     this.countdown?.update();
     data['countdown'] = this.countdown;
 
     for (let i = 0; i < 2; i++) {
       const player: Player = this.players.get(this.sockets[i].id);
       player.update(this);
-      data.set('player' + i, player);
+      data.player[i] = player;
     }
 
     this.ball.update(this);
-    data.set('ball', this.ball);
+    data['ball'] = this.ball;
     return data;
   }
 }
