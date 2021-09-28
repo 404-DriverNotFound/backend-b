@@ -37,7 +37,7 @@ export class RoomManagerService {
     }
     user1.status = UserStatus.IN_GAME;
 
-    const user2Id: string = socket0.handshake.query.userId as string;
+    const user2Id: string = socket1.handshake.query.userId as string;
     const user2: User = await this.usersRepository.findOne({ id: user2Id });
     if (!user2) {
       return;
