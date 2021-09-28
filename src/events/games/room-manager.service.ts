@@ -67,7 +67,7 @@ export class RoomManagerService {
 
     room.sockets.forEach(async (socket: Socket) => {
       const message: string =
-        !room.players[socket.id].ready && !room.countdown
+        !room.players.get(socket.id).ready && !room.countdown
           ? 'YOU ARE NOT PREPARED'
           : null;
       this.roomIds.delete(socket.id);

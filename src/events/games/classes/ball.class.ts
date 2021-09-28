@@ -41,7 +41,7 @@ export class Ball extends Base {
 
     if (this.serve && this.serve.isOn) {
       playerIds.forEach((playerId) => {
-        const player: Player = room.players[playerId];
+        const player: Player = room.players.get(playerId);
         if (player.id === this.serve.playerId) {
           this.y = player.y;
           if (player.x < SETTINGS.WIDTH / 2) {
@@ -108,13 +108,13 @@ export class Ball extends Base {
         this.y += this.dynamic.yVel * this.speed;
       }
       if (this.x <= 0 - this.width * 2) {
-        room.players[this.playerId[1]].score += 1;
+        room.players.get(this.playerId[1]).score += 1;
         this.serve = setServe(this.playerId[0]);
         this.color = '#000000';
         this.boostCount = 0;
       }
       if (this.x >= SETTINGS.WIDTH + this.width * 2) {
-        room.players[this.playerId[0]].score += 1;
+        room.players.get(this.playerId[0]).score += 1;
         this.serve = setServe(this.playerId[1]);
         this.color = '#000000';
         this.boostCount = 0;
@@ -127,7 +127,7 @@ export class Ball extends Base {
       }
 
       playerIds.forEach((playerId) => {
-        const player: Player = room.players[playerId];
+        const player: Player = room.players.get(playerId);
         const collision = ballCollisionCheck(this, player, this.dynamic.angle);
 
         switch (collision) {

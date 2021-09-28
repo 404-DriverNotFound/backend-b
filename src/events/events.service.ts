@@ -83,34 +83,34 @@ export class EventsService {
   }
 
   handleReady(client: Socket): void {
-    const roomId: string = this.roomManagerService.roomIds[client.id];
+    const roomId: string = this.roomManagerService.roomIds.get(client.id);
     if (roomId) {
-      this.roomManagerService.rooms[roomId].players[client.id].ready = true;
+      this.roomManagerService.rooms.get(roomId).players.get(client.id).ready = true;
     }
   }
 
   handleKeyDown(client: Socket, keyCode: KeyCode): void {
-    const roomId: string = this.roomManagerService.roomIds[client.id];
+    const roomId: string = this.roomManagerService.roomIds.get(client.id);
     if (roomId) {
-      this.roomManagerService.rooms[roomId].players[client.id].keypress[
+      this.roomManagerService.rooms.get(roomId).players.get(client.id).keypress[
         keyCode
       ] = true;
     }
   }
 
   handlekeyUp(client: Socket, keyCode: KeyCode): void {
-    const roomId: string = this.roomManagerService.roomIds[client.id];
+    const roomId: string = this.roomManagerService.roomIds.get(client.id);
     if (roomId) {
-      delete this.roomManagerService.rooms[roomId].players[client.id].keypress[
+      delete this.roomManagerService.rooms.get(roomId).players.get(client.id).keypress[
         keyCode
       ];
     }
   }
 
   handleMouseMove(client: Socket, mouse: any): void {
-    const roomId: string = this.roomManagerService.roomIds[client.id];
+    const roomId: string = this.roomManagerService.roomIds.get(client.id);
     if (roomId) {
-      this.roomManagerService.rooms[roomId].players[client.id].mouse.move = {
+      this.roomManagerService.rooms.get(roomId).players.get(client.id).mouse.move = {
         x: mouse[0],
         y: mouse[1],
       };
@@ -118,9 +118,9 @@ export class EventsService {
   }
 
   handleClick(client: Socket, mouse: any): void {
-    const roomId: string = this.roomManagerService.roomIds[client.id];
+    const roomId: string = this.roomManagerService.roomIds.get(client.id);
     if (roomId) {
-      this.roomManagerService.rooms[roomId].players[client.id].mouse.click = {
+      this.roomManagerService.rooms.get(roomId).players.get(client.id).mouse.click = {
         x: mouse[0],
         y: mouse[1],
       };
@@ -129,7 +129,7 @@ export class EventsService {
 
   handleLeaveGame(server: Server, client: Socket): string {
     // TODO 소켓이 끊어지면 플레이어일때 게임 종료되는 로직 추가
-    const roomId: string = this.roomManagerService.roomIds[client.id];
+    const roomId: string = this.roomManagerService.roomIds.get(client.id);
     if (roomId) {
       this.roomManagerService.destroyRoom(server, roomId);
     }

@@ -97,8 +97,8 @@ export class Room {
   }
 
   readyLoop(): void {
-    const player0ready: boolean = this.players.get(this.players[0].id).ready;
-    const player1ready: boolean = this.players.get(this.players[1].id).ready;
+    const player0ready: boolean = this.players.get(this.sockets[0].id).ready;
+    const player1ready: boolean = this.players.get(this.sockets[1].id).ready;
     if (player0ready && player1ready) {
       this.playInit();
     }
