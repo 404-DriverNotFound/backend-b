@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChannelsRepository } from 'src/channels/repositories/channels.repository';
 import { MatchesRepository } from 'src/matches/matches.repository';
@@ -16,6 +17,7 @@ import { RoomManagerService } from './games/room-manager.service';
       UsersRepository,
       MatchesRepository,
     ]),
+    ScheduleModule.forRoot(),
   ],
   providers: [
     EventsGateway,
