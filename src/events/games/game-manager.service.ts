@@ -8,10 +8,6 @@ export class GameManagerService {
 
   @Interval(10)
   update() {
-    const roomIds: string[] = Array.from(this.roomManagerService.rooms.keys());
-
-    roomIds.forEach((roomId: string) =>
-      this.roomManagerService.rooms[roomId].loop(),
-    );
+    this.roomManagerService.rooms.forEach((room) => room.loop());
   }
 }

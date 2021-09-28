@@ -39,8 +39,8 @@ export class Room {
     this.server = server;
     this.id = id;
     this.sockets = [socket0, socket1];
-    this.players[socket0.id] = new Player(socket0.id, PlayerPosition.LEFT);
-    this.players[socket1.id] = new Player(socket1.id, PlayerPosition.RIGHT);
+    this.players.set(socket0.id, new Player(socket0.id, PlayerPosition.LEFT));
+    this.players.set(socket1.id, new Player(socket1.id, PlayerPosition.RIGHT));
     this.ball = new Ball(socket0.id, socket1.id);
   }
 
@@ -60,16 +60,16 @@ export class Room {
     this.server.to(this.id).emit('update', data);
     if (
       this.status === GameStatus.PLAYING &&
-      (this.players[this.sockets[0].id].score >= SETTINGS.GOAL ||
-        this.players[this.sockets[1].id].score >= SETTINGS.GOAL)
+      (this.players.get(this.sockets[0].id).score >= SETTINGS.GOAL ||
+        this.players.get(this.sockets[1].id).score >= SETTINGS.GOAL)
     ) {
       this.status = GameStatus.GAMEOVER;
       this.gameOverDelay = 3;
     }
     if (this.status === GameStatus.GAMEOVER && this.gameOverDelay < 0) {
       if (
-        this.players[this.sockets[0].id].score >
-        this.players[this.sockets[1].id].score
+        this.players.get(this.sockets[0].id).score >
+        this.players.get(this.sockets[1].id).score
       ) {
         this.roomManagerService.gameOverRoom(
           this.server,
@@ -97,8 +97,8 @@ export class Room {
   }
 
   readyLoop(): void {
-    const player0ready: boolean = this.players[this.players[0].id].ready;
-    const player1ready: boolean = this.players[this.players[1].id].ready;
+    const player0ready: boolean = this.players.get(this.players[0].id).ready;
+    const player1ready: boolean = this.players.get(this.players[1].id).ready;
     if (player0ready && player1ready) {
       this.playInit();
     }
@@ -113,13 +113,13 @@ export class Room {
     data['countdown'] = this.countdown;
 
     for (let i = 0; i < 2; i++) {
-      const player: Player = this.players[this.sockets[i].id];
+      const player: Player = this.players.get(this.sockets[i].id);
       player.update(this);
-      data['player' + i] = player;
+      data.set('player' + i, player);
     }
 
     this.ball.update(this);
-    data['ball'] = this.ball;
+    data.set('ball', this.ball);
     return data;
   }
 }
