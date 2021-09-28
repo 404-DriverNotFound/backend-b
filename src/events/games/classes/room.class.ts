@@ -18,7 +18,7 @@ export class Room {
 
   sockets: Socket[];
 
-  players: Map<string, Player>;
+  players: Map<string, Player> = new Map<string, Player>();
 
   countdown: Countdown = null;
 
