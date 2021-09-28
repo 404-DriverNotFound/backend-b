@@ -53,9 +53,9 @@ export class RoomManagerService {
     const room: Room = new Room(this, server, roomId, socket0, socket1);
     socket0.join(roomId);
     socket1.join(roomId);
-    this.rooms[roomId] = room;
-    this.roomIds[socket0.id] = roomId;
-    this.roomIds[socket1.id] = roomId;
+    this.rooms.set(roomId, room);
+    this.roomIds.set(socket0.id, roomId);
+    this.roomIds.set(socket1.id, roomId);
     room.readyInit();
     server.to(socket0.id).emit('ready', PlayerPosition.LEFT, CLIENT_SETTINGS);
     server.to(socket1.id).emit('ready', PlayerPosition.RIGHT, CLIENT_SETTINGS);
@@ -63,14 +63,14 @@ export class RoomManagerService {
   }
 
   async destroyRoom(server: Server, roomId: string): Promise<void> {
-    const room: Room = this.rooms[roomId];
+    const room: Room = this.rooms.get(roomId);
 
     room.sockets.forEach(async (socket: Socket) => {
       const message: string =
         !room.players[socket.id].ready && !room.countdown
           ? 'YOU ARE NOT PREPARED'
           : null;
-      delete this.roomIds[socket.id];
+      this.roomIds.delete(socket.id);
       server.to(socket.id).emit('destroy', message);
       socket.leave(roomId);
       // REVIEW 회원 접속상태 게임에서 온라인으로 바꿔야함.
@@ -78,7 +78,7 @@ export class RoomManagerService {
       await this.usersRepository.update(userId, { status: UserStatus.ONLINE });
     });
 
-    delete this.rooms[roomId];
+    this.rooms.delete(roomId);
     await this.matchesRepository.delete(roomId);
   }
 
@@ -87,7 +87,7 @@ export class RoomManagerService {
     roomId: string,
     winnerSocketId: string,
   ): Promise<void> {
-    const room: Room = this.rooms[roomId];
+    const room: Room = this.rooms.get(roomId);
     let winner: User;
     let loser: User;
 
@@ -98,17 +98,23 @@ export class RoomManagerService {
       await this.usersRepository.update(userId, { status: UserStatus.ONLINE });
       if (socket.id === winnerSocketId) {
         winner = user;
+        await this.usersRepository.update(winner.id, {
+          score: winner.score + 10,
+        });
       } else {
         loser = user;
+        await this.usersRepository.update(loser.id, {
+          score: loser.score - 10,
+        });
       }
       const message: string =
         socket.id === winnerSocketId ? 'YOU WIN!' : 'YOU LOSE!';
-      delete this.roomIds[socket.id];
+      this.roomIds.delete(socket.id);
       server.to(socket.id).emit('destroy', message);
       socket.leave(roomId);
     });
 
-    delete this.rooms[roomId];
+    this.rooms.delete(roomId);
     await this.matchesRepository.update(roomId, { winner, loser });
   }
 }
