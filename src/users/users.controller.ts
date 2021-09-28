@@ -44,7 +44,7 @@ export class UsersController {
   getUsers(
     @Query() { search, perPage, page }: GetUsersFilterDto,
   ): Promise<User[]> {
-    return this.usersService.getUsers(search, +perPage, +page);
+    return this.usersService.getUsers(search, perPage, page);
   }
 
   @ApiCookieAuth()
@@ -78,7 +78,7 @@ export class UsersController {
     @GetUser() user: User,
     @Param('name') name: string,
   ): Promise<User> {
-    return this.usersService.getUserByName(/*user, */ name);
+    return this.usersService.getUserByName(name);
   }
 
   @ApiOperation({ summary: '유저를 생성합니다.' })
