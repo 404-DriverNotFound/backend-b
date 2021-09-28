@@ -115,7 +115,7 @@ export class Room {
     for (let i = 0; i < 2; i++) {
       const player: Player = this.players.get(this.sockets[i].id);
       player.update(this);
-      data.player[i] = player;
+      data['player' + i] = player;
     }
 
     this.ball.update(this);
