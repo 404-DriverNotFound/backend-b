@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import {
   ApiCookieAuth,
   ApiOperation,
@@ -25,5 +25,12 @@ export class AchievementsController {
   @Get()
   getAchievements(@GetUser() user: User): Promise<Achievement[]> {
     return this.achievementsService.getAchievements(user);
+  }
+
+  @ApiOperation({ summary: '특정 유저의 업적 목록을 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @Get(':name')
+  getUserAchievements(@Param('name') name: string): Promise<Achievement[]> {
+    return this.achievementsService.getUserAchievements(name);
   }
 }

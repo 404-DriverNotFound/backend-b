@@ -55,7 +55,7 @@ export class MatchesController {
   @ApiResponse({ status: 200, description: '성공' })
   @Get(':name')
   getUserMatches(
-    @Param() name: string,
+    @Param('name') name: string,
     @Query() { type, status, perPage, page }: GetMatchesInfoFilterDto,
   ): Promise<Match[]> {
     return this.matchesService.getUserMatches(

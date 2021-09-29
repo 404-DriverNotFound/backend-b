@@ -4,6 +4,7 @@ import { AchievementsController } from './achievements.controller';
 import { AchievementsService } from './achievements.service';
 import { AchievementsRepository } from './repositories/achievement.repository';
 import { UserAchievementsRepository } from './repositories/user-achievement.repository';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { UserAchievementsRepository } from './repositories/user-achievement.repo
       AchievementsRepository,
       UserAchievementsRepository,
     ]),
+    UsersModule,
   ],
   controllers: [AchievementsController],
   providers: [AchievementsService],

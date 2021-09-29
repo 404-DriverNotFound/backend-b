@@ -6,6 +6,7 @@ import { Achievement } from './entities/achievement.entity';
 import { UserAchievement } from './entities/user-achievement.entity';
 import { AchievementsRepository } from './repositories/achievement.repository';
 import { UserAchievementsRepository } from './repositories/user-achievement.repository';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AchievementsService {
@@ -14,9 +15,15 @@ export class AchievementsService {
     private readonly achievementsRepository: AchievementsRepository,
     @InjectRepository(UserAchievementsRepository)
     private readonly userAchievementsRepository: UserAchievementsRepository,
+    private readonly usersService: UsersService,
   ) {}
 
   getAchievements(user: User): Promise<Achievement[]> {
+    return this.achievementsRepository.getAchievements(user);
+  }
+
+  async getUserAchievements(name: string): Promise<Achievement[]> {
+    const user = await this.usersService.getUserByName(name);
     return this.achievementsRepository.getAchievements(user);
   }
 
