@@ -9,8 +9,6 @@ import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-authenticated.guard';
 import { GetUser } from 'src/users/get-user.decorator';
 import { User } from 'src/users/entities/user.entity';
-import { CreateMatchDto } from './dto/create-match.dto';
-import { GetMatchesCountFilterDto } from './dto/get-matches-count-filter.dto';
 import { GetMatchesFilterDto } from './dto/get-matches-filter.dto';
 import { GetSpectatingFilterDto } from './dto/get-spectating-filter.dto';
 import { Match } from './match.entity';
@@ -51,15 +49,5 @@ export class MatchesController {
     @Query() { status, type, perPage, page }: GetMatchesFilterDto,
   ): Promise<Match[]> {
     return this.matchesService.getMyMatches(user, status, type, perPage, page);
-  }
-
-  @ApiOperation({ summary: '매치를 추가합니다.' })
-  @ApiResponse({ status: 201, description: '성공' })
-  @Post()
-  createMatch(
-    @GetUser() user: User,
-    @Body() { name, type, mode }: CreateMatchDto,
-  ): Promise<Match> {
-    return this.matchesService.createMatch(user, name, type, mode);
   }
 }

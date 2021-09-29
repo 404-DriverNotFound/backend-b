@@ -6,57 +6,40 @@ import { MatchStatus } from './constants/match-status.enum';
 import { MatchType } from './constants/match-type.enum';
 import { Match } from './match.entity';
 import { MatchesRepository } from './matches.repository';
-import { MatchGameMode } from './constants/match-game-mode.enum';
 
 @Injectable()
 export class MatchesService {
   constructor(
-    @InjectRepository(MatchesRepository)
-    private readonly matchesRepository: MatchesRepository,
-    private readonly usersService: UsersService,
-  ) {}
+      @InjectRepository(MatchesRepository)
+      private readonly matchesRepository: MatchesRepository,
+  ) {
+  }
 
   getMatches(perPage?: number, page?: number): Promise<Match[]> {
     return this.matchesRepository.getMatches(perPage, page);
   }
 
   getSpectatingMatches(
-    type?: MatchType,
-    perPage?: number,
-    page?: number,
+      type?: MatchType,
+      perPage?: number,
+      page?: number,
   ): Promise<Match[]> {
     return this.matchesRepository.getSpectatingMatches(type, perPage, page);
   }
+
   getMyMatches(
-    user: User,
-    status?: MatchStatus,
-    type?: MatchType,
-    perPage?: number,
-    page?: number,
+      user: User,
+      status?: MatchStatus,
+      type?: MatchType,
+      perPage?: number,
+      page?: number,
   ): Promise<Match[]> {
     return this.matchesRepository.getMyMatches(
-      user,
-      status,
-      type,
-      perPage,
-      page,
+        user,
+        status,
+        type,
+        perPage,
+        page,
     );
-  }
-
-  async createMatch(
-    user1: User,
-    name: string,
-    type: MatchType,
-    mode: MatchGameMode,
-  ): Promise<Match> {
-    const user2: User = await this.usersService.getUserByName(name);
-    const match: Match = this.matchesRepository.create({
-      user1,
-      user2,
-      type,
-      mode,
-    });
-    await this.matchesRepository.save(match);
-    return match;
   }
 }
