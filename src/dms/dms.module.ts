@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AchievementsModule } from 'src/achievements/achievements.module';
+import { AchievementsService } from 'src/achievements/achievements.service';
+import { AchievementsRepository } from 'src/achievements/repositories/achievement.repository';
+import { UserAchievementsRepository } from 'src/achievements/repositories/user-achievement.repository';
 import { EventsModule } from 'src/events/events.module';
 import { FriendshipsRepository } from 'src/friendships/friendships.repository';
 import { FriendshipsService } from 'src/friendships/friendships.service';
@@ -16,11 +18,17 @@ import { DmsService } from './dms.service';
       DmsRepository,
       UsersRepository,
       FriendshipsRepository,
+      AchievementsRepository,
+      UserAchievementsRepository,
     ]),
     EventsModule,
-    AchievementsModule,
   ],
   controllers: [DmsController],
-  providers: [DmsService, UsersService, FriendshipsService],
+  providers: [
+    DmsService,
+    UsersService,
+    FriendshipsService,
+    AchievementsService,
+  ],
 })
 export class DmsModule {}

@@ -14,6 +14,5 @@ import { UserAchievementsRepository } from './repositories/user-achievement.repo
   ],
   controllers: [AchievementsController],
   providers: [AchievementsService],
-  exports: [AchievementsService],
 })
 export class AchievementsModule {}

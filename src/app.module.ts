@@ -16,6 +16,9 @@ import { UsersService } from './users/users.service';
 import { FriendshipsService } from './friendships/friendships.service';
 import { AchievementsModule } from './achievements/achievements.module';
 import { MatchesModule } from './matches/matches.module';
+import { AchievementsService } from './achievements/achievements.service';
+import { AchievementsRepository } from './achievements/repositories/achievement.repository';
+import { UserAchievementsRepository } from './achievements/repositories/user-achievement.repository';
 
 @Module({
   imports: [
@@ -38,7 +41,12 @@ import { MatchesModule } from './matches/matches.module';
         synchronize: true,
       }),
     }),
-    TypeOrmModule.forFeature([FriendshipsRepository, UsersRepository]),
+    TypeOrmModule.forFeature([
+      FriendshipsRepository,
+      UsersRepository,
+      AchievementsRepository,
+      UserAchievementsRepository,
+    ]),
     AuthModule,
     UsersModule,
     AchievementsModule,
@@ -49,6 +57,11 @@ import { MatchesModule } from './matches/matches.module';
     EventsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, UsersService, FriendshipsService],
+  providers: [
+    AppService,
+    UsersService,
+    FriendshipsService,
+    AchievementsService,
+  ],
 })
 export class AppModule {}
