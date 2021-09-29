@@ -85,7 +85,8 @@ export class EventsService {
   handleReady(client: Socket): void {
     const roomId: string = this.roomManagerService.roomIds.get(client.id);
     if (roomId) {
-      this.roomManagerService.rooms.get(roomId).players.get(client.id).ready = true;
+      this.roomManagerService.rooms.get(roomId).players.get(client.id).ready =
+        true;
     }
   }
 
@@ -101,9 +102,8 @@ export class EventsService {
   handlekeyUp(client: Socket, keyCode: KeyCode): void {
     const roomId: string = this.roomManagerService.roomIds.get(client.id);
     if (roomId) {
-      delete this.roomManagerService.rooms.get(roomId).players.get(client.id).keypress[
-        keyCode
-      ];
+      delete this.roomManagerService.rooms.get(roomId).players.get(client.id)
+        .keypress[keyCode];
     }
   }
 

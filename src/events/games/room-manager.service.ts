@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Server, Socket } from 'socket.io';
+import { MatchStatus } from 'src/matches/constants/match-status.enum';
 import { Match } from 'src/matches/match.entity';
 import { MatchesRepository } from 'src/matches/matches.repository';
 import { UserStatus } from 'src/users/constants/user-status.enum';
@@ -57,8 +58,12 @@ export class RoomManagerService {
     this.roomIds.set(socket0.id, roomId);
     this.roomIds.set(socket1.id, roomId);
     room.readyInit();
-    server.to(socket0.id).emit('ready', PlayerPosition.LEFT, user1, user2, CLIENT_SETTINGS);
-    server.to(socket1.id).emit('ready', PlayerPosition.RIGHT, user1, user2 ,CLIENT_SETTINGS);
+    server
+      .to(socket0.id)
+      .emit('ready', PlayerPosition.LEFT, user1, user2, CLIENT_SETTINGS);
+    server
+      .to(socket1.id)
+      .emit('ready', PlayerPosition.RIGHT, user1, user2, CLIENT_SETTINGS);
     console.log('Room Created :', roomId);
   }
 
@@ -116,6 +121,10 @@ export class RoomManagerService {
     });
 
     this.rooms.delete(roomId);
-    await this.matchesRepository.update(roomId, { winner, loser });
+    await this.matchesRepository.update(roomId, {
+      status: MatchStatus.DONE,
+      winner,
+      loser,
+    });
   }
 }
