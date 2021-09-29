@@ -63,7 +63,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: '유저 없음' })
   @Head(':name')
   isDuplicated(@Param('name') name: string): Promise<User> {
-    return this.usersService.isDuplicated(name);
+    return this.usersService.getUserByName(name);
   }
 
   @ApiCookieAuth()
@@ -74,10 +74,7 @@ export class UsersController {
   @Get(':name')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  getUserByName(
-    @GetUser() user: User,
-    @Param('name') name: string,
-  ): Promise<User> {
+  getUserByName(@Param('name') name: string): Promise<User> {
     return this.usersService.getUserByName(name);
   }
 

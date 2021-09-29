@@ -41,14 +41,6 @@ export class UsersService {
     return data;
   }
 
-  async isDuplicated(name: string): Promise<User> {
-    const found: User = await this.usersRepository.findOne({ name });
-    if (!found) {
-      throw new NotFoundException([`User with ${name} not found`]);
-    }
-    return found;
-  }
-
   async getUserByName(name: string): Promise<User> {
     const found: User = await this.usersRepository.findOne({ name });
     if (!found) {
