@@ -40,10 +40,10 @@ export class MatchesRepository extends Repository<Match> {
     return qb.getMany();
   }
 
-  async getMyMatches(
+  async getUserMatches(
     user: User,
-    status?: MatchStatus,
     type?: MatchType,
+    status?: MatchStatus,
     perPage?: number,
     page?: number,
   ): Promise<Match[]> {
