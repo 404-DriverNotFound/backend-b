@@ -7,9 +7,18 @@ import { AuthController } from './auth.controller';
 import { SessionSerializer } from './session.serializer';
 import { FtStrategy } from './strategies/ft.strategy';
 import { AuthService } from './auth.service';
+import { AchievementsService } from 'src/achievements/achievements.service';
+import { AchievementsRepository } from 'src/achievements/repositories/achievement.repository';
+import { UserAchievementsRepository } from 'src/achievements/repositories/user-achievement.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UsersRepository])],
+  imports: [
+    TypeOrmModule.forFeature([
+      UsersRepository,
+      AchievementsRepository,
+      UserAchievementsRepository,
+    ]),
+  ],
   controllers: [AuthController],
   providers: [
     ConfigService,
@@ -17,6 +26,7 @@ import { AuthService } from './auth.service';
     SessionSerializer,
     UsersService,
     AuthService,
+    AchievementsService,
   ],
 })
 export class AuthModule {}

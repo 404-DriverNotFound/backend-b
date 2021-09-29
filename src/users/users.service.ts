@@ -4,6 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AchievementsService } from 'src/achievements/achievements.service';
+import { Achievement } from 'src/achievements/entities/achievement.entity';
 import { Channel } from 'src/channels/entities/channel.entity';
 import { Like } from 'typeorm';
 import { UserStatus } from './constants/user-status.enum';
@@ -15,6 +17,7 @@ export class UsersService {
   constructor(
     @InjectRepository(UsersRepository)
     private readonly usersRepository: UsersRepository,
+    private readonly achievementsService: AchievementsService,
   ) {}
 
   async getUsers(
@@ -47,6 +50,11 @@ export class UsersService {
       throw new NotFoundException([`User with ${name} not found`]);
     }
     return found;
+  }
+
+  async getAchievementsByUserName(name: string): Promise<Achievement[]> {
+    const user: User = await this.usersRepository.findOne({ name });
+    return this.achievementsService.getAchievements(user);
   }
 
   createUser(
