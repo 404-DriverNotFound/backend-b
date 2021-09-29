@@ -57,8 +57,8 @@ export class RoomManagerService {
     this.roomIds.set(socket0.id, roomId);
     this.roomIds.set(socket1.id, roomId);
     room.readyInit();
-    server.to(socket0.id).emit('ready', PlayerPosition.LEFT, CLIENT_SETTINGS);
-    server.to(socket1.id).emit('ready', PlayerPosition.RIGHT, CLIENT_SETTINGS);
+    server.to(socket0.id).emit('ready', PlayerPosition.LEFT, user1, user2, CLIENT_SETTINGS);
+    server.to(socket1.id).emit('ready', PlayerPosition.RIGHT, user2, user1 ,CLIENT_SETTINGS);
     console.log('Room Created :', roomId);
   }
 
