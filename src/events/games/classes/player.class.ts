@@ -26,11 +26,6 @@ export class Player extends Base {
     [KeyCode.DOWN]: false,
   };
 
-  mouse: {
-    move: { x: number; y: number };
-    click: { x: number; y: number };
-  } = { move: null, click: null };
-
   constructor(id: string, position: PlayerPosition) {
     super();
 
@@ -60,25 +55,9 @@ export class Player extends Base {
     ) {
       if (this.keypress[KeyCode.UP]) {
         this.moveUp();
-        this.mouse.click = null;
       }
       if (this.keypress[KeyCode.DOWN]) {
         this.moveDown();
-        this.mouse.click = null;
-      }
-      if (
-        this.mouse.click &&
-        ((this.mouse.click.x < this.x + 50 &&
-          this.mouse.click.x > this.x - 50) ||
-          this.mouse.click.x === null)
-      ) {
-        if (this.mouse.click.y < this.y - 5) {
-          this.moveUp();
-        } else if (this.mouse.click.y > this.y + 5) {
-          this.moveDown();
-        } else {
-          this.mouse.click = null;
-        }
       }
     }
   }

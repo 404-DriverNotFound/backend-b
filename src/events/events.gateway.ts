@@ -71,22 +71,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return this.eventsService.handlekeyUp(client, keyCode);
   }
 
-  @SubscribeMessage('mousemove')
-  handleMouseMove(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() mouse: any,
-  ): void {
-    return this.eventsService.handleMouseMove(client, mouse);
-  }
-
-  @SubscribeMessage('click')
-  handleClick(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() mouse: any,
-  ): void {
-    return this.eventsService.handleClick(client, mouse);
-  }
-
   @SubscribeMessage('leaveGame')
   handleLeaveGame(@ConnectedSocket() client: Socket): string {
     return this.eventsService.handleLeaveGame(this.server, client);

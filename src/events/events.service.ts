@@ -107,26 +107,6 @@ export class EventsService {
     }
   }
 
-  handleMouseMove(client: Socket, mouse: any): void {
-    const roomId: string = this.roomManagerService.roomIds.get(client.id);
-    if (roomId) {
-      this.roomManagerService.rooms.get(roomId).players.get(client.id).mouse.move = {
-        x: mouse[0],
-        y: mouse[1],
-      };
-    }
-  }
-
-  handleClick(client: Socket, mouse: any): void {
-    const roomId: string = this.roomManagerService.roomIds.get(client.id);
-    if (roomId) {
-      this.roomManagerService.rooms.get(roomId).players.get(client.id).mouse.click = {
-        x: mouse[0],
-        y: mouse[1],
-      };
-    }
-  }
-
   handleLeaveGame(server: Server, client: Socket): string {
     // TODO 소켓이 끊어지면 플레이어일때 게임 종료되는 로직 추가
     const roomId: string = this.roomManagerService.roomIds.get(client.id);
