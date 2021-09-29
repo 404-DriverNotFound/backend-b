@@ -28,7 +28,7 @@ import { UsersService } from './users.service';
 import { localOptions } from './constants/multer-options';
 import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-authenticated.guard';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
-import { Achievement } from 'src/achievements/entities/achievement.entity';
+import { Achievement } from 'src/users/entities/achievement.entity';
 
 @ApiTags('Users')
 @Controller('users')

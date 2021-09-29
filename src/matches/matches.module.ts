@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AchievementsService } from 'src/achievements/achievements.service';
-import { AchievementsRepository } from 'src/achievements/repositories/achievement.repository';
-import { UserAchievementsRepository } from 'src/achievements/repositories/user-achievement.repository';
+import { AchievementsRepository } from 'src/users/repositories/achievement.repository';
+import { UserAchievementsRepository } from 'src/users/repositories/user-achievement.repository';
 import { UsersRepository } from 'src/users/repositories/users.repository';
 import { UsersService } from 'src/users/users.service';
 import { MatchesController } from './matches.controller';
@@ -19,6 +18,6 @@ import { MatchesService } from './matches.service';
     ]),
   ],
   controllers: [MatchesController],
-  providers: [MatchesService, UsersService, AchievementsService],
+  providers: [MatchesService, UsersService],
 })
 export class MatchesModule {}

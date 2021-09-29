@@ -14,11 +14,9 @@ import { FriendshipsRepository } from './friendships/friendships.repository';
 import { UsersRepository } from './users/repositories/users.repository';
 import { UsersService } from './users/users.service';
 import { FriendshipsService } from './friendships/friendships.service';
-import { AchievementsModule } from './achievements/achievements.module';
 import { MatchesModule } from './matches/matches.module';
-import { AchievementsService } from './achievements/achievements.service';
-import { AchievementsRepository } from './achievements/repositories/achievement.repository';
-import { UserAchievementsRepository } from './achievements/repositories/user-achievement.repository';
+import { AchievementsRepository } from './users/repositories/achievement.repository';
+import { UserAchievementsRepository } from './users/repositories/user-achievement.repository';
 
 @Module({
   imports: [
@@ -49,7 +47,6 @@ import { UserAchievementsRepository } from './achievements/repositories/user-ach
     ]),
     AuthModule,
     UsersModule,
-    AchievementsModule,
     FriendshipsModule,
     MatchesModule,
     ChannelsModule,
@@ -57,11 +54,6 @@ import { UserAchievementsRepository } from './achievements/repositories/user-ach
     EventsModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    UsersService,
-    FriendshipsService,
-    AchievementsService,
-  ],
+  providers: [AppService, UsersService, FriendshipsService],
 })
 export class AppModule {}

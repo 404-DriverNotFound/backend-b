@@ -4,9 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersController } from './users.controller';
 import { UsersRepository } from './repositories/users.repository';
 import { UsersService } from './users.service';
-import { AchievementsService } from 'src/achievements/achievements.service';
-import { AchievementsRepository } from 'src/achievements/repositories/achievement.repository';
-import { UserAchievementsRepository } from 'src/achievements/repositories/user-achievement.repository';
+import { AchievementsRepository } from 'src/users/repositories/achievement.repository';
+import { UserAchievementsRepository } from './repositories/user-achievement.repository';
 
 @Module({
   imports: [
@@ -17,6 +16,6 @@ import { UserAchievementsRepository } from 'src/achievements/repositories/user-a
     ]),
   ],
   controllers: [UsersController],
-  providers: [UsersService, ConfigService, AchievementsService],
+  providers: [UsersService, ConfigService],
 })
 export class UsersModule {}

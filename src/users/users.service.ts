@@ -4,20 +4,26 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AchievementsService } from 'src/achievements/achievements.service';
-import { Achievement } from 'src/achievements/entities/achievement.entity';
+import { Achievement } from 'src/users/entities/achievement.entity';
 import { Channel } from 'src/channels/entities/channel.entity';
 import { Like } from 'typeorm';
 import { UserStatus } from './constants/user-status.enum';
 import { User } from './entities/user.entity';
 import { UsersRepository } from './repositories/users.repository';
+import { AchievementsRepository } from './repositories/achievement.repository';
+import { AchievementName } from './constants/achievement-name.enum';
+import { UserAchievement } from './entities/user-achievement.entity';
+import { UserAchievementsRepository } from './repositories/user-achievement.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UsersRepository)
     private readonly usersRepository: UsersRepository,
-    private readonly achievementsService: AchievementsService,
+    @InjectRepository(AchievementsRepository)
+    private readonly achievementsRepository: AchievementsRepository,
+    @InjectRepository(UserAchievementsRepository)
+    private readonly userAchievementsRepository: UserAchievementsRepository,
   ) {}
 
   async getUsers(
@@ -54,7 +60,7 @@ export class UsersService {
 
   async getAchievementsByUserName(name: string): Promise<Achievement[]> {
     const user: User = await this.usersRepository.findOne({ name });
-    return this.achievementsService.getAchievements(user);
+    return this.achievementsRepository.getAchievements(user);
   }
 
   createUser(
@@ -126,5 +132,21 @@ export class UsersService {
       perPage,
       page,
     );
+  }
+
+  async createUserAchievement(
+    user: User,
+    name: AchievementName,
+  ): Promise<UserAchievement> {
+    const achievement: Achievement = await this.achievementsRepository.findOne({
+      name,
+    });
+
+    const userAchievement: UserAchievement =
+      this.userAchievementsRepository.create({ user, achievement });
+
+    await this.userAchievementsRepository.save(userAchievement);
+
+    return userAchievement;
   }
 }
