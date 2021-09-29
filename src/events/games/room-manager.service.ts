@@ -95,32 +95,39 @@ export class RoomManagerService {
     const room: Room = this.rooms.get(roomId);
     let winner: User;
     let loser: User;
+    console.log('before loop');
+    const promises: Promise<void>[] = room.sockets.map(
+      async (socket: Socket) => {
+        // REVIEW 회원 접속상태 게임에서 온라인으로 바꿔야함.
+        const userId: string = socket.handshake.query.userId as string;
+        const user: User = await this.usersRepository.findOne(userId);
+        if (socket.id === winnerSocketId) {
+          winner = user;
+          await this.usersRepository.update(winner.id, {
+            status: UserStatus.ONLINE,
+            score: winner.score + 10,
+          });
+        } else {
+          loser = user;
+          await this.usersRepository.update(loser.id, {
+            status: UserStatus.ONLINE,
+            score: loser.score - 10,
+          });
+        }
+        const message: string =
+          socket.id === winnerSocketId ? 'YOU WIN!' : 'YOU LOSE!';
+        this.roomIds.delete(socket.id);
+        server.to(socket.id).emit('destroy', message);
+        socket.leave(roomId);
 
-    room.sockets.forEach(async (socket: Socket) => {
-      // REVIEW 회원 접속상태 게임에서 온라인으로 바꿔야함.
-      const userId: string = socket.handshake.query.userId as string;
-      const user: User = await this.usersRepository.findOne(userId);
-      if (socket.id === winnerSocketId) {
-        winner = user;
-        await this.usersRepository.update(winner.id, {
-          status: UserStatus.ONLINE,
-          score: winner.score + 10,
-        });
-      } else {
-        loser = user;
-        await this.usersRepository.update(loser.id, {
-          status: UserStatus.ONLINE,
-          score: loser.score - 10,
-        });
-      }
-      const message: string =
-        socket.id === winnerSocketId ? 'YOU WIN!' : 'YOU LOSE!';
-      this.roomIds.delete(socket.id);
-      server.to(socket.id).emit('destroy', message);
-      socket.leave(roomId);
-    });
-
+        console.log('in loop ', socket.id, userId);
+      },
+    );
+    await Promise.all(promises);
+    console.log('after loop');
     this.rooms.delete(roomId);
+    console.log('winner name: ', winner?.name);
+    console.log('loser name: ', loser?.name);
     await this.matchesRepository.update(roomId, {
       status: MatchStatus.DONE,
       winner,
