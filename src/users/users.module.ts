@@ -4,12 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersController } from './users.controller';
 import { UsersRepository } from './repositories/users.repository';
 import { UsersService } from './users.service';
-import { AchievementsRepository } from './repositories/achievement.repository';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([UsersRepository, AchievementsRepository]),
-  ],
+  imports: [TypeOrmModule.forFeature([UsersRepository])],
   controllers: [UsersController],
   providers: [UsersService, ConfigService],
   exports: [UsersService],

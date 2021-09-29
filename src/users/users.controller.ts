@@ -25,7 +25,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { GetUser } from './get-user.decorator';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
-import { localOptions } from './constants/local-options.constant';
+import { localOptions } from './constants/multer-options';
 import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-authenticated.guard';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 
@@ -44,7 +44,7 @@ export class UsersController {
   getUsers(
     @Query() { search, perPage, page }: GetUsersFilterDto,
   ): Promise<User[]> {
-    return this.usersService.getUsers(search, +perPage, +page);
+    return this.usersService.getUsers(search, perPage, page);
   }
 
   @ApiCookieAuth()
@@ -78,7 +78,7 @@ export class UsersController {
     @GetUser() user: User,
     @Param('name') name: string,
   ): Promise<User> {
-    return this.usersService.getUserByName(/*user, */ name);
+    return this.usersService.getUserByName(name);
   }
 
   @ApiOperation({ summary: '유저를 생성합니다.' })

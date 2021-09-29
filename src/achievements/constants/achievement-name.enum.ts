@@ -1,0 +1,7 @@
+export enum AchievementName {
+  FIRST_GAME = 'FIRST_GAME',
+  FIRST_WIN = 'FIRST_WIN',
+  FIRST_LOSE = 'FIRST_LOSE',
+  FIRST_FRIEND = 'FIRST_FRIEND',
+  FIRST_BLOCK = 'FIRST_BLOCK',
+}

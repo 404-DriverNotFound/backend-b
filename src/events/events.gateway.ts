@@ -11,8 +11,8 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Channel } from 'src/channels/entities/channel.entity';
 import { ChannelsRepository } from 'src/channels/repositories/channels.repository';
-import { UserStatus } from 'src/users/constants/user-status.enum';
 import { User } from 'src/users/entities/user.entity';
+import { UserStatus } from 'src/users/constants/user-status.enum';
 import { UsersRepository } from 'src/users/repositories/users.repository';
 
 @WebSocketGateway()

@@ -6,6 +6,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AchievementsService } from 'src/achievements/achievements.service';
+import { AchievementName } from 'src/achievements/constants/achievement-name.enum';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { FriendshipRole } from './friendship-role.enum';
@@ -19,6 +21,7 @@ export class FriendshipsService {
     @InjectRepository(FriendshipsRepository)
     private readonly friendshipsRepository: FriendshipsRepository,
     private readonly usersService: UsersService,
+    private readonly achievementsService: AchievementsService,
   ) {}
 
   async createFriendship(
@@ -148,6 +151,17 @@ export class FriendshipsService {
       ]);
     }
 
+    if (friendship.status === FriendshipStatus.ACCEPTED) {
+      await this.achievementsService.createUserAchievement(
+        requester,
+        AchievementName.FIRST_FRIEND,
+      );
+      await this.achievementsService.createUserAchievement(
+        addressee,
+        AchievementName.FIRST_FRIEND,
+      );
+    }
+
     return friendship;
   }
 
@@ -266,7 +280,7 @@ export class FriendshipsService {
     return users;
   }
 
-  async createBlack(
+  async createBlock(
     requester: User,
     addresseeName: string,
   ): Promise<Friendship> {
@@ -277,10 +291,21 @@ export class FriendshipsService {
     const addressee: User = await this.usersService.getUserByName(
       addresseeName,
     );
-    return this.friendshipsRepository.createBlack(requester, addressee);
+
+    const friendship: Friendship = await this.friendshipsRepository.createBlock(
+      requester,
+      addressee,
+    );
+
+    await this.achievementsService.createUserAchievement(
+      requester,
+      AchievementName.FIRST_BLOCK,
+    );
+
+    return friendship;
   }
 
-  async deleteBlack(requester: User, addresseeName: string): Promise<void> {
+  async deleteBlock(requester: User, addresseeName: string): Promise<void> {
     if (addresseeName === requester.name) {
       throw new ConflictException(['Cannot unblock yourself']);
     }

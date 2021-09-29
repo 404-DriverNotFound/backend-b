@@ -83,7 +83,7 @@ export class FriendshipsRepository extends Repository<Friendship> {
     return friendship;
   }
 
-  async createBlack(requester: User, addressee: User): Promise<Friendship> {
+  async createBlock(requester: User, addressee: User): Promise<Friendship> {
     const friendship: Friendship = this.create({
       requester,
       addressee,
@@ -94,7 +94,7 @@ export class FriendshipsRepository extends Repository<Friendship> {
       await this.save(friendship);
     } catch (error) {
       throw new InternalServerErrorException([
-        'Someting wrong while saving a friendship data in createBlack.',
+        'Someting wrong while saving a friendship data in createBlock.',
       ]);
     }
 

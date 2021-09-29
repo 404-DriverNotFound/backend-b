@@ -7,12 +7,9 @@ import { AuthController } from './auth.controller';
 import { SessionSerializer } from './session.serializer';
 import { FtStrategy } from './strategies/ft.strategy';
 import { AuthService } from './auth.service';
-//import { FriendshipsRepository } from 'src/friendships/friendships.repository';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([UsersRepository /*, FriendshipsRepository*/]),
-  ],
+  imports: [TypeOrmModule.forFeature([UsersRepository])],
   controllers: [AuthController],
   providers: [
     ConfigService,

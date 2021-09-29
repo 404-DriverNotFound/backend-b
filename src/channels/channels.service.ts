@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from './entities/channel.entity';
 import { ChannelsRepository } from './repositories/channels.repository';
 import * as bcrypt from 'bcrypt';
+import { User } from 'src/users/entities/user.entity';
 import { Like, MoreThan } from 'typeorm';
 import { Membership } from './entities/membership.entity';
 import { MembershipsRepository } from './repositories/memberships.repository';
@@ -18,7 +19,6 @@ import { MembershipRole } from './membership-role.enum';
 import { Chat } from './entities/chat.entity';
 import { ChatsRepository } from './repositories/chats.repository';
 import { EventsGateway } from 'src/events/events.gateway';
-import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class ChannelsService {

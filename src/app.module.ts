@@ -14,6 +14,7 @@ import { FriendshipsRepository } from './friendships/friendships.repository';
 import { UsersRepository } from './users/repositories/users.repository';
 import { UsersService } from './users/users.service';
 import { FriendshipsService } from './friendships/friendships.service';
+import { AchievementsModule } from './achievements/achievements.module';
 import { MatchesModule } from './matches/matches.module';
 
 @Module({
@@ -21,6 +22,7 @@ import { MatchesModule } from './matches/matches.module';
     ConfigModule.forRoot({
       envFilePath: [`.env.stage.${process.env.STAGE}`],
       validationSchema: configValidationSchema,
+      isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -39,6 +41,7 @@ import { MatchesModule } from './matches/matches.module';
     TypeOrmModule.forFeature([FriendshipsRepository, UsersRepository]),
     AuthModule,
     UsersModule,
+    AchievementsModule,
     FriendshipsModule,
     MatchesModule,
     ChannelsModule,
