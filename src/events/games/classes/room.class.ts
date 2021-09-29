@@ -90,7 +90,7 @@ export class Room {
   readyInit(): void {
     this.status = GameStatus.READY;
     this.loop = this.readyLoop;
-    this.countdown = new Countdown(10);
+    this.countdown = new Countdown(30);
     this.countdown.action = () => {
       delete this.countdown;
       this.roomManagerService.destroyRoom(this.server, this.id);

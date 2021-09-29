@@ -1,5 +1,5 @@
 export class Countdown {
-  count = 10;
+  count = 30;
 
   left = 0;
 
