@@ -1,10 +1,12 @@
 import { MatchType } from '../constants/match-type.enum';
 import { MatchStatus } from '../constants/match-status.enum';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsEnum, IsOptional } from 'class-validator';
-import { PaginationMatchFilterDto } from './pagination-match-filter.dto';
+import { PaginationFilterDto } from 'src/channels/dto/pagination-filter.dto';
 
-export class GetMatchesFilterDto extends PaginationMatchFilterDto {
+export class GetMatchesFilterDto extends OmitType(PaginationFilterDto, [
+  'search',
+] as const) {
   @ApiProperty({
     example: MatchType.LADDER,
     required: false,

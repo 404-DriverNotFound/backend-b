@@ -72,12 +72,12 @@ export class UsersService {
     page?: number,
   ): Promise<Match[]> {
     const user: User = await this.usersRepository.findOne({ name });
-    return this.matchesRepository.getMatchesByUserName(
-      user,
+    return this.matchesRepository.getMatchesByUser(
       type,
       status,
       perPage,
       page,
+      user,
     );
   }
 

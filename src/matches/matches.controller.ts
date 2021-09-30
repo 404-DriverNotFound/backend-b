@@ -7,7 +7,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-authenticated.guard';
-import { GetSpectatingFilterDto } from './dto/get-spectating-filter.dto';
+import { GetMatchesFilterDto } from './dto/get-matches-filter.dto';
 import { Match } from './match.entity';
 import { MatchesService } from './matches.service';
 
@@ -22,9 +22,9 @@ export class MatchesController {
   @ApiOperation({ summary: '모든 매치 정보를 가져옵니다.' })
   @ApiResponse({ status: 200, description: '성공' })
   @Get()
-  getSpectatingMatches(
-    @Query() { type, perPage, page }: GetSpectatingFilterDto,
+  getMatches(
+    @Query() { type, status, perPage, page }: GetMatchesFilterDto,
   ): Promise<Match[]> {
-    return this.matchesService.getSpectatingMatches(type, perPage, page);
+    return this.matchesService.getMatches(type, status, perPage, page);
   }
 }
