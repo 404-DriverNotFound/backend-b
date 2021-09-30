@@ -2,14 +2,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { seeder } from 'nestjs-seeder';
 import { configValidationSchema } from './config.schema';
-import { AchievementsSeeder } from './achievements/achievements.seeder';
-import { AchievementsRepository } from './achievements/repositories/achievement.repository';
-import { UserAchievementsRepository } from './achievements/repositories/user-achievement.repository';
+import { AchievementsSeeder } from './seeders/achievements.seeder';
+import { AchievementsRepository } from './users/repositories/achievement.repository';
 import { UsersRepository } from './users/repositories/users.repository';
 import { MembershipsRepository } from './channels/repositories/memberships.repository';
 import { ChannelsRepository } from './channels/repositories/channels.repository';
 import { ChatsRepository } from './channels/repositories/chats.repository';
 import { DmsRepository } from './dms/dms.repository';
+import { UserAchievementsRepository } from './users/repositories/user-achievement.repository';
 
 seeder({
   imports: [
