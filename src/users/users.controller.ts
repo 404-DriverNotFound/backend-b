@@ -28,6 +28,7 @@ import { UsersService } from './users.service';
 import { localOptions } from './constants/multer-options';
 import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-authenticated.guard';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
+import { Achievement } from 'src/users/entities/achievement.entity';
 
 @ApiTags('Users')
 @Controller('users')
@@ -44,7 +45,7 @@ export class UsersController {
   getUsers(
     @Query() { search, perPage, page }: GetUsersFilterDto,
   ): Promise<User[]> {
-    return this.usersService.getUsers(search, +perPage, +page);
+    return this.usersService.getUsers(search, perPage, page);
   }
 
   @ApiCookieAuth()
@@ -63,7 +64,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: '유저 없음' })
   @Head(':name')
   isDuplicated(@Param('name') name: string): Promise<User> {
-    return this.usersService.isDuplicated(name);
+    return this.usersService.getUserByName(name);
   }
 
   @ApiCookieAuth()
@@ -74,11 +75,22 @@ export class UsersController {
   @Get(':name')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
-  getUserByName(
-    @GetUser() user: User,
+  getUserByName(@Param('name') name: string): Promise<User> {
+    return this.usersService.getUserByName(name);
+  }
+
+  @ApiCookieAuth()
+  @ApiOperation({ summary: '닉네임으로 유저의 업적 목록을 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 403, description: '세션 인증 실패' })
+  @ApiResponse({ status: 404, description: '유저 없음' })
+  @Get(':name/achievements')
+  @UseGuards(AuthenticatedGuard)
+  @UseGuards(SecondFactorAuthenticatedGuard)
+  getAchievementsByUserName(
     @Param('name') name: string,
-  ): Promise<User> {
-    return this.usersService.getUserByName(/*user, */ name);
+  ): Promise<Achievement[]> {
+    return this.usersService.getAchievementsByUserName(name);
   }
 
   @ApiOperation({ summary: '유저를 생성합니다.' })

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import {
   ApiCookieAuth,
   ApiOperation,
@@ -9,12 +9,11 @@ import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-authenticated.guard';
 import { GetUser } from 'src/users/get-user.decorator';
 import { User } from 'src/users/entities/user.entity';
-import { CreateMatchDto } from './dto/create-match.dto';
-import { GetMatchesFilterDto } from './dto/get-matches-filter.dto';
 import { GetSpectatingFilterDto } from './dto/get-spectating-filter.dto';
 import { Match } from './match.entity';
 import { MatchesService } from './matches.service';
 import { PaginationMatchFilterDto } from './dto/pagination-match-filter.dto';
+import { GetMatchesInfoFilterDto } from './dto/get-matches-info-filter.dto';
 
 @ApiCookieAuth()
 @ApiTags('Matches')
@@ -47,18 +46,24 @@ export class MatchesController {
   @Get('me')
   getMyMatches(
     @GetUser() user: User,
-    @Query() { status, type, perPage, page }: GetMatchesFilterDto,
+    @Query() { status, type, perPage, page }: GetMatchesInfoFilterDto,
   ): Promise<Match[]> {
     return this.matchesService.getMyMatches(user, status, type, perPage, page);
   }
 
-  @ApiOperation({ summary: '매치를 추가합니다.' })
-  @ApiResponse({ status: 201, description: '성공' })
-  @Post()
-  createMatch(
-    @GetUser() user: User,
-    @Body() { name, type, mode }: CreateMatchDto,
-  ): Promise<Match> {
-    return this.matchesService.createMatch(user, name, type, mode);
+  @ApiOperation({ summary: '특정 유저의 모든 매치 정보를 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @Get(':name')
+  getUserMatches(
+    @Param('name') name: string,
+    @Query() { type, status, perPage, page }: GetMatchesInfoFilterDto,
+  ): Promise<Match[]> {
+    return this.matchesService.getUserMatches(
+      name,
+      type,
+      status,
+      perPage,
+      page,
+    );
   }
 }

@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { UsersService } from 'src/users/users.service';
 import { MatchStatus } from './constants/match-status.enum';
 import { MatchType } from './constants/match-type.enum';
 import { Match } from './match.entity';
 import { MatchesRepository } from './matches.repository';
-import { MatchGameMode } from './constants/match-game-mode.enum';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class MatchesService {
@@ -27,6 +26,7 @@ export class MatchesService {
   ): Promise<Match[]> {
     return this.matchesRepository.getSpectatingMatches(type, perPage, page);
   }
+
   getMyMatches(
     user: User,
     status?: MatchStatus,
@@ -34,29 +34,29 @@ export class MatchesService {
     perPage?: number,
     page?: number,
   ): Promise<Match[]> {
-    return this.matchesRepository.getMyMatches(
+    return this.matchesRepository.getUserMatches(
       user,
-      status,
       type,
+      status,
       perPage,
       page,
     );
   }
 
-  async createMatch(
-    user1: User,
+  async getUserMatches(
     name: string,
-    type: MatchType,
-    mode: MatchGameMode,
-  ): Promise<Match> {
-    const user2: User = await this.usersService.getUserByName(name);
-    const match: Match = this.matchesRepository.create({
-      user1,
-      user2,
+    type?: MatchType,
+    status?: MatchStatus,
+    perPage?: number,
+    page?: number,
+  ): Promise<Match[]> {
+    const user = await this.usersService.getUserByName(name);
+    return this.matchesRepository.getUserMatches(
+      user,
       type,
-      mode,
-    });
-    await this.matchesRepository.save(match);
-    return match;
+      status,
+      perPage,
+      page,
+    );
   }
 }
