@@ -7,8 +7,6 @@ import {
 } from '@nestjs/swagger';
 import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-authenticated.guard';
-import { GetUser } from 'src/users/get-user.decorator';
-import { User } from 'src/users/entities/user.entity';
 import { GetSpectatingFilterDto } from './dto/get-spectating-filter.dto';
 import { Match } from './match.entity';
 import { MatchesService } from './matches.service';
@@ -29,16 +27,6 @@ export class MatchesController {
     @Query() { type, perPage, page }: GetSpectatingFilterDto,
   ): Promise<Match[]> {
     return this.matchesService.getSpectatingMatches(type, perPage, page);
-  }
-
-  @ApiOperation({ summary: '나의 모든 매치 정보를 가져옵니다.' })
-  @ApiResponse({ status: 200, description: '성공' })
-  @Get('me')
-  getMyMatches(
-    @GetUser() user: User,
-    @Query() { status, type, perPage, page }: GetMatchesInfoFilterDto,
-  ): Promise<Match[]> {
-    return this.matchesService.getMyMatches(user, status, type, perPage, page);
   }
 
   @ApiOperation({ summary: '특정 유저의 모든 매치 정보를 가져옵니다.' })
