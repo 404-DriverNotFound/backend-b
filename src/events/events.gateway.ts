@@ -51,8 +51,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() { type, mode }: OnMatchTypeModeDto,
   ): void {
-    console.log(`<=====${type}, ${mode} =====>`);
-    return this.eventsService.handleWaiting(this.server, client);
+    return this.eventsService.handleWaiting(this.server, client, type, mode);
   }
 
   @SubscribeMessage('ready')
