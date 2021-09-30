@@ -85,7 +85,8 @@ export class EventsService {
     type: MatchType,
     mode: MatchGameMode,
   ): void {
-    const set = this.lobbyManagerService.queue(client, type, mode);
+    const set = this.lobbyManagerService.queue(type, mode);
+    set.add(client);
     this.lobbyManagerService.dispatch(server, set, type, mode); // FIXME roommanager
   }
 
@@ -114,13 +115,18 @@ export class EventsService {
     }
   }
 
-  handleLeaveGame(server: Server, client: Socket): string {
+  handleLeaveGame(
+    server: Server,
+    client: Socket,
+    type: MatchType,
+    mode: MatchGameMode,
+  ): string {
     // TODO 소켓이 끊어지면 플레이어일때 게임 종료되는 로직 추가
     const roomId: string = this.roomManagerService.roomIds.get(client.id);
     if (roomId) {
       this.roomManagerService.destroyRoom(server, roomId);
     }
-    this.lobbyManagerService.lobby.delete(client);
+    this.lobbyManagerService.queue(type, mode).delete(client);
     return 'You leave the game.';
   }
 }
