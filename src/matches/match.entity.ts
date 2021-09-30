@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -28,6 +29,7 @@ export class Match {
   loser: User;
 
   @CreateDateColumn()
+  @Index()
   createdAt: Date;
 
   @Column({ type: 'enum', enum: MatchStatus, default: MatchStatus.IN_PROGRESS })

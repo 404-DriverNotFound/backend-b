@@ -70,6 +70,8 @@ export class MatchesRepository extends Repository<Match> {
       qb.skip(perPage * (page - 1));
     }
 
+    qb.orderBy('match.createdAt', 'DESC');
+
     return qb.getMany();
   }
 }
