@@ -8,6 +8,8 @@ import { UsersService } from 'src/users/users.service';
 import { ChatsRepository } from './repositories/chats.repository';
 import { EventsModule } from 'src/events/events.module';
 import { UsersRepository } from 'src/users/repositories/users.repository';
+import { AchievementsRepository } from 'src/users/repositories/achievement.repository';
+import { UserAchievementsRepository } from 'src/users/repositories/user-achievement.repository';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { UsersRepository } from 'src/users/repositories/users.repository';
       MembershipsRepository,
       UsersRepository,
       ChatsRepository,
+      AchievementsRepository,
+      UserAchievementsRepository,
     ]),
     EventsModule,
   ],

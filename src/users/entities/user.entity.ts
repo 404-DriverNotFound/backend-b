@@ -1,5 +1,4 @@
 import { Exclude, Transform } from 'class-transformer';
-import { UserAchievement } from 'src/achievements/entities/user-achievement.entity';
 import { Chat } from 'src/channels/entities/chat.entity';
 import { Membership } from 'src/channels/entities/membership.entity';
 import { Dm } from 'src/dms/dm.entity';
@@ -11,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserStatus } from '../constants/user-status.enum';
+import { UserAchievement } from './user-achievement.entity';
 
 @Entity()
 export class User {
