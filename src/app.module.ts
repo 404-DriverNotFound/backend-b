@@ -52,6 +52,7 @@ import { UserAchievementsRepository } from './users/repositories/user-achievemen
     ChannelsModule,
     DmsModule,
     EventsModule,
+    //GamesModule,
   ],
   controllers: [AppController],
   providers: [AppService, UsersService, FriendshipsService],
