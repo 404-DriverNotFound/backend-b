@@ -70,19 +70,23 @@ export class RoomManagerService {
   async destroyRoom(server: Server, roomId: string): Promise<void> {
     const room: Room = this.rooms.get(roomId);
 
-    room.sockets.forEach(async (socket: Socket) => {
-      const message: string =
-        !room.players.get(socket.id).ready && !room.countdown
-          ? 'YOU ARE NOT PREPARED'
-          : null;
-      this.roomIds.delete(socket.id);
-      server.to(socket.id).emit('destroy', message);
-      socket.leave(roomId);
-      // REVIEW 회원 접속상태 게임에서 온라인으로 바꿔야함.
-      const userId: string = socket.handshake.query.userId as string;
-      await this.usersRepository.update(userId, { status: UserStatus.ONLINE });
-    });
-
+    const promises: Promise<void>[] = room.sockets.map(
+      async (socket: Socket) => {
+        // REVIEW 회원 접속상태 게임에서 온라인으로 바꿔야함.
+        const userId: string = socket.handshake.query.userId as string;
+        await this.usersRepository.update(userId, {
+          status: UserStatus.ONLINE,
+        });
+        const message: string =
+          !room.players.get(socket.id).ready && !room.countdown
+            ? 'YOU ARE NOT PREPARED'
+            : null;
+        this.roomIds.delete(socket.id);
+        server.to(socket.id).emit('destroy', message);
+        socket.leave(roomId);
+      },
+    );
+    await Promise.all(promises);
     this.rooms.delete(roomId);
     await this.matchesRepository.delete(roomId);
   }
