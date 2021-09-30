@@ -18,8 +18,8 @@ import { GetMatchesInfoFilterDto } from './dto/get-matches-info-filter.dto';
 @ApiCookieAuth()
 @ApiTags('Matches')
 @Controller('matches')
-// @UseGuards(AuthenticatedGuard)
-// @UseGuards(SecondFactorAuthenticatedGuard)
+@UseGuards(AuthenticatedGuard)
+@UseGuards(SecondFactorAuthenticatedGuard)
 export class MatchesController {
   constructor(private readonly matchesService: MatchesService) {}
 
