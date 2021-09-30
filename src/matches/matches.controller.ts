@@ -12,7 +12,6 @@ import { User } from 'src/users/entities/user.entity';
 import { GetSpectatingFilterDto } from './dto/get-spectating-filter.dto';
 import { Match } from './match.entity';
 import { MatchesService } from './matches.service';
-import { PaginationMatchFilterDto } from './dto/pagination-match-filter.dto';
 import { GetMatchesInfoFilterDto } from './dto/get-matches-info-filter.dto';
 
 @ApiCookieAuth()
@@ -22,15 +21,6 @@ import { GetMatchesInfoFilterDto } from './dto/get-matches-info-filter.dto';
 @UseGuards(SecondFactorAuthenticatedGuard)
 export class MatchesController {
   constructor(private readonly matchesService: MatchesService) {}
-
-  @ApiOperation({ summary: '모든 매치 정보를 가져옵니다.' })
-  @ApiResponse({ status: 200, description: '성공' })
-  @Get()
-  getMatches(
-    @Query() { perPage, page }: PaginationMatchFilterDto,
-  ): Promise<Match[]> {
-    return this.matchesService.getMatches(perPage, page);
-  }
 
   @ApiOperation({ summary: '관전 가능한 모든 매치 정보를 가져옵니다.' })
   @ApiResponse({ status: 200, description: '성공' })

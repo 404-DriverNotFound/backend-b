@@ -15,10 +15,6 @@ export class MatchesService {
     private readonly usersService: UsersService,
   ) {}
 
-  getMatches(perPage?: number, page?: number): Promise<Match[]> {
-    return this.matchesRepository.getMatches(perPage, page);
-  }
-
   getSpectatingMatches(
     type?: MatchType,
     perPage?: number,

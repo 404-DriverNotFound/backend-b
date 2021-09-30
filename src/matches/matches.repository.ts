@@ -6,14 +6,6 @@ import { Match } from './match.entity';
 
 @EntityRepository(Match)
 export class MatchesRepository extends Repository<Match> {
-  async getMatches(perPage?: number, page?: number): Promise<Match[]> {
-    return await this.find({
-      skip: (page - 1) * perPage,
-      take: perPage,
-      relations: ['user1', 'user2', 'winner', 'loser'],
-    });
-  }
-
   async getSpectatingMatches(
     type?: MatchType,
     perPage?: number,
