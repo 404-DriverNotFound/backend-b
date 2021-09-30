@@ -80,7 +80,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() { type, mode }: OnMatchTypeModeDto,
   ): string {
-    console.log(`<======gateway : ${type}, ${mode}==========>`);
     return this.eventsService.handleLeaveGame(this.server, client, type, mode);
   }
 }
