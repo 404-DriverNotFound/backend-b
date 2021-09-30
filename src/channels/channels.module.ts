@@ -10,6 +10,7 @@ import { EventsModule } from 'src/events/events.module';
 import { UsersRepository } from 'src/users/repositories/users.repository';
 import { AchievementsRepository } from 'src/users/repositories/achievement.repository';
 import { UserAchievementsRepository } from 'src/users/repositories/user-achievement.repository';
+import { MatchesRepository } from 'src/matches/matches.repository';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserAchievementsRepository } from 'src/users/repositories/user-achievem
       MembershipsRepository,
       UsersRepository,
       ChatsRepository,
+      MatchesRepository,
       AchievementsRepository,
       UserAchievementsRepository,
     ]),

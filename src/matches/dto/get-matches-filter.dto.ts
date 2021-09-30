@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional } from 'class-validator';
 import { PaginationMatchFilterDto } from './pagination-match-filter.dto';
 
-export class GetMatchesInfoFilterDto extends PaginationMatchFilterDto {
+export class GetMatchesFilterDto extends PaginationMatchFilterDto {
   @ApiProperty({
     example: MatchType.LADDER,
     required: false,

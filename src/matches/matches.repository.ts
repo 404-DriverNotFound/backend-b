@@ -32,26 +32,24 @@ export class MatchesRepository extends Repository<Match> {
     return qb.getMany();
   }
 
-  async getUserMatches(
+  async getMatchesByUserName(
     user: User,
     type?: MatchType,
     status?: MatchStatus,
     perPage?: number,
     page?: number,
   ): Promise<Match[]> {
-    const qb = this.createQueryBuilder('match');
-
-    qb.leftJoinAndSelect('match.user1', 'user1');
-    qb.leftJoinAndSelect('match.user2', 'user2');
-    qb.leftJoinAndSelect('match.winner', 'winner');
-    qb.leftJoinAndSelect('match.loser', 'loser');
-
-    qb.where(
-      new Brackets((qb) => {
-        qb.where('match.user1Id = :id', { id: user.id });
-        qb.orWhere('match.user2Id = :id', { id: user.id });
-      }),
-    );
+    const qb = this.createQueryBuilder('match')
+      .leftJoinAndSelect('match.user1', 'user1')
+      .leftJoinAndSelect('match.user2', 'user2')
+      .leftJoinAndSelect('match.winner', 'winner')
+      .leftJoinAndSelect('match.loser', 'loser')
+      .where(
+        new Brackets((qb) => {
+          qb.where('match.user1Id = :id', { id: user.id });
+          qb.orWhere('match.user2Id = :id', { id: user.id });
+        }),
+      );
 
     if (status) {
       qb.andWhere('match.status = :status', { status });

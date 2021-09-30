@@ -6,11 +6,13 @@ import { UsersRepository } from './repositories/users.repository';
 import { UsersService } from './users.service';
 import { AchievementsRepository } from 'src/users/repositories/achievement.repository';
 import { UserAchievementsRepository } from './repositories/user-achievement.repository';
+import { MatchesRepository } from 'src/matches/matches.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       UsersRepository,
+      MatchesRepository,
       AchievementsRepository,
       UserAchievementsRepository,
     ]),

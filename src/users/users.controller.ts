@@ -29,6 +29,8 @@ import { localOptions } from './constants/multer-options';
 import { SecondFactorAuthenticatedGuard } from 'src/auth/guards/second-factor-authenticated.guard';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 import { Achievement } from 'src/users/entities/achievement.entity';
+import { Match } from 'src/matches/match.entity';
+import { GetMatchesFilterDto } from 'src/matches/dto/get-matches-filter.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -77,6 +79,27 @@ export class UsersController {
   @UseGuards(SecondFactorAuthenticatedGuard)
   getUserByName(@Param('name') name: string): Promise<User> {
     return this.usersService.getUserByName(name);
+  }
+
+  @ApiCookieAuth()
+  @ApiOperation({ summary: '닉네임으로 유저의 매치 정보를 가져옵니다.' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 403, description: '세션 인증 실패' })
+  @ApiResponse({ status: 404, description: '유저 없음' })
+  @Get(':name/matches')
+  @UseGuards(AuthenticatedGuard)
+  @UseGuards(SecondFactorAuthenticatedGuard)
+  getMatchesByUserName(
+    @Param('name') name: string,
+    @Query() { type, status, perPage, page }: GetMatchesFilterDto,
+  ): Promise<Match[]> {
+    return this.usersService.getMatchesByUserName(
+      name,
+      type,
+      status,
+      perPage,
+      page,
+    );
   }
 
   @ApiCookieAuth()

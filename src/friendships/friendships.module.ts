@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MatchesRepository } from 'src/matches/matches.repository';
 import { AchievementsRepository } from 'src/users/repositories/achievement.repository';
 import { UserAchievementsRepository } from 'src/users/repositories/user-achievement.repository';
 import { UsersRepository } from 'src/users/repositories/users.repository';
@@ -13,6 +14,7 @@ import { FriendshipsService } from './friendships.service';
     TypeOrmModule.forFeature([
       FriendshipsRepository,
       UsersRepository,
+      MatchesRepository,
       AchievementsRepository,
       UserAchievementsRepository,
     ]),

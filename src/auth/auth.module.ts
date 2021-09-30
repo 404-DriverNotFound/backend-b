@@ -9,11 +9,13 @@ import { FtStrategy } from './strategies/ft.strategy';
 import { AuthService } from './auth.service';
 import { AchievementsRepository } from 'src/users/repositories/achievement.repository';
 import { UserAchievementsRepository } from 'src/users/repositories/user-achievement.repository';
+import { MatchesRepository } from 'src/matches/matches.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       UsersRepository,
+      MatchesRepository,
       AchievementsRepository,
       UserAchievementsRepository,
     ]),

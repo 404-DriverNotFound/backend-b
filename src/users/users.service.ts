@@ -14,12 +14,18 @@ import { AchievementsRepository } from './repositories/achievement.repository';
 import { AchievementName } from './constants/achievement-name.enum';
 import { UserAchievement } from './entities/user-achievement.entity';
 import { UserAchievementsRepository } from './repositories/user-achievement.repository';
+import { Match } from 'src/matches/match.entity';
+import { MatchType } from 'src/matches/constants/match-type.enum';
+import { MatchStatus } from 'src/matches/constants/match-status.enum';
+import { MatchesRepository } from 'src/matches/matches.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UsersRepository)
     private readonly usersRepository: UsersRepository,
+    @InjectRepository(MatchesRepository)
+    private readonly matchesRepository: MatchesRepository,
     @InjectRepository(AchievementsRepository)
     private readonly achievementsRepository: AchievementsRepository,
     @InjectRepository(UserAchievementsRepository)
@@ -56,6 +62,23 @@ export class UsersService {
       throw new NotFoundException([`User with ${name} not found`]);
     }
     return found;
+  }
+
+  async getMatchesByUserName(
+    name: string,
+    type?: MatchType,
+    status?: MatchStatus,
+    perPage?: number,
+    page?: number,
+  ): Promise<Match[]> {
+    const user: User = await this.usersRepository.findOne({ name });
+    return this.matchesRepository.getMatchesByUserName(
+      user,
+      type,
+      status,
+      perPage,
+      page,
+    );
   }
 
   async getAchievementsByUserName(name: string): Promise<Achievement[]> {
