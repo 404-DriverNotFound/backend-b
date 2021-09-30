@@ -10,6 +10,7 @@ import { DmsController } from './dms.controller';
 import { DmsRepository } from './dms.repository';
 import { DmsService } from './dms.service';
 import { UserAchievementsRepository } from 'src/users/repositories/user-achievement.repository';
+import { MatchesRepository } from 'src/matches/matches.repository';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserAchievementsRepository } from 'src/users/repositories/user-achievem
       DmsRepository,
       UsersRepository,
       FriendshipsRepository,
+      MatchesRepository,
       AchievementsRepository,
       UserAchievementsRepository,
     ]),

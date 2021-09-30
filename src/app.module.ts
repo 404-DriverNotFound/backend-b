@@ -17,6 +17,7 @@ import { FriendshipsService } from './friendships/friendships.service';
 import { MatchesModule } from './matches/matches.module';
 import { AchievementsRepository } from './users/repositories/achievement.repository';
 import { UserAchievementsRepository } from './users/repositories/user-achievement.repository';
+import { MatchesRepository } from './matches/matches.repository';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { UserAchievementsRepository } from './users/repositories/user-achievemen
     TypeOrmModule.forFeature([
       FriendshipsRepository,
       UsersRepository,
+      MatchesRepository,
       AchievementsRepository,
       UserAchievementsRepository,
     ]),
@@ -52,7 +54,6 @@ import { UserAchievementsRepository } from './users/repositories/user-achievemen
     ChannelsModule,
     DmsModule,
     EventsModule,
-    //GamesModule,
   ],
   controllers: [AppController],
   providers: [AppService, UsersService, FriendshipsService],
