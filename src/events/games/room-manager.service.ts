@@ -110,12 +110,14 @@ export class RoomManagerService {
           await this.usersRepository.update(winner.id, {
             status: UserStatus.ONLINE,
             score: winner.score + 10,
+            win: winner.win + 1,
           });
         } else {
           loser = user;
           await this.usersRepository.update(loser.id, {
             status: UserStatus.ONLINE,
             score: loser.score - 10,
+            lose: loser.lose + 1,
           });
         }
         const message: string =
