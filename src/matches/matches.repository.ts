@@ -6,32 +6,6 @@ import { Match } from './match.entity';
 
 @EntityRepository(Match)
 export class MatchesRepository extends Repository<Match> {
-  async getSpectatingMatches(
-    type?: MatchType,
-    perPage?: number,
-    page?: number,
-  ): Promise<Match[]> {
-    const qb = this.createQueryBuilder('match');
-
-    qb.leftJoinAndSelect('match.user1', 'user1');
-    qb.leftJoinAndSelect('match.user2', 'user2');
-    qb.where('match.status = :status', { status: MatchStatus.IN_PROGRESS });
-
-    if (type) {
-      qb.andWhere('match.type = :type', { type });
-    }
-
-    if (perPage) {
-      qb.take(perPage);
-    }
-
-    if (page) {
-      qb.skip(perPage * (page - 1));
-    }
-
-    return qb.getMany();
-  }
-
   async getMatchesByUser(
     type?: MatchType,
     status?: MatchStatus,
