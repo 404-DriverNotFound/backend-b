@@ -130,21 +130,33 @@ export class EventsService {
     return 'You leave the game.';
   }
 
+  async getOpponentSocketId(
+    server: Server,
+    opponentId: string,
+  ): Promise<string> {
+    const clientIds: string[] = [...(await server.allSockets())];
+
+    const opponentSocketId: string = clientIds.find((clientId: string) => {
+      const client: Socket = server.sockets.sockets.get(clientId);
+      const userId: string = client.handshake.query.userId as string;
+      return userId === opponentId ? true : false;
+    });
+
+    return opponentSocketId;
+  }
+
   async handleInviteMatch(
     server: Server,
     client: Socket,
     mode: MatchGameMode,
     opponentId: string,
   ): Promise<void> {
-    const clientIds: string[] = [...(await server.allSockets())];
+    const opponentSocketId: string = await this.getOpponentSocketId(
+      server,
+      opponentId,
+    );
 
-    const opponentClientId: string = clientIds.find((clientId: string) => {
-      const client: Socket = server.sockets.sockets.get(clientId);
-      const userId: string = client.handshake.query.userId as string;
-      return userId === opponentId ? true : false;
-    });
-
-    server.to(opponentClientId).emit('invitedToMatch', {
+    server.to(opponentSocketId).emit('invitedToMatch', {
       mode,
       opponentId: client.handshake.query.userId,
     });
@@ -156,15 +168,12 @@ export class EventsService {
     mode: MatchGameMode,
     opponentId: string,
   ): Promise<void> {
-    const clientIds: string[] = [...(await server.allSockets())];
+    const opponentSocketId: string = await this.getOpponentSocketId(
+      server,
+      opponentId,
+    );
 
-    const opponentClientId: string = clientIds.find((clientId: string) => {
-      const client: Socket = server.sockets.sockets.get(clientId);
-      const userId: string = client.handshake.query.userId as string;
-      return userId === opponentId ? true : false;
-    });
-
-    const opponentSocket: Socket = server.sockets.sockets.get(opponentClientId);
+    const opponentSocket: Socket = server.sockets.sockets.get(opponentSocketId);
 
     this.roomManagerService.createRoom(
       server,
@@ -176,16 +185,13 @@ export class EventsService {
   }
 
   async handleDeclineMatch(server: Server, opponentId: string): Promise<void> {
-    const clientIds: string[] = [...(await server.allSockets())];
-
-    const opponentClientId: string = clientIds.find((clientId: string) => {
-      const client: Socket = server.sockets.sockets.get(clientId);
-      const userId: string = client.handshake.query.userId as string;
-      return userId === opponentId ? true : false;
-    });
+    const opponentSocketId: string = await this.getOpponentSocketId(
+      server,
+      opponentId,
+    );
 
     server
-      .to(opponentClientId)
+      .to(opponentSocketId)
       .emit('declined', 'Your invitation has been declined.');
   }
 
@@ -193,16 +199,13 @@ export class EventsService {
     server: Server,
     opponentId: string,
   ): Promise<void> {
-    const clientIds: string[] = [...(await server.allSockets())];
-
-    const opponentClientId: string = clientIds.find((clientId: string) => {
-      const client: Socket = server.sockets.sockets.get(clientId);
-      const userId: string = client.handshake.query.userId as string;
-      return userId === opponentId ? true : false;
-    });
+    const opponentSocketId: string = await this.getOpponentSocketId(
+      server,
+      opponentId,
+    );
 
     server
-      .to(opponentClientId)
+      .to(opponentSocketId)
       .emit('canceled', 'Match invitation has been canceled.');
   }
 }
