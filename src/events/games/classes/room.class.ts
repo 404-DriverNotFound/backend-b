@@ -7,7 +7,6 @@ import { PlayerPosition } from '../constants/player-position.enum';
 import { RoomManagerService } from '../room-manager.service';
 import { SETTINGS } from '../constants/SETTINGS';
 import { EmitDataDto } from '../dto/emit-data.dto';
-import { MatchType } from '../../../matches/constants/match-type.enum';
 import { MatchGameMode } from '../../../matches/constants/match-game-mode.enum';
 
 export class Room {
