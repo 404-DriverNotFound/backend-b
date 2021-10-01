@@ -129,4 +129,26 @@ export class EventsService {
     this.lobbyManagerService.queue(type, mode).delete(client);
     return 'You leave the game.';
   }
+
+  async handleInviteMatch(
+    server: Server,
+    client: Socket,
+    mode: MatchGameMode,
+    opponentId: string,
+  ): Promise<void> {
+    const clientIds: string[] = [...(await server.allSockets())];
+
+    const opponentClientId: string = clientIds.find((clientId: string) => {
+      const client: Socket = server.sockets.sockets.get(clientId);
+      const userId: string = client.handshake.query.userId as string;
+      if (userId === opponentId) {
+        return;
+      }
+    });
+
+    server.to(opponentClientId).emit('invitedToMatch', {
+      mode,
+      opponentId: client.handshake.query.userId,
+    });
+  }
 }

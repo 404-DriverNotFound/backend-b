@@ -12,6 +12,7 @@ import { Channel } from 'src/channels/entities/channel.entity';
 import { KeyCode } from './games/constants/key-code.enum';
 import { EventsService } from './events.service';
 import { OnMatchTypeModeDto } from './games/dto/on-match-type-mode.dto';
+import { InviteMatchDto } from './games/dto/invite-match.dto';
 
 @WebSocketGateway()
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -81,5 +82,18 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() { type, mode }: OnMatchTypeModeDto,
   ): string {
     return this.eventsService.handleLeaveGame(this.server, client, type, mode);
+  }
+
+  @SubscribeMessage('inviteMatch')
+  handleInviteMatch(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() { mode, opponentId }: InviteMatchDto,
+  ): Promise<void> {
+    return this.eventsService.handleInviteMatch(
+      this.server,
+      client,
+      mode,
+      opponentId,
+    );
   }
 }
