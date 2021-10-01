@@ -10,6 +10,8 @@ import { UsersRepository } from 'src/users/repositories/users.repository';
 import { Room } from './classes/room.class';
 import { PlayerPosition } from './constants/player-position.enum';
 import { CLIENT_SETTINGS } from './constants/SETTINGS';
+import { MatchType } from '../../matches/constants/match-type.enum';
+import { MatchGameMode } from '../../matches/constants/match-game-mode.enum';
 
 @Injectable()
 export class RoomManagerService {
@@ -29,6 +31,8 @@ export class RoomManagerService {
     server: Server,
     socket0: Socket,
     socket1: Socket,
+    type: MatchType,
+    mode: MatchGameMode,
   ): Promise<void> {
     // TODO REVIEW match : user1 user2 를 user0 user1로 바꿔야할까?
     const user1Id: string = socket0.handshake.query.userId as string;
@@ -47,7 +51,12 @@ export class RoomManagerService {
     // REVIEW 회원 접속상태 온라인에서 게임으로 바꿔야함.
     await this.usersRepository.save([user1, user2]);
 
-    const match: Match = this.matchesRepository.create({ user1, user2 });
+    const match: Match = this.matchesRepository.create({
+      user1,
+      user2,
+      type,
+      mode,
+    });
     await this.matchesRepository.save(match);
 
     const roomId: string = match.id; // REVIEW 나중에 match id로

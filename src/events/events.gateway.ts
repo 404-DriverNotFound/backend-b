@@ -11,6 +11,7 @@ import { Server, Socket } from 'socket.io';
 import { Channel } from 'src/channels/entities/channel.entity';
 import { KeyCode } from './games/constants/key-code.enum';
 import { EventsService } from './events.service';
+import { OnMatchTypeModeDto } from './games/dto/on-match-type-mode.dto';
 
 @WebSocketGateway()
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -46,8 +47,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // NOTE events for Game below:
 
   @SubscribeMessage('waiting')
-  handleWaiting(@ConnectedSocket() client: Socket): void {
-    return this.eventsService.handleWaiting(this.server, client);
+  handleWaiting(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() { type, mode }: OnMatchTypeModeDto,
+  ): void {
+    return this.eventsService.handleWaiting(this.server, client, type, mode);
   }
 
   @SubscribeMessage('ready')
@@ -72,7 +76,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('leaveGame')
-  handleLeaveGame(@ConnectedSocket() client: Socket): string {
-    return this.eventsService.handleLeaveGame(this.server, client);
+  handleLeaveGame(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() { type, mode }: OnMatchTypeModeDto,
+  ): string {
+    return this.eventsService.handleLeaveGame(this.server, client, type, mode);
   }
 }

@@ -9,6 +9,8 @@ import { UsersRepository } from 'src/users/repositories/users.repository';
 import { KeyCode } from './games/constants/key-code.enum';
 import { LobbyManagerService } from './games/lobby-manager.service';
 import { RoomManagerService } from './games/room-manager.service';
+import { MatchType } from '../matches/constants/match-type.enum';
+import { MatchGameMode } from '../matches/constants/match-game-mode.enum';
 
 @Injectable()
 export class EventsService {
@@ -77,9 +79,15 @@ export class EventsService {
 
   // NOTE events for Game below:
 
-  handleWaiting(server: Server, client: Socket): void {
-    this.lobbyManagerService.lobby.add(client);
-    this.lobbyManagerService.dispatch(server); // FIXME roommanager
+  handleWaiting(
+    server: Server,
+    client: Socket,
+    type: MatchType,
+    mode: MatchGameMode,
+  ): void {
+    const set = this.lobbyManagerService.queue(type, mode);
+    set.add(client);
+    this.lobbyManagerService.dispatch(server, set, type, mode); // FIXME roommanager
   }
 
   handleReady(client: Socket): void {
@@ -107,13 +115,18 @@ export class EventsService {
     }
   }
 
-  handleLeaveGame(server: Server, client: Socket): string {
+  handleLeaveGame(
+    server: Server,
+    client: Socket,
+    type: MatchType,
+    mode: MatchGameMode,
+  ): string {
     // TODO 소켓이 끊어지면 플레이어일때 게임 종료되는 로직 추가
     const roomId: string = this.roomManagerService.roomIds.get(client.id);
     if (roomId) {
       this.roomManagerService.destroyRoom(server, roomId);
     }
-    this.lobbyManagerService.lobby.delete(client);
+    this.lobbyManagerService.queue(type, mode).delete(client);
     return 'You leave the game.';
   }
 }
