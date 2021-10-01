@@ -60,7 +60,7 @@ export class RoomManagerService {
     await this.matchesRepository.save(match);
 
     const roomId: string = match.id; // REVIEW 나중에 match id로
-    const room: Room = new Room(this, server, roomId, socket0, socket1);
+    const room: Room = new Room(this, server, roomId, socket0, socket1, mode);
     socket0.join(roomId);
     socket1.join(roomId);
     this.rooms.set(roomId, room);

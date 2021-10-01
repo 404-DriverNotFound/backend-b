@@ -7,6 +7,8 @@ import { PlayerPosition } from '../constants/player-position.enum';
 import { RoomManagerService } from '../room-manager.service';
 import { SETTINGS } from '../constants/SETTINGS';
 import { EmitDataDto } from '../dto/emit-data.dto';
+import { MatchType } from '../../../matches/constants/match-type.enum';
+import { MatchGameMode } from '../../../matches/constants/match-game-mode.enum';
 
 export class Room {
   roomManagerService: RoomManagerService;
@@ -35,14 +37,21 @@ export class Room {
     id: string,
     socket0: Socket,
     socket1: Socket,
+    mode: MatchGameMode,
   ) {
     this.roomManagerService = roomManagerService;
     this.server = server;
     this.id = id;
     this.sockets = [socket0, socket1];
-    this.players.set(socket0.id, new Player(socket0.id, PlayerPosition.LEFT));
-    this.players.set(socket1.id, new Player(socket1.id, PlayerPosition.RIGHT));
-    this.ball = new Ball(socket0.id, socket1.id);
+    this.players.set(
+      socket0.id,
+      new Player(socket0.id, PlayerPosition.LEFT, mode),
+    );
+    this.players.set(
+      socket1.id,
+      new Player(socket1.id, PlayerPosition.RIGHT, mode),
+    );
+    this.ball = new Ball(socket0.id, socket1.id, mode);
   }
 
   playInit(): void {
