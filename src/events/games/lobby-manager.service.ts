@@ -6,12 +6,12 @@ import { MatchGameMode } from '../../matches/constants/match-game-mode.enum';
 
 @Injectable()
 export class LobbyManagerService {
-  ladder_classic: Set<Socket> = new Set<Socket>();
-  ladder_reverse: Set<Socket> = new Set<Socket>();
-  ladder_hard: Set<Socket> = new Set<Socket>();
-  exhibition_classic: Set<Socket> = new Set<Socket>();
-  exhibition_reverse: Set<Socket> = new Set<Socket>();
-  exhibition_hard: Set<Socket> = new Set<Socket>();
+  ladderClassic: Set<Socket> = new Set<Socket>();
+  ladderReverse: Set<Socket> = new Set<Socket>();
+  ladderHard: Set<Socket> = new Set<Socket>();
+  exhibitionClassic: Set<Socket> = new Set<Socket>();
+  exhibitionReverse: Set<Socket> = new Set<Socket>();
+  exhibitionHard: Set<Socket> = new Set<Socket>();
   dispatching = false;
 
   // NOTE push is add
@@ -23,19 +23,19 @@ export class LobbyManagerService {
   queue(type: MatchType, mode: MatchGameMode): Set<Socket> {
     if (type === MatchType.LADDER) {
       if (mode === MatchGameMode.CLASSIC) {
-        return this.ladder_classic;
+        return this.ladderClassic;
       } else if (mode === MatchGameMode.REVERSE) {
-        return this.ladder_reverse;
+        return this.ladderReverse;
       } else {
-        return this.ladder_hard;
+        return this.ladderHard;
       }
     } else {
       if (mode === MatchGameMode.CLASSIC) {
-        return this.exhibition_classic;
+        return this.exhibitionClassic;
       } else if (mode === MatchGameMode.REVERSE) {
-        return this.exhibition_reverse;
+        return this.exhibitionReverse;
       } else {
-        return this.exhibition_hard;
+        return this.exhibitionHard;
       }
     }
   }
