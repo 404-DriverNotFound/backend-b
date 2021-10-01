@@ -64,6 +64,10 @@ export class LobbyManagerService {
       set.delete(socket0);
 
       const socket1: Socket = [...set][0];
+      if (socket0.handshake.query.userId === socket1.handshake.query.userId) {
+        server.to(socket0.id).emit('duplicated');
+        continue;
+      }
       set.delete(socket1);
 
       this.roomManagerService.createRoom(server, socket0, socket1, type, mode);
