@@ -96,4 +96,17 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       opponentId,
     );
   }
+
+  @SubscribeMessage('acceptMatch')
+  handleAcceptMatch(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() { mode, opponentId }: InviteMatchDto,
+  ): Promise<void> {
+    return this.eventsService.handleAcceptMatch(
+      this.server,
+      client,
+      mode,
+      opponentId,
+    );
+  }
 }

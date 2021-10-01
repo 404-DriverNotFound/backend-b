@@ -151,4 +151,31 @@ export class EventsService {
       opponentId: client.handshake.query.userId,
     });
   }
+
+  async handleAcceptMatch(
+    server: Server,
+    client: Socket,
+    mode: MatchGameMode,
+    opponentId: string,
+  ): Promise<void> {
+    const clientIds: string[] = [...(await server.allSockets())];
+
+    const opponentClientId: string = clientIds.find((clientId: string) => {
+      const client: Socket = server.sockets.sockets.get(clientId);
+      const userId: string = client.handshake.query.userId as string;
+      if (userId === opponentId) {
+        return;
+      }
+    });
+
+    const opponentSocket: Socket = server.sockets.sockets.get(opponentClientId);
+
+    this.roomManagerService.createRoom(
+      server,
+      opponentSocket,
+      client,
+      MatchType.EXHIBITION,
+      mode,
+    );
+  }
 }
