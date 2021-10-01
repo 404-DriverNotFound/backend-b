@@ -4,6 +4,7 @@ import { KeyCode } from '../constants/key-code.enum';
 import { PlayerPosition } from '../constants/player-position.enum';
 import { Room } from './room.class';
 import { SETTINGS } from '../constants/SETTINGS';
+import { MatchGameMode } from '../../../matches/constants/match-game-mode.enum';
 
 const UNIT = 2;
 
@@ -26,7 +27,7 @@ export class Player extends Base {
     [KeyCode.DOWN]: false,
   };
 
-  constructor(id: string, position: PlayerPosition) {
+  constructor(id: string, position: PlayerPosition, mode: MatchGameMode) {
     super();
 
     this.id = id;
@@ -44,6 +45,7 @@ export class Player extends Base {
       color += Math.floor(Math.random() * 16).toString(16);
     }
     this.color = color;
+    this.mode = mode;
 
     this.update = this.setUpdate;
   }
@@ -53,11 +55,20 @@ export class Player extends Base {
       room.status === GameStatus.COUNTDOWN ||
       room.status === GameStatus.PLAYING
     ) {
-      if (this.keypress[KeyCode.UP]) {
-        this.moveUp();
-      }
-      if (this.keypress[KeyCode.DOWN]) {
-        this.moveDown();
+      if (this.mode !== MatchGameMode.REVERSE) {
+        if (this.keypress[KeyCode.UP]) {
+          this.moveUp();
+        }
+        if (this.keypress[KeyCode.DOWN]) {
+          this.moveDown();
+        }
+      } else {
+        if (this.keypress[KeyCode.UP]) {
+          this.moveDown();
+        }
+        if (this.keypress[KeyCode.DOWN]) {
+          this.moveUp();
+        }
       }
     }
   }

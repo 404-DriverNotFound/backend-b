@@ -9,6 +9,7 @@ import { DirectionTo } from '../constants/direction-to.enum';
 import { Quadrant } from '../constants/quadrant.enum';
 import { CollisionType } from '../constants/collision-type.enum';
 import { Player } from './player.class';
+import { MatchGameMode } from '../../../matches/constants/match-game-mode.enum';
 
 export class Ball extends Base {
   playerId: string[];
@@ -23,7 +24,11 @@ export class Ball extends Base {
 
   dynamic: Dynamic = null;
 
-  constructor(leftPlayerId: string, rightPlayerId: string) {
+  constructor(
+    leftPlayerId: string,
+    rightPlayerId: string,
+    mode: MatchGameMode,
+  ) {
     super();
 
     this.playerId = [leftPlayerId, rightPlayerId];
@@ -33,6 +38,10 @@ export class Ball extends Base {
     this.width = SETTINGS.BALL.WIDTH;
     this.height = SETTINGS.BALL.HEIGHT;
     this.color = '#000000';
+    this.mode = mode;
+    if (this.mode === MatchGameMode.SPEED) {
+      this.speed = this.speed * 2;
+    }
     this.update = this.setUpdate; // REVIEW super.update = this.setUpdate; 랑 무슨 차이지?
   }
 

@@ -1,6 +1,8 @@
 //import { GameStatus } from '../constants/game-status.enum';
 import { Rectangle } from '../interfaces/rectangle.interface';
 import { Room } from './room.class';
+import { MatchType } from '../../../matches/constants/match-type.enum';
+import { MatchGameMode } from '../../../matches/constants/match-game-mode.enum';
 
 export class Base implements Rectangle {
   //status: GameStatus = GameStatus.NONE;
@@ -9,6 +11,8 @@ export class Base implements Rectangle {
   width: number;
   height: number;
   color: string;
+  type: MatchType;
+  mode: MatchGameMode;
 
   update: (room: Room) => void;
 
