@@ -96,6 +96,7 @@ export class RoomManagerService {
       },
     );
     await Promise.all(promises);
+    server.to(roomId).emit('destroy', 'Game canceled!');
     this.rooms.delete(roomId);
     await this.matchesRepository.delete(roomId);
   }
@@ -139,6 +140,7 @@ export class RoomManagerService {
       },
     );
     await Promise.all(promises);
+    server.to(roomId).emit('destroy', `Game ended! Winner is ${winner.name}.`);
     console.log('after loop');
     this.rooms.delete(roomId);
     console.log('winner name: ', winner?.name);
