@@ -188,4 +188,21 @@ export class EventsService {
       .to(opponentClientId)
       .emit('declined', 'Your invitation has been declined.');
   }
+
+  async handleCancelMatchInvitaion(
+    server: Server,
+    opponentId: string,
+  ): Promise<void> {
+    const clientIds: string[] = [...(await server.allSockets())];
+
+    const opponentClientId: string = clientIds.find((clientId: string) => {
+      const client: Socket = server.sockets.sockets.get(clientId);
+      const userId: string = client.handshake.query.userId as string;
+      userId === opponentId ? true : false;
+    });
+
+    server
+      .to(opponentClientId)
+      .emit('canceled', 'Match invitation has been canceled.');
+  }
 }
