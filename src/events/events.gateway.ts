@@ -109,4 +109,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       opponentId,
     );
   }
+
+  @SubscribeMessage('declineMatch')
+  handleDeclineMatch(
+    @MessageBody() { opponentId }: InviteMatchDto,
+  ): Promise<void> {
+    return this.eventsService.handleDeclineMatch(this.server, opponentId);
+  }
 }
