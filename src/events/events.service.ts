@@ -141,9 +141,7 @@ export class EventsService {
     const opponentClientId: string = clientIds.find((clientId: string) => {
       const client: Socket = server.sockets.sockets.get(clientId);
       const userId: string = client.handshake.query.userId as string;
-      if (userId === opponentId) {
-        return;
-      }
+      userId === opponentId ? true : false;
     });
 
     server.to(opponentClientId).emit('invitedToMatch', {
@@ -163,9 +161,7 @@ export class EventsService {
     const opponentClientId: string = clientIds.find((clientId: string) => {
       const client: Socket = server.sockets.sockets.get(clientId);
       const userId: string = client.handshake.query.userId as string;
-      if (userId === opponentId) {
-        return;
-      }
+      userId === opponentId ? true : false;
     });
 
     const opponentSocket: Socket = server.sockets.sockets.get(opponentClientId);
@@ -185,9 +181,7 @@ export class EventsService {
     const opponentClientId: string = clientIds.find((clientId: string) => {
       const client: Socket = server.sockets.sockets.get(clientId);
       const userId: string = client.handshake.query.userId as string;
-      if (userId === opponentId) {
-        return;
-      }
+      userId === opponentId ? true : false;
     });
 
     server
