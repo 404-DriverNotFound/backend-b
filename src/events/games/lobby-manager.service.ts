@@ -40,6 +40,14 @@ export class LobbyManagerService {
     }
   }
 
+  cleanDisconnectedSocket(set: Set<Socket>): void {
+    set.forEach((socket: Socket) => {
+      if (socket.disconnected) {
+        set.delete(socket);
+      }
+    });
+  }
+
   dispatch(
     server: Server,
     set: Set<Socket>,
@@ -50,6 +58,7 @@ export class LobbyManagerService {
       return;
     }
     this.dispatching = true;
+    this.cleanDisconnectedSocket(set);
     while (set.size > 1) {
       const socket0: Socket = [...set][0];
       set.delete(socket0);
