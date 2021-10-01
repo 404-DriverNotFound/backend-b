@@ -11,7 +11,6 @@ export class Base implements Rectangle {
   width: number;
   height: number;
   color: string;
-  type: MatchType;
   mode: MatchGameMode;
 
   update: (room: Room) => void;

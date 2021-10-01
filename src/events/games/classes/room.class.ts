@@ -37,7 +37,6 @@ export class Room {
     id: string,
     socket0: Socket,
     socket1: Socket,
-    type: MatchType,
     mode: MatchGameMode,
   ) {
     this.roomManagerService = roomManagerService;
