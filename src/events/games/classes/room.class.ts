@@ -17,6 +17,8 @@ export class Room {
 
   id: string;
 
+  type: MatchType;
+
   status: GameStatus = GameStatus.NONE;
 
   sockets: Socket[];
@@ -38,10 +40,12 @@ export class Room {
     socket0: Socket,
     socket1: Socket,
     mode: MatchGameMode,
+    type: MatchType,
   ) {
     this.roomManagerService = roomManagerService;
     this.server = server;
     this.id = id;
+    this.type = type;
     this.sockets = [socket0, socket1];
     this.players.set(
       socket0.id,
