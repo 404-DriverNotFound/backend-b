@@ -158,9 +158,12 @@ export class EventsService {
         message: `${opponent?.name}(${opponent?.status}) cannot receive your invitation.`,
       });
     } else {
+      const user: User = await this.usersRepository.findOne(
+        client.handshake.query.userId as string,
+      );
       server.to(opponentId).emit('invitedToMatch', {
         mode,
-        opponent,
+        opponent: user,
       });
     }
   }
