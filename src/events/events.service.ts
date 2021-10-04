@@ -15,6 +15,7 @@ import { PlayerPosition } from './games/constants/player-position.enum';
 import { CLIENT_SETTINGS } from './games/constants/SETTINGS';
 import { MatchesRepository } from 'src/matches/matches.repository';
 import { Match } from 'src/matches/match.entity';
+import { MatchStatus } from 'src/matches/constants/match-status.enum';
 
 @Injectable()
 export class EventsService {
@@ -142,10 +143,11 @@ export class EventsService {
     matchId: string,
   ): Promise<void> {
     const match: Match = await this.matchesRepository.findOne({
-      where: { matchId },
+      where: { id: matchId },
       relations: ['user1', 'user2'],
     });
-    if (!match) {
+
+    if (!match || match.status === MatchStatus.DONE) {
       return;
     }
 
