@@ -141,7 +141,10 @@ export class EventsService {
     client: Socket,
     matchId: string,
   ): Promise<void> {
-    const match: Match = await this.matchesRepository.findOne(matchId);
+    const match: Match = await this.matchesRepository.findOne({
+      where: { matchId },
+      relations: ['user1', 'user2'],
+    });
     if (!match) {
       return;
     }
