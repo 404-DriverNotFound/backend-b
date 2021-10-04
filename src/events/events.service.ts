@@ -151,15 +151,18 @@ export class EventsService {
     mode: MatchGameMode,
     opponentId: string,
   ): Promise<void> {
-    const opponentSocketId: string = await this.getOpponentSocketId(
-      server,
-      opponentId,
-    );
+    const opponent: User = await this.usersRepository.findOne(opponentId);
 
-    server.to(opponentSocketId).emit('invitedToMatch', {
-      mode,
-      opponentId: client.handshake.query.userId,
-    });
+    if (opponent?.status !== UserStatus.ONLINE) {
+      server.to(client.id).emit('declined', {
+        message: `${opponent?.name}(${opponent?.status}) cannot receive your invitation.`,
+      });
+    } else {
+      server.to(opponentId).emit('invitedToMatch', {
+        mode,
+        opponent,
+      });
+    }
   }
 
   async handleAcceptMatch(
@@ -168,44 +171,55 @@ export class EventsService {
     mode: MatchGameMode,
     opponentId: string,
   ): Promise<void> {
-    const opponentSocketId: string = await this.getOpponentSocketId(
-      server,
-      opponentId,
-    );
+    const opponent: User = await this.usersRepository.findOne(opponentId);
 
-    const opponentSocket: Socket = server.sockets.sockets.get(opponentSocketId);
+    if (opponent?.status !== UserStatus.ONLINE) {
+      server.to(client.id).emit('canceled', {
+        message: `You cannot accept ${opponent?.name}(${opponent?.status})'s invitation.`,
+      });
+    } else {
+      const opponentSocketId: string = await this.getOpponentSocketId(
+        server,
+        opponentId,
+      );
 
-    this.roomManagerService.createRoom(
-      server,
-      opponentSocket,
-      client,
-      MatchType.EXHIBITION,
-      mode,
-    );
+      const opponentSocket: Socket =
+        server.sockets.sockets.get(opponentSocketId);
+
+      this.roomManagerService.createRoom(
+        server,
+        opponentSocket,
+        client,
+        MatchType.EXHIBITION,
+        mode,
+      );
+    }
   }
 
-  async handleDeclineMatch(server: Server, opponentId: string): Promise<void> {
-    const opponentSocketId: string = await this.getOpponentSocketId(
-      server,
-      opponentId,
-    );
+  async handleDeclineMatch(
+    server: Server,
+    client: Socket,
+    opponentId: string,
+  ): Promise<void> {
+    const opponent: User = await this.usersRepository.findOne(opponentId);
 
-    server
-      .to(opponentSocketId)
-      .emit('declined', 'Your invitation has been declined.');
+    if (opponent?.status !== UserStatus.ONLINE) {
+      server.to(client.id).emit('canceled', {
+        message: `You cannot decline ${opponent?.name}(${opponent?.status})'s invitation.`,
+      });
+    } else {
+      server
+        .to(opponentId)
+        .emit('declined', { message: 'Your invitation has been declined.' });
+    }
   }
 
   async handleCancelMatchInvitaion(
     server: Server,
     opponentId: string,
   ): Promise<void> {
-    const opponentSocketId: string = await this.getOpponentSocketId(
-      server,
-      opponentId,
-    );
-
     server
-      .to(opponentSocketId)
-      .emit('canceled', 'Match invitation has been canceled.');
+      .to(opponentId)
+      .emit('canceled', { message: 'Match invitation has been canceled.' });
   }
 }
