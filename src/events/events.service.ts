@@ -136,11 +136,13 @@ export class EventsService {
   ): Promise<string> {
     const clientIds: string[] = [...(await server.allSockets())];
 
-    const opponentSocketId: string = clientIds.find((clientId: string) => {
-      const client: Socket = server.sockets.sockets.get(clientId);
-      const userId: string = client.handshake.query.userId as string;
-      return userId === opponentId ? true : false;
-    });
+    const opponentSocketId: string = clientIds
+      .reverse()
+      .find((clientId: string) => {
+        const client: Socket = server.sockets.sockets.get(clientId);
+        const userId: string = client.handshake.query.userId as string;
+        return userId === opponentId ? true : false;
+      });
 
     return opponentSocketId;
   }
@@ -151,6 +153,11 @@ export class EventsService {
     mode: MatchGameMode,
     opponentId: string,
   ): Promise<void> {
+    const opponentSocketId: string = await this.getOpponentSocketId(
+      server,
+      opponentId,
+    );
+
     const opponent: User = await this.usersRepository.findOne(opponentId);
 
     const user: User = await this.usersRepository.findOne(
@@ -158,6 +165,7 @@ export class EventsService {
     );
 
     if (
+      !opponentSocketId &&
       user?.status !== UserStatus.ONLINE &&
       opponent?.status !== UserStatus.ONLINE
     ) {
@@ -215,6 +223,11 @@ export class EventsService {
     client: Socket,
     opponentId: string,
   ): Promise<void> {
+    const opponentSocketId: string = await this.getOpponentSocketId(
+      server,
+      opponentId,
+    );
+
     const opponent: User = await this.usersRepository.findOne(opponentId);
 
     const user: User = await this.usersRepository.findOne(
@@ -222,6 +235,7 @@ export class EventsService {
     );
 
     if (
+      !opponentSocketId &&
       user?.status !== UserStatus.ONLINE &&
       opponent?.status !== UserStatus.ONLINE
     ) {
@@ -230,7 +244,7 @@ export class EventsService {
       });
     } else {
       server
-        .to(opponentId)
+        .to(opponentSocketId)
         .emit('declined', { message: 'Your invitation has been declined.' });
     }
   }
@@ -239,8 +253,13 @@ export class EventsService {
     server: Server,
     opponentId: string,
   ): Promise<void> {
+    const opponentSocketId: string = await this.getOpponentSocketId(
+      server,
+      opponentId,
+    );
+
     server
-      .to(opponentId)
+      .to(opponentSocketId)
       .emit('canceled', { message: 'Match invitation has been canceled.' });
   }
 }
