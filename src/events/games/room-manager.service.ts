@@ -60,7 +60,15 @@ export class RoomManagerService {
     await this.matchesRepository.save(match);
 
     const roomId: string = match.id; // REVIEW 나중에 match id로
-    const room: Room = new Room(this, server, roomId, socket0, socket1, mode);
+    const room: Room = new Room(
+      this,
+      server,
+      roomId,
+      socket0,
+      socket1,
+      mode,
+      type,
+    );
     socket0.join(roomId);
     socket1.join(roomId);
     this.rooms.set(roomId, room);
@@ -108,7 +116,6 @@ export class RoomManagerService {
     const room: Room = this.rooms.get(roomId);
     let winner: User;
     let loser: User;
-    console.log('before loop');
     const promises: Promise<void>[] = room.sockets.map(
       async (socket: Socket) => {
         // REVIEW 회원 접속상태 게임에서 온라인으로 바꿔야함.
@@ -118,15 +125,17 @@ export class RoomManagerService {
           winner = user;
           await this.usersRepository.update(winner.id, {
             status: UserStatus.ONLINE,
-            score: winner.score + 10,
-            win: winner.win + 1,
+            score:
+              room.type === MatchType.LADDER ? winner.score + 10 : winner.score,
+            win: room.type === MatchType.LADDER ? winner.win + 1 : winner.win,
           });
         } else {
           loser = user;
           await this.usersRepository.update(loser.id, {
             status: UserStatus.ONLINE,
-            score: loser.score - 10,
-            lose: loser.lose + 1,
+            score:
+              room.type === MatchType.LADDER ? loser.score - 10 : loser.score,
+            lose: room.type === MatchType.LADDER ? loser.lose + 1 : loser.lose,
           });
         }
         const message: string =
@@ -134,15 +143,10 @@ export class RoomManagerService {
         this.roomIds.delete(socket.id);
         server.to(socket.id).emit('destroy', message);
         socket.leave(roomId);
-
-        console.log('in loop ', socket.id, userId);
       },
     );
     await Promise.all(promises);
-    console.log('after loop');
     this.rooms.delete(roomId);
-    console.log('winner name: ', winner?.name);
-    console.log('loser name: ', loser?.name);
     await this.matchesRepository.update(roomId, {
       status: MatchStatus.DONE,
       winner,
