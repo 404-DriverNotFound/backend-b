@@ -153,14 +153,18 @@ export class EventsService {
   ): Promise<void> {
     const opponent: User = await this.usersRepository.findOne(opponentId);
 
-    if (opponent?.status !== UserStatus.ONLINE) {
+    const user: User = await this.usersRepository.findOne(
+      client.handshake.query.userId as string,
+    );
+
+    if (
+      user?.status !== UserStatus.ONLINE &&
+      opponent?.status !== UserStatus.ONLINE
+    ) {
       server.to(client.id).emit('declined', {
         message: `${opponent?.name}(${opponent?.status}) cannot receive your invitation.`,
       });
     } else {
-      const user: User = await this.usersRepository.findOne(
-        client.handshake.query.userId as string,
-      );
       server.to(opponentId).emit('invitedToMatch', {
         mode,
         opponent: user,
@@ -176,7 +180,14 @@ export class EventsService {
   ): Promise<void> {
     const opponent: User = await this.usersRepository.findOne(opponentId);
 
-    if (opponent?.status !== UserStatus.ONLINE) {
+    const user: User = await this.usersRepository.findOne(
+      client.handshake.query.userId as string,
+    );
+
+    if (
+      user?.status !== UserStatus.ONLINE &&
+      opponent?.status !== UserStatus.ONLINE
+    ) {
       server.to(client.id).emit('canceled', {
         message: `You cannot accept ${opponent?.name}(${opponent?.status})'s invitation.`,
       });
@@ -206,7 +217,14 @@ export class EventsService {
   ): Promise<void> {
     const opponent: User = await this.usersRepository.findOne(opponentId);
 
-    if (opponent?.status !== UserStatus.ONLINE) {
+    const user: User = await this.usersRepository.findOne(
+      client.handshake.query.userId as string,
+    );
+
+    if (
+      user?.status !== UserStatus.ONLINE &&
+      opponent?.status !== UserStatus.ONLINE
+    ) {
       server.to(client.id).emit('canceled', {
         message: `You cannot decline ${opponent?.name}(${opponent?.status})'s invitation.`,
       });
