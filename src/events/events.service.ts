@@ -186,6 +186,11 @@ export class EventsService {
     mode: MatchGameMode,
     opponentId: string,
   ): Promise<void> {
+    const opponentSocketId: string = await this.getOpponentSocketId(
+      server,
+      opponentId,
+    );
+
     const opponent: User = await this.usersRepository.findOne(opponentId);
 
     const user: User = await this.usersRepository.findOne(
@@ -193,6 +198,7 @@ export class EventsService {
     );
 
     if (
+      !opponentSocketId &&
       user?.status !== UserStatus.ONLINE &&
       opponent?.status !== UserStatus.ONLINE
     ) {
@@ -200,11 +206,6 @@ export class EventsService {
         message: `You cannot accept ${opponent?.name}(${opponent?.status})'s invitation.`,
       });
     } else {
-      const opponentSocketId: string = await this.getOpponentSocketId(
-        server,
-        opponentId,
-      );
-
       const opponentSocket: Socket =
         server.sockets.sockets.get(opponentSocketId);
 
