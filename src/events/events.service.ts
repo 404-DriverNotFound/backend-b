@@ -165,8 +165,8 @@ export class EventsService {
     );
 
     if (
-      user.status === UserStatus.ONLINE &&
-      opponent.status === UserStatus.ONLINE &&
+      user?.status === UserStatus.ONLINE &&
+      opponent?.status === UserStatus.ONLINE &&
       opponentSocketId
     ) {
       server.to(opponentSocketId).emit('invitedToMatch', {
@@ -196,8 +196,8 @@ export class EventsService {
     );
 
     if (
-      user.status === UserStatus.ONLINE &&
-      opponent.status === UserStatus.ONLINE
+      user?.status === UserStatus.ONLINE &&
+      opponent?.status === UserStatus.ONLINE
     ) {
       const opponentSocket: Socket =
         server.sockets.sockets.get(opponentSocketId);
@@ -230,8 +230,8 @@ export class EventsService {
     );
 
     if (
-      user.status === UserStatus.ONLINE &&
-      opponent.status === UserStatus.ONLINE
+      user?.status === UserStatus.ONLINE &&
+      opponent?.status === UserStatus.ONLINE
     ) {
       server
         .to(opponentSocketId)
