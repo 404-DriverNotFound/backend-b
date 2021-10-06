@@ -176,7 +176,7 @@ export class EventsService {
       server.to(opponentUserId).emit('invitedToMatch', {
         mode,
         opponent: user,
-        opponentSocketId,
+        opponentSocketId: client.id,
       });
     }
   }
