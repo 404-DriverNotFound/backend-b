@@ -171,6 +171,7 @@ export class EventsService {
     ) {
       server.to(client.id).emit('declined', {
         message: `${opponent?.name}(${opponent?.status}) cannot receive your invitation.`,
+        opponentSocketId,
       });
     } else {
       server.to(opponentId).emit('invitedToMatch', {
@@ -184,13 +185,10 @@ export class EventsService {
     server: Server,
     client: Socket,
     mode: MatchGameMode,
-    opponentId: string,
+    opponentSocketId: string,
   ): Promise<void> {
-    const opponentSocketId: string = await this.getOpponentSocketId(
-      server,
-      opponentId,
-    );
-
+    const opponentId: string = server.sockets.sockets.get(opponentSocketId)
+      .handshake.query.userId as string;
     const opponent: User = await this.usersRepository.findOne(opponentId);
 
     const user: User = await this.usersRepository.findOne(
@@ -198,7 +196,6 @@ export class EventsService {
     );
 
     if (
-      !opponentSocketId &&
       user?.status !== UserStatus.ONLINE &&
       opponent?.status !== UserStatus.ONLINE
     ) {
@@ -222,13 +219,10 @@ export class EventsService {
   async handleDeclineMatch(
     server: Server,
     client: Socket,
-    opponentId: string,
+    opponentSocketId: string,
   ): Promise<void> {
-    const opponentSocketId: string = await this.getOpponentSocketId(
-      server,
-      opponentId,
-    );
-
+    const opponentId: string = server.sockets.sockets.get(opponentSocketId)
+      .handshake.query.userId as string;
     const opponent: User = await this.usersRepository.findOne(opponentId);
 
     const user: User = await this.usersRepository.findOne(

@@ -4,4 +4,6 @@ export interface InviteMatchDto {
   readonly mode: MatchGameMode;
 
   readonly opponentId: string;
+
+  readonly opponentSocketId: string;
 }
