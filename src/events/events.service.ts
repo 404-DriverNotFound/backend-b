@@ -165,18 +165,18 @@ export class EventsService {
     );
 
     if (
-      !opponentSocketId &&
-      user?.status !== UserStatus.ONLINE &&
-      opponent?.status !== UserStatus.ONLINE
+      user.status === UserStatus.ONLINE &&
+      opponent.status === UserStatus.ONLINE &&
+      opponentSocketId
     ) {
-      server.to(client.id).emit('declined', {
-        message: `${opponent?.name}(${opponent?.status}) cannot receive your invitation.`,
-      });
-    } else {
-      server.to(opponentUserId).emit('invitedToMatch', {
+      server.to(opponentSocketId).emit('invitedToMatch', {
         mode,
         opponent: user,
         opponentSocketId: client.id,
+      });
+    } else {
+      server.to(client.id).emit('declined', {
+        message: `${opponent?.name}(${opponent?.status}) cannot receive your invitation.`,
       });
     }
   }
@@ -196,13 +196,9 @@ export class EventsService {
     );
 
     if (
-      user?.status !== UserStatus.ONLINE &&
-      opponent?.status !== UserStatus.ONLINE
+      user.status === UserStatus.ONLINE &&
+      opponent.status === UserStatus.ONLINE
     ) {
-      server.to(client.id).emit('canceled', {
-        message: `You cannot accept ${opponent?.name}(${opponent?.status})'s invitation.`,
-      });
-    } else {
       const opponentSocket: Socket =
         server.sockets.sockets.get(opponentSocketId);
 
@@ -213,6 +209,10 @@ export class EventsService {
         MatchType.EXHIBITION,
         mode,
       );
+    } else {
+      server.to(client.id).emit('canceled', {
+        message: `You cannot accept ${opponent?.name}(${opponent?.status})'s invitation.`,
+      });
     }
   }
 
@@ -230,17 +230,16 @@ export class EventsService {
     );
 
     if (
-      !opponentSocketId &&
-      user?.status !== UserStatus.ONLINE &&
-      opponent?.status !== UserStatus.ONLINE
+      user.status === UserStatus.ONLINE &&
+      opponent.status === UserStatus.ONLINE
     ) {
-      server.to(client.id).emit('canceled', {
-        message: `You cannot decline ${opponent?.name}(${opponent?.status})'s invitation.`,
-      });
-    } else {
       server
         .to(opponentSocketId)
         .emit('declined', { message: 'Your invitation has been declined.' });
+    } else {
+      server.to(client.id).emit('canceled', {
+        message: `You cannot decline ${opponent?.name}(${opponent?.status})'s invitation.`,
+      });
     }
   }
 
