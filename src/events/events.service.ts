@@ -132,7 +132,7 @@ export class EventsService {
 
   async getOpponentSocketId(
     server: Server,
-    opponentId: string,
+    opponentUserId: string,
   ): Promise<string> {
     const clientIds: string[] = [...(await server.allSockets())];
 
@@ -141,7 +141,7 @@ export class EventsService {
       .find((clientId: string) => {
         const client: Socket = server.sockets.sockets.get(clientId);
         const userId: string = client.handshake.query.userId as string;
-        return userId === opponentId ? true : false;
+        return userId === opponentUserId ? true : false;
       });
 
     return opponentSocketId;
@@ -151,14 +151,14 @@ export class EventsService {
     server: Server,
     client: Socket,
     mode: MatchGameMode,
-    opponentId: string,
+    opponentUserId: string,
   ): Promise<void> {
     const opponentSocketId: string = await this.getOpponentSocketId(
       server,
-      opponentId,
+      opponentUserId,
     );
 
-    const opponent: User = await this.usersRepository.findOne(opponentId);
+    const opponent: User = await this.usersRepository.findOne(opponentUserId);
 
     const user: User = await this.usersRepository.findOne(
       client.handshake.query.userId as string,
@@ -174,7 +174,7 @@ export class EventsService {
         opponentSocketId,
       });
     } else {
-      server.to(opponentId).emit('invitedToMatch', {
+      server.to(opponentUserId).emit('invitedToMatch', {
         mode,
         opponent: user,
       });
@@ -187,9 +187,9 @@ export class EventsService {
     mode: MatchGameMode,
     opponentSocketId: string,
   ): Promise<void> {
-    const opponentId: string = server.sockets.sockets.get(opponentSocketId)
+    const opponentUserId: string = server.sockets.sockets.get(opponentSocketId)
       .handshake.query.userId as string;
-    const opponent: User = await this.usersRepository.findOne(opponentId);
+    const opponent: User = await this.usersRepository.findOne(opponentUserId);
 
     const user: User = await this.usersRepository.findOne(
       client.handshake.query.userId as string,
@@ -221,9 +221,9 @@ export class EventsService {
     client: Socket,
     opponentSocketId: string,
   ): Promise<void> {
-    const opponentId: string = server.sockets.sockets.get(opponentSocketId)
+    const opponentUserId: string = server.sockets.sockets.get(opponentSocketId)
       .handshake.query.userId as string;
-    const opponent: User = await this.usersRepository.findOne(opponentId);
+    const opponent: User = await this.usersRepository.findOne(opponentUserId);
 
     const user: User = await this.usersRepository.findOne(
       client.handshake.query.userId as string,

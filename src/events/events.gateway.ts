@@ -87,13 +87,13 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('inviteMatch')
   handleInviteMatch(
     @ConnectedSocket() client: Socket,
-    @MessageBody() { mode, opponentId }: InviteMatchDto,
+    @MessageBody() { mode, opponentUserId }: InviteMatchDto,
   ): Promise<void> {
     return this.eventsService.handleInviteMatch(
       this.server,
       client,
       mode,
-      opponentId,
+      opponentUserId,
     );
   }
 
@@ -124,11 +124,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('cancelMatchInvitation')
   handleCancelMatchInvitaion(
-    @MessageBody() { opponentId }: InviteMatchDto,
+    @MessageBody() { opponentUserId }: InviteMatchDto,
   ): Promise<void> {
     return this.eventsService.handleCancelMatchInvitaion(
       this.server,
-      opponentId,
+      opponentUserId,
     );
   }
 }
