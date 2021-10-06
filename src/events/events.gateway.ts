@@ -87,48 +87,48 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('inviteMatch')
   handleInviteMatch(
     @ConnectedSocket() client: Socket,
-    @MessageBody() { mode, opponentId }: InviteMatchDto,
+    @MessageBody() { mode, opponentUserId }: InviteMatchDto,
   ): Promise<void> {
     return this.eventsService.handleInviteMatch(
       this.server,
       client,
       mode,
-      opponentId,
+      opponentUserId,
     );
   }
 
   @SubscribeMessage('acceptMatch')
   handleAcceptMatch(
     @ConnectedSocket() client: Socket,
-    @MessageBody() { mode, opponentId }: InviteMatchDto,
+    @MessageBody() { mode, opponentSocketId }: InviteMatchDto,
   ): Promise<void> {
     return this.eventsService.handleAcceptMatch(
       this.server,
       client,
       mode,
-      opponentId,
+      opponentSocketId,
     );
   }
 
   @SubscribeMessage('declineMatch')
   handleDeclineMatch(
     @ConnectedSocket() client: Socket,
-    @MessageBody() { opponentId }: InviteMatchDto,
+    @MessageBody() { opponentSocketId }: InviteMatchDto,
   ): Promise<void> {
     return this.eventsService.handleDeclineMatch(
       this.server,
       client,
-      opponentId,
+      opponentSocketId,
     );
   }
 
   @SubscribeMessage('cancelMatchInvitation')
-  handleCancelMatchInvitaion(
-    @MessageBody() { opponentId }: InviteMatchDto,
+  handleCancelMatchInvitation(
+    @MessageBody() { opponentUserId }: InviteMatchDto,
   ): Promise<void> {
-    return this.eventsService.handleCancelMatchInvitaion(
+    return this.eventsService.handleCancelMatchInvitation(
       this.server,
-      opponentId,
+      opponentUserId,
     );
   }
 }
