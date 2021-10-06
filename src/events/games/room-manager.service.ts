@@ -12,10 +12,13 @@ import { PlayerPosition } from './constants/player-position.enum';
 import { CLIENT_SETTINGS } from './constants/SETTINGS';
 import { MatchType } from '../../matches/constants/match-type.enum';
 import { MatchGameMode } from '../../matches/constants/match-game-mode.enum';
+import { UsersService } from 'src/users/users.service';
+import { AchievementName } from 'src/users/constants/achievement-name.enum';
 
 @Injectable()
 export class RoomManagerService {
   constructor(
+    private readonly usersService: UsersService,
     @InjectRepository(MatchesRepository)
     private readonly matchesRepository: MatchesRepository,
     @InjectRepository(UsersRepository)
@@ -123,20 +126,20 @@ export class RoomManagerService {
         const user: User = await this.usersRepository.findOne(userId);
         if (socket.id === winnerSocketId) {
           winner = user;
-          await this.usersRepository.update(winner.id, {
-            status: UserStatus.ONLINE,
-            score:
-              room.type === MatchType.LADDER ? winner.score + 10 : winner.score,
-            win: room.type === MatchType.LADDER ? winner.win + 1 : winner.win,
-          });
+          winner.status = UserStatus.ONLINE;
+          if (room.type === MatchType.LADDER) {
+            winner.score += 10;
+            winner.win += 1;
+          }
+          await this.usersRepository.update(winner.id, winner);
         } else {
           loser = user;
-          await this.usersRepository.update(loser.id, {
-            status: UserStatus.ONLINE,
-            score:
-              room.type === MatchType.LADDER ? loser.score - 10 : loser.score,
-            lose: room.type === MatchType.LADDER ? loser.lose + 1 : loser.lose,
-          });
+          loser.status = UserStatus.ONLINE;
+          if (room.type === MatchType.LADDER) {
+            loser.score -= 10;
+            loser.lose += 1;
+          }
+          await this.usersRepository.update(loser.id, loser);
         }
         const message: string =
           socket.id === winnerSocketId ? 'YOU WIN!' : 'YOU LOSE!';
@@ -152,5 +155,33 @@ export class RoomManagerService {
       winner,
       loser,
     });
+
+    if (winner.win === 1) {
+      if (winner.lose === 0) {
+        this.usersService.createUserAchievement(
+          winner,
+          AchievementName.FIRST_GAME,
+        );
+      }
+
+      this.usersService.createUserAchievement(
+        winner,
+        AchievementName.FIRST_WIN,
+      );
+    }
+
+    if (loser.lose === 1) {
+      if (loser.win === 0) {
+        this.usersService.createUserAchievement(
+          loser,
+          AchievementName.FIRST_GAME,
+        );
+      }
+
+      this.usersService.createUserAchievement(
+        loser,
+        AchievementName.FIRST_LOSE,
+      );
+    }
   }
 }
