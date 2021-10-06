@@ -171,12 +171,12 @@ export class EventsService {
     ) {
       server.to(client.id).emit('declined', {
         message: `${opponent?.name}(${opponent?.status}) cannot receive your invitation.`,
-        opponentSocketId,
       });
     } else {
       server.to(opponentUserId).emit('invitedToMatch', {
         mode,
         opponent: user,
+        opponentSocketId,
       });
     }
   }
@@ -244,7 +244,7 @@ export class EventsService {
     }
   }
 
-  async handleCancelMatchInvitaion(
+  async handleCancelMatchInvitation(
     server: Server,
     opponentId: string,
   ): Promise<void> {

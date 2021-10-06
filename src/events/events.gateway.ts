@@ -123,10 +123,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('cancelMatchInvitation')
-  handleCancelMatchInvitaion(
+  handleCancelMatchInvitation(
     @MessageBody() { opponentUserId }: InviteMatchDto,
   ): Promise<void> {
-    return this.eventsService.handleCancelMatchInvitaion(
+    return this.eventsService.handleCancelMatchInvitation(
       this.server,
       opponentUserId,
     );
