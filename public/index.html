@@ -6,7 +6,9 @@
       crossorigin="anonymous"
     ></script>
     <script>
-      const socket = io('http://localhost:5000');
+      const socket = io('http://localhost:5000', {
+        query: { userId: 'e01a4c4a-df2a-4f7d-b7ba-de56326588cb' },
+      });
       socket.on('connect', function () {
         console.log('Connected');
 

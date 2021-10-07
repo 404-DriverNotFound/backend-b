@@ -19,6 +19,7 @@ import { MembershipRole } from './membership-role.enum';
 import { Chat } from './entities/chat.entity';
 import { ChatsRepository } from './repositories/chats.repository';
 import { EventsGateway } from 'src/events/events.gateway';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class ChannelsService {
@@ -362,6 +363,10 @@ export class ChannelsService {
     membershipOfMember.role = role;
 
     if (event) {
+      membershipOfMember.channel = plainToClass(
+        Channel,
+        membershipOfMember.channel,
+      );
       this.eventsGateway.server.to(member.id).emit(event, membershipOfMember);
     }
     return membershipOfMember;
@@ -508,6 +513,9 @@ export class ChannelsService {
     const chat = this.chatsRepository.create({ channel, user, content });
     await this.chatsRepository.save(chat);
     // REVIEW socket.io 설정 추가
+    chat.channel = plainToClass(Channel, chat.channel);
+    chat.user = plainToClass(User, chat.user);
+    console.log(chat);
     this.eventsGateway.server.to(chat.channel.id).emit('message', chat);
     return chat;
   }

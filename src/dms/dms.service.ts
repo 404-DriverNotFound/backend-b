@@ -4,6 +4,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { plainToClass } from 'class-transformer';
 import { EventsGateway } from 'src/events/events.gateway';
 import { FriendshipStatus } from 'src/friendships/friendship-status.enum';
 import { Friendship } from 'src/friendships/friendship.entity';
@@ -45,7 +46,8 @@ export class DmsService {
     const dm: Dm = this.dmsRepository.create({ sender, receiver, content });
 
     await this.dmsRepository.save(dm);
-    // REVIEW socket 설정
+    dm.sender = plainToClass(User, dm.sender);
+    dm.receiver = plainToClass(User, dm.receiver);
     this.eventsGateway.server.to(receiver.id).emit('dm', dm);
     this.eventsGateway.server.to(sender.id).emit('dm', dm);
     return dm;

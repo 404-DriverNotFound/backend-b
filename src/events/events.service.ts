@@ -11,6 +11,7 @@ import { LobbyManagerService } from './games/lobby-manager.service';
 import { RoomManagerService } from './games/room-manager.service';
 import { MatchType } from '../matches/constants/match-type.enum';
 import { MatchGameMode } from '../matches/constants/match-game-mode.enum';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class EventsService {
@@ -37,10 +38,10 @@ export class EventsService {
 
     client.join(user.id);
 
-    const channel: Channel[] = await this.channelsRepository.getChannelsByMe(
+    const channels: Channel[] = await this.channelsRepository.getChannelsByMe(
       user,
     );
-    channel.forEach((channel: Channel) => client.join(channel.id));
+    channels.forEach((channel: Channel) => client.join(channel.id));
 
     return `${user.name} connected.`;
   }
@@ -59,10 +60,10 @@ export class EventsService {
 
     client.leave(user.id);
 
-    const channel: Channel[] = await this.channelsRepository.getChannelsByMe(
+    const channels: Channel[] = await this.channelsRepository.getChannelsByMe(
       user,
     );
-    channel.forEach((channel: Channel) => client.leave(channel.id));
+    channels.forEach((channel: Channel) => client.leave(channel.id));
 
     return `${user.name} disconnected.`;
   }
@@ -171,7 +172,7 @@ export class EventsService {
     ) {
       server.to(opponentSocketId).emit('invitedToMatch', {
         mode,
-        opponent: user,
+        opponent: plainToClass(User, user),
         opponentSocketId: client.id,
       });
     } else {
