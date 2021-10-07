@@ -14,6 +14,7 @@ import { MatchType } from '../../matches/constants/match-type.enum';
 import { MatchGameMode } from '../../matches/constants/match-game-mode.enum';
 import { UsersService } from 'src/users/users.service';
 import { AchievementName } from 'src/users/constants/achievement-name.enum';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class RoomManagerService {
@@ -70,12 +71,28 @@ export class RoomManagerService {
     this.roomIds.set(socket0.id, roomId);
     this.roomIds.set(socket1.id, roomId);
     room.readyInit();
+
+    const transformedUser1: User = plainToClass(User, user1);
+    const transformedUser2: User = plainToClass(User, user2);
+
     server
       .to(socket0.id)
-      .emit('ready', PlayerPosition.LEFT, user1, user2, CLIENT_SETTINGS);
+      .emit(
+        'ready',
+        PlayerPosition.LEFT,
+        transformedUser1,
+        transformedUser2,
+        CLIENT_SETTINGS,
+      );
     server
       .to(socket1.id)
-      .emit('ready', PlayerPosition.RIGHT, user1, user2, CLIENT_SETTINGS);
+      .emit(
+        'ready',
+        PlayerPosition.RIGHT,
+        transformedUser1,
+        transformedUser2,
+        CLIENT_SETTINGS,
+      );
     console.log('Room Created :', roomId);
   }
 
