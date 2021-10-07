@@ -12,10 +12,13 @@ import { PlayerPosition } from './constants/player-position.enum';
 import { CLIENT_SETTINGS } from './constants/SETTINGS';
 import { MatchType } from '../../matches/constants/match-type.enum';
 import { MatchGameMode } from '../../matches/constants/match-game-mode.enum';
+import { UsersService } from 'src/users/users.service';
+import { AchievementName } from 'src/users/constants/achievement-name.enum';
 
 @Injectable()
 export class RoomManagerService {
   constructor(
+    private readonly usersService: UsersService,
     @InjectRepository(MatchesRepository)
     private readonly matchesRepository: MatchesRepository,
     @InjectRepository(UsersRepository)
@@ -60,7 +63,15 @@ export class RoomManagerService {
     await this.matchesRepository.save(match);
 
     const roomId: string = match.id; // REVIEW 나중에 match id로
-    const room: Room = new Room(this, server, roomId, socket0, socket1, mode);
+    const room: Room = new Room(
+      this,
+      server,
+      roomId,
+      socket0,
+      socket1,
+      mode,
+      type,
+    );
     socket0.join(roomId);
     socket1.join(roomId);
     this.rooms.set(roomId, room);
@@ -109,7 +120,6 @@ export class RoomManagerService {
     const room: Room = this.rooms.get(roomId);
     let winner: User;
     let loser: User;
-    console.log('before loop');
     const promises: Promise<void>[] = room.sockets.map(
       async (socket: Socket) => {
         // REVIEW 회원 접속상태 게임에서 온라인으로 바꿔야함.
@@ -117,38 +127,64 @@ export class RoomManagerService {
         const user: User = await this.usersRepository.findOne(userId);
         if (socket.id === winnerSocketId) {
           winner = user;
-          await this.usersRepository.update(winner.id, {
-            status: UserStatus.ONLINE,
-            score: winner.score + 10,
-            win: winner.win + 1,
-          });
+          winner.status = UserStatus.ONLINE;
+          if (room.type === MatchType.LADDER) {
+            winner.score += 10;
+            winner.win += 1;
+          }
+          await this.usersRepository.update(winner.id, winner);
         } else {
           loser = user;
-          await this.usersRepository.update(loser.id, {
-            status: UserStatus.ONLINE,
-            score: loser.score - 10,
-            lose: loser.lose + 1,
-          });
+          loser.status = UserStatus.ONLINE;
+          if (room.type === MatchType.LADDER) {
+            loser.score -= 10;
+            loser.lose += 1;
+          }
+          await this.usersRepository.update(loser.id, loser);
         }
         const message: string =
           socket.id === winnerSocketId ? 'YOU WIN!' : 'YOU LOSE!';
         this.roomIds.delete(socket.id);
         server.to(socket.id).emit('destroy', message);
         socket.leave(roomId);
-
-        console.log('in loop ', socket.id, userId);
       },
     );
     await Promise.all(promises);
     server.to(roomId).emit('destroy', `Game ended! Winner is ${winner.name}.`);
     console.log('after loop');
     this.rooms.delete(roomId);
-    console.log('winner name: ', winner?.name);
-    console.log('loser name: ', loser?.name);
     await this.matchesRepository.update(roomId, {
       status: MatchStatus.DONE,
       winner,
       loser,
     });
+
+    if (winner.win === 1) {
+      if (winner.lose === 0) {
+        this.usersService.createUserAchievement(
+          winner,
+          AchievementName.FIRST_GAME,
+        );
+      }
+
+      this.usersService.createUserAchievement(
+        winner,
+        AchievementName.FIRST_WIN,
+      );
+    }
+
+    if (loser.lose === 1) {
+      if (loser.win === 0) {
+        this.usersService.createUserAchievement(
+          loser,
+          AchievementName.FIRST_GAME,
+        );
+      }
+
+      this.usersService.createUserAchievement(
+        loser,
+        AchievementName.FIRST_LOSE,
+      );
+    }
   }
 }

@@ -1,18 +1,18 @@
 import { BadRequestException } from '@nestjs/common';
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { diskStorage } from 'multer';
+import { v4 as uuid } from 'uuid';
 
 export const localOptions: MulterOptions = {
   storage: diskStorage({
     destination: './files/avatar',
-    filename: (req, file, cb) => {
-      const fileName: string = req.body.name;
+    filename: (_req, file, cb) => {
       const timeStamp = Date.now();
       const fileExt: string = file.mimetype.split('/')[1];
-      return cb(null, `${fileName}.${timeStamp}.${fileExt}`);
+      return cb(null, `${uuid()}.${timeStamp}.${fileExt}`);
     },
   }),
-  fileFilter: (req, file, cb) => {
+  fileFilter: (_req, file, cb) => {
     const type: string = file.mimetype.split('/')[0];
     if (type !== 'image') {
       return cb(new BadRequestException([`not a image file!`]), false);

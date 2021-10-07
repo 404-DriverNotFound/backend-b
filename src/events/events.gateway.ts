@@ -13,6 +13,7 @@ import { KeyCode } from './games/constants/key-code.enum';
 import { EventsService } from './events.service';
 import { OnMatchTypeModeDto } from './games/dto/on-match-type-mode.dto';
 import { Match } from 'src/matches/match.entity';
+import { InviteMatchDto } from './games/dto/invite-match.dto';
 
 @WebSocketGateway()
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -90,5 +91,53 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() { id }: Match,
   ): Promise<void> {
     return this.eventsService.handleWatchMatch(this.server, client, id);
+  }
+
+  @SubscribeMessage('inviteMatch')
+  handleInviteMatch(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() { mode, opponentUserId }: InviteMatchDto,
+  ): Promise<void> {
+    return this.eventsService.handleInviteMatch(
+      this.server,
+      client,
+      mode,
+      opponentUserId,
+    );
+  }
+
+  @SubscribeMessage('acceptMatch')
+  handleAcceptMatch(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() { mode, opponentSocketId }: InviteMatchDto,
+  ): Promise<void> {
+    return this.eventsService.handleAcceptMatch(
+      this.server,
+      client,
+      mode,
+      opponentSocketId,
+    );
+  }
+
+  @SubscribeMessage('declineMatch')
+  handleDeclineMatch(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() { opponentSocketId }: InviteMatchDto,
+  ): Promise<void> {
+    return this.eventsService.handleDeclineMatch(
+      this.server,
+      client,
+      opponentSocketId,
+    );
+  }
+
+  @SubscribeMessage('cancelMatchInvitation')
+  handleCancelMatchInvitation(
+    @MessageBody() { opponentUserId }: InviteMatchDto,
+  ): Promise<void> {
+    return this.eventsService.handleCancelMatchInvitation(
+      this.server,
+      opponentUserId,
+    );
   }
 }
