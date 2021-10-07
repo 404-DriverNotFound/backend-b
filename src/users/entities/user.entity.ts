@@ -25,6 +25,7 @@ export class User {
   @Index()
   name: string;
 
+  @Transform(({ value }) => process.env.HOST + '/' + value)
   @Column({ default: 'files/avatar/default.png' })
   avatar: string;
 
