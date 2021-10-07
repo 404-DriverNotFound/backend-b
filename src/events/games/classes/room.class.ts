@@ -7,7 +7,6 @@ import { PlayerPosition } from '../constants/player-position.enum';
 import { RoomManagerService } from '../room-manager.service';
 import { SETTINGS } from '../constants/SETTINGS';
 import { EmitDataDto } from '../dto/emit-data.dto';
-import { MatchType } from '../../../matches/constants/match-type.enum';
 import { MatchGameMode } from '../../../matches/constants/match-game-mode.enum';
 
 export class Room {
@@ -16,8 +15,6 @@ export class Room {
   server: Server;
 
   id: string;
-
-  type: MatchType;
 
   status: GameStatus = GameStatus.NONE;
 
@@ -40,12 +37,10 @@ export class Room {
     socket0: Socket,
     socket1: Socket,
     mode: MatchGameMode,
-    type: MatchType,
   ) {
     this.roomManagerService = roomManagerService;
     this.server = server;
     this.id = id;
-    this.type = type;
     this.sockets = [socket0, socket1];
     this.players.set(
       socket0.id,
