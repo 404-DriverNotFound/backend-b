@@ -11,6 +11,11 @@ import { LobbyManagerService } from './games/lobby-manager.service';
 import { RoomManagerService } from './games/room-manager.service';
 import { MatchType } from '../matches/constants/match-type.enum';
 import { MatchGameMode } from '../matches/constants/match-game-mode.enum';
+import { PlayerPosition } from './games/constants/player-position.enum';
+import { CLIENT_SETTINGS } from './games/constants/SETTINGS';
+import { MatchesRepository } from 'src/matches/matches.repository';
+import { Match } from 'src/matches/match.entity';
+import { MatchStatus } from 'src/matches/constants/match-status.enum';
 
 @Injectable()
 export class EventsService {
@@ -19,6 +24,8 @@ export class EventsService {
     private readonly channelsRepository: ChannelsRepository,
     @InjectRepository(UsersRepository)
     private readonly usersRepository: UsersRepository,
+    @InjectRepository(MatchesRepository)
+    private readonly matchesRepository: MatchesRepository,
     private readonly lobbyManagerService: LobbyManagerService,
     private readonly roomManagerService: RoomManagerService,
   ) {}
@@ -128,6 +135,33 @@ export class EventsService {
     }
     this.lobbyManagerService.queue(type, mode).delete(client);
     return 'You leave the game.';
+  }
+
+  async handleWatchMatch(
+    server: Server,
+    client: Socket,
+    matchId: string,
+  ): Promise<void> {
+    const match: Match = await this.matchesRepository.findOne({
+      where: { id: matchId },
+      relations: ['user1', 'user2'],
+    });
+
+    if (!match || match.status === MatchStatus.DONE) {
+      return;
+    }
+
+    server
+      .to(client.id)
+      .emit(
+        'ready',
+        PlayerPosition.WATCH,
+        match.user1,
+        match.user2,
+        CLIENT_SETTINGS,
+      );
+
+    client.join(matchId);
   }
 
   async getOpponentSocketId(
