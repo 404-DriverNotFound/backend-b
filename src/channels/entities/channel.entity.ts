@@ -29,7 +29,6 @@ export class Channel {
   updatedAt: Date;
 
   @OneToMany(() => Membership, (membership) => membership.channel)
-  // REVIEW @Transform(({ value }) => (value.length === 1 ? value[0] : value))
   memberships: Membership[];
 
   @OneToMany(() => Chat, (chat) => chat.user, { cascade: true })

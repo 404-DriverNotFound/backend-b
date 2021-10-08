@@ -76,7 +76,6 @@ export class ChannelsService {
       await this.channelsRepository.save(channel);
     } catch (error) {
       if (error.code === '23505') {
-        // duplicate channel
         throw new ConflictException(['Channel is already exists']);
       } else {
         throw new InternalServerErrorException();
@@ -92,9 +91,7 @@ export class ChannelsService {
     try {
       await this.membershipsRepository.save(membership);
     } catch (error) {
-      console.log(error);
       if (error.code === '23505') {
-        // duplicate channel
         throw new ConflictException(['Membership is already exists']);
       } else {
         throw new InternalServerErrorException();
@@ -414,7 +411,7 @@ export class ChannelsService {
 
     const muteMinutes = 1;
     const unmutedAt: Date = new Date();
-    unmutedAt.setMinutes(unmutedAt.getMinutes() + muteMinutes); // NOTE add muteMinutes
+    unmutedAt.setMinutes(unmutedAt.getMinutes() + muteMinutes);
 
     membershipOfMember.unmutedAt = unmutedAt;
 
@@ -512,10 +509,8 @@ export class ChannelsService {
 
     const chat = this.chatsRepository.create({ channel, user, content });
     await this.chatsRepository.save(chat);
-    // REVIEW socket.io 설정 추가
     chat.channel = plainToClass(Channel, chat.channel);
     chat.user = plainToClass(User, chat.user);
-    console.log(chat);
     this.eventsGateway.server.to(chat.channel.id).emit('message', chat);
     return chat;
   }
@@ -557,7 +552,6 @@ export class ChannelsService {
       options.skip = perPage * (page - 1);
     }
     const [data] = await this.chatsRepository.findAndCount(options);
-    console.log(data);
 
     return data;
   }

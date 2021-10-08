@@ -13,7 +13,6 @@ export class SecondFactorAuthenticatedGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
-    console.log('SecondFactorAuthenticatedGuard: ', request.isAuthenticated());
 
     const user: User = request.user;
     if (user?.enable2FA) {

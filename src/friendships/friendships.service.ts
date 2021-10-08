@@ -202,7 +202,7 @@ export class FriendshipsService {
 
     const [data] = await this.friendshipsRepository.findAndCount(options);
 
-    // REVIEW 서로 수락한 경우, 친구 중복이 발생할 수 있다. 서로 수락한 경우가 안생기게 확인하기, DB를 임의조작하지 않는 이상 생기는 케이스는 아님.
+    // NOTE 서로 수락한 경우, 친구 중복이 발생할 수 있다. 서로 수락한 경우가 안생기게 확인하기, DB를 임의조작하지 않는 이상 생기는 케이스는 아님.
     const users: User[] = data.reduce((acc: User[], cur: Friendship) => {
       if (cur.requester.id === user.id) {
         acc.push(cur.addressee);
@@ -236,7 +236,6 @@ export class FriendshipsService {
       ]);
     }
 
-    // REVIEW 둘 사이의 친구 관계가 2개 이상이면 모두 삭제된다.
     for (const friendship of friendships) {
       const result = await this.friendshipsRepository.delete({
         requester: friendship.requester,

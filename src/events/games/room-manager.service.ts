@@ -26,7 +26,6 @@ export class RoomManagerService {
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  // REVIEW map으로 수정함이 적절한가?
   rooms: Map<string, Room> = new Map<string, Room>();
 
   roomIds: Map<string, string> = new Map<string, string>();
@@ -38,7 +37,6 @@ export class RoomManagerService {
     type: MatchType,
     mode: MatchGameMode,
   ): Promise<void> {
-    // TODO REVIEW match : user1 user2 를 user0 user1로 바꿔야할까?
     const user1Id: string = socket0.handshake.query.userId as string;
     const user1: User = await this.usersRepository.findOne({ id: user1Id });
     if (!user1) {
@@ -52,7 +50,7 @@ export class RoomManagerService {
       return;
     }
     user2.status = UserStatus.IN_GAME;
-    // REVIEW 회원 접속상태 온라인에서 게임으로 바꿔야함.
+    // NOTE 회원 접속상태 온라인에서 게임으로 바꿔야함.
     await this.usersRepository.save([user1, user2]);
 
     const match: Match = this.matchesRepository.create({
@@ -63,7 +61,7 @@ export class RoomManagerService {
     });
     await this.matchesRepository.save(match);
 
-    const roomId: string = match.id; // REVIEW 나중에 match id로
+    const roomId: string = match.id;
     const room: Room = new Room(
       this,
       server,
@@ -104,7 +102,7 @@ export class RoomManagerService {
 
     const promises: Promise<void>[] = room.sockets.map(
       async (socket: Socket) => {
-        // REVIEW 회원 접속상태 게임에서 온라인으로 바꿔야함.
+        // NOTE 회원 접속상태 게임에서 온라인으로 바꿔야함.
         const userId: string = socket.handshake.query.userId as string;
         await this.usersRepository.update(userId, {
           status: UserStatus.ONLINE,
@@ -134,7 +132,7 @@ export class RoomManagerService {
     let loser: User;
     const promises: Promise<void>[] = room.sockets.map(
       async (socket: Socket) => {
-        // REVIEW 회원 접속상태 게임에서 온라인으로 바꿔야함.
+        // NOTE 회원 접속상태 게임에서 온라인으로 바꿔야함.
         const userId: string = socket.handshake.query.userId as string;
         const user: User = await this.usersRepository.findOne(userId);
         if (socket.id === winnerSocketId) {
@@ -165,7 +163,6 @@ export class RoomManagerService {
     server
       .to(roomId)
       .emit('destroy', { message: `Game ended! Winner is ${winner.name}.` });
-    console.log('after loop');
     this.rooms.delete(roomId);
     await this.matchesRepository.update(roomId, {
       status: MatchStatus.DONE,

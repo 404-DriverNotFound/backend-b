@@ -14,10 +14,6 @@ export class LobbyManagerService {
 
   dispatching = false;
 
-  // NOTE push is add
-  // NOTE kick is delete
-  // NOTE clean is clear
-
   constructor(private readonly roomManagerService: RoomManagerService) {}
 
   queue(mode: MatchGameMode): Set<Socket> {

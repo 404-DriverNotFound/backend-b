@@ -42,7 +42,7 @@ export class Ball extends Base {
     if (this.mode === MatchGameMode.SPEED) {
       this.speed = this.speed * 2;
     }
-    this.update = this.setUpdate; // REVIEW super.update = this.setUpdate; 랑 무슨 차이지?
+    this.update = this.setUpdate;
   }
 
   setUpdate(room: Room): void {
@@ -146,39 +146,32 @@ export class Ball extends Base {
             if (getUpDown(this.dynamic.angle) === DirectionTo.DOWN) {
               this.dynamic = bounce(0, this.dynamic.angle);
             } else this.dynamic = angleToVelocity(this.dynamic.angle - 5);
-            // console.log("UP");
             break;
           case CollisionType.DOWN:
             if (getUpDown(this.dynamic.angle) === DirectionTo.UP) {
               this.dynamic = bounce(0, this.dynamic.angle);
             } else this.dynamic = angleToVelocity(this.dynamic.angle + 5);
-            // console.log("DOWN");
             break;
           case CollisionType.LEFT:
             if (getLeftRight(this.dynamic.angle) === DirectionTo.RIGHT) {
               this.dynamic = bounce(90, this.dynamic.angle);
             }
-            // console.log("LEFT");
             break;
           case CollisionType.RIGHT:
             if (getLeftRight(this.dynamic.angle) === DirectionTo.LEFT) {
               this.dynamic = bounce(90, this.dynamic.angle);
             }
-            // console.log("RIGHT");
             break;
           case CollisionType.SMASH_TYPE_1:
             this.dynamic = smash(this.dynamic.angle);
             this.boostCount = this.boostCountMax;
-            // console.log("SMASH_TYPE_1");
             break;
           case CollisionType.SMASH_TYPE_2:
             this.dynamic = slide(this.dynamic.angle);
             this.boostCount = this.boostCountMax;
-            // console.log("SMASH_TYPE_2");
             break;
           case CollisionType.STRAIGHT:
             this.dynamic = straight(this.dynamic.angle);
-            // console.log("STRAIGHT");
             break;
           default:
             break;
@@ -345,8 +338,8 @@ function ballCollisionCheck(
           p2bUpDown === DirectionTo.UP ? CollisionType.UP : CollisionType.DOWN;
       }
       break;
-    case 3: // it will never happen
-    case 4: // you can put recursive function here if you want to be perfect
+    case 3: // NOTE It will never happen
+    case 4: // NOTE You can put recursive function here if you want to be perfect
     default:
       break;
   }

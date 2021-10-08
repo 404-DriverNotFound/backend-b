@@ -90,7 +90,7 @@ export class EventsService {
   handleWaiting(server: Server, client: Socket, mode: MatchGameMode): void {
     const set = this.lobbyManagerService.queue(mode);
     set.add(client);
-    this.lobbyManagerService.dispatch(server, set, mode); // FIXME roommanager
+    this.lobbyManagerService.dispatch(server, set, mode);
   }
 
   handleReady(client: Socket): void {
@@ -119,7 +119,7 @@ export class EventsService {
   }
 
   handleLeaveGame(server: Server, client: Socket, mode: MatchGameMode): string {
-    // TODO 소켓이 끊어지면 플레이어일때 게임 종료되는 로직 추가
+    // NOTE 소켓이 끊어지면 플레이어일때 게임 종료되는 로직
     const roomId: string = this.roomManagerService.roomIds.get(client.id);
     if (roomId) {
       this.roomManagerService.destroyRoom(server, roomId);

@@ -81,7 +81,6 @@ export class Room {
       this.gameOverDelay = 3;
     }
     if (this.status === GameStatus.GAMEOVER && this.gameOverDelay-- < 0) {
-      console.log('after gameover delay');
       if (
         this.players.get(this.sockets[0].id).score >
         this.players.get(this.sockets[1].id).score

@@ -58,7 +58,7 @@ export class UsersRepository extends Repository<User> {
 
     if (enable2FA !== undefined) {
       user.enable2FA = enable2FA;
-      user.isSecondFactorAuthenticated = true; // REVIEW 업데이트하고 바로 인증으로 넘어가지 않고, 재로그인시 검사
+      user.isSecondFactorAuthenticated = true; // NOTE 2FA true로 바꿀 시에 재로그인 해야함(강제 로그아웃).
       user.authenticatorSecret = null;
     }
 
@@ -113,18 +113,6 @@ export class UsersRepository extends Repository<User> {
   }
 
   async getDMers(user: User, perPage?: number, page?: number): Promise<User[]> {
-    //NOTE Query version
-    //const qb = this.createQueryBuilder('user')
-    //  .leftJoin('user.senderDms', 'senderDms')
-    //  .leftJoin('user.receiverDms', 'receiverDms')
-    //  .where(
-    //    '(receiverDms.senderId = :id AND receiverDms.receiverId != :id) OR (senderDms.senderId != :id AND senderDms.receiverId = :id)',
-    //    {
-    //      id: user.id,
-    //    },
-    //  );
-
-    //NOTE Brackets version
     const parameters = { id: user.id };
     const qb = this.createQueryBuilder('user')
       .leftJoin('user.senderDms', 'senderDms')
