@@ -21,6 +21,9 @@ export class CreateChannelDto {
   @Matches(/^[^\s]+(\s+[^\s]+)*$/, {
     message: 'No spaces are allowed before or after the title.',
   })
+  @Matches(/^[^\\%]+$/, {
+    message: 'Invalid characters(\\, %) in channel name.',
+  })
   readonly name!: string;
 
   @ApiProperty({
