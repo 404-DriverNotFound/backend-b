@@ -142,15 +142,15 @@ export class EventsService {
       return;
     }
 
-    server
-      .to(client.id)
-      .emit(
-        'ready',
-        PlayerPosition.WATCH,
-        match.user1,
-        match.user2,
-        CLIENT_SETTINGS,
-      );
+    const transformedUser1: User = plainToClass(User, match.user1);
+    const transformedUser2: User = plainToClass(User, match.user2);
+
+    server.to(client.id).emit('ready', {
+      position: PlayerPosition.WATCH,
+      user1: transformedUser1,
+      user2: transformedUser2,
+      setting: CLIENT_SETTINGS,
+    });
 
     client.join(matchId);
   }
