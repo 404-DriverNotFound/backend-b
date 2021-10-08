@@ -55,7 +55,10 @@ export class FriendshipsController {
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 400, description: '요청이 잘못됐을 때' })
   @ApiResponse({ status: 404, description: '관계를 알 수 없을 때' })
-  @ApiResponse({ status: 409, description: '자기 자신과의 관계를 삭제했을 때' })
+  @ApiResponse({
+    status: 409,
+    description: '자기 자신과의 친구 관계를 요청했을 때',
+  })
   @Get('friendships/:name')
   @UseGuards(AuthenticatedGuard)
   @UseGuards(SecondFactorAuthenticatedGuard)
