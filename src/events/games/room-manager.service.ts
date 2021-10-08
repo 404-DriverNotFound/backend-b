@@ -70,12 +70,18 @@ export class RoomManagerService {
     this.roomIds.set(socket0.id, roomId);
     this.roomIds.set(socket1.id, roomId);
     room.readyInit();
-    server
-      .to(socket0.id)
-      .emit('ready', PlayerPosition.LEFT, user1, user2, CLIENT_SETTINGS);
-    server
-      .to(socket1.id)
-      .emit('ready', PlayerPosition.RIGHT, user1, user2, CLIENT_SETTINGS);
+    server.to(socket0.id).emit('ready', {
+      position: PlayerPosition.LEFT,
+      user1,
+      user2,
+      setting: CLIENT_SETTINGS,
+    });
+    server.to(socket1.id).emit('ready', {
+      position: PlayerPosition.RIGHT,
+      user1,
+      user2,
+      setting: CLIENT_SETTINGS,
+    });
     console.log('Room Created :', roomId);
   }
 
@@ -94,12 +100,12 @@ export class RoomManagerService {
             ? 'YOU ARE NOT PREPARED'
             : null;
         this.roomIds.delete(socket.id);
-        server.to(socket.id).emit('destroy', message);
+        server.to(socket.id).emit('destroy', { message });
         socket.leave(roomId);
       },
     );
     await Promise.all(promises);
-    server.to(roomId).emit('destroy', 'Game canceled!');
+    server.to(roomId).emit('destroy', { mesage: 'Game canceled!' });
     this.rooms.delete(roomId);
     await this.matchesRepository.delete(roomId);
   }
@@ -133,12 +139,14 @@ export class RoomManagerService {
         const message: string =
           socket.id === winnerSocketId ? 'YOU WIN!' : 'YOU LOSE!';
         this.roomIds.delete(socket.id);
-        server.to(socket.id).emit('destroy', message);
+        server.to(socket.id).emit('destroy', { message });
         socket.leave(roomId);
       },
     );
     await Promise.all(promises);
-    server.to(roomId).emit('destroy', `Game ended! Winner is ${winner.name}.`);
+    server
+      .to(roomId)
+      .emit('destroy', { message: `Game ended! Winner is ${winner.name}.` });
     console.log('after loop');
     this.rooms.delete(roomId);
     await this.matchesRepository.update(roomId, {
