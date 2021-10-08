@@ -64,7 +64,15 @@ export class RoomManagerService {
     await this.matchesRepository.save(match);
 
     const roomId: string = match.id; // REVIEW 나중에 match id로
-    const room: Room = new Room(this, server, roomId, socket0, socket1, mode);
+    const room: Room = new Room(
+      this,
+      server,
+      roomId,
+      socket0,
+      socket1,
+      type,
+      mode,
+    );
     socket0.join(roomId);
     socket1.join(roomId);
     this.rooms.set(roomId, room);
@@ -132,14 +140,18 @@ export class RoomManagerService {
         if (socket.id === winnerSocketId) {
           winner = user;
           winner.status = UserStatus.ONLINE;
-          winner.score += 10;
-          winner.win += 1;
+          if (room.type === MatchType.LADDER) {
+            winner.score += 10;
+            winner.win += 1;
+          }
           await this.usersRepository.update(winner.id, winner);
         } else {
           loser = user;
           loser.status = UserStatus.ONLINE;
-          loser.score -= 10;
-          loser.lose += 1;
+          if (room.type === MatchType.LADDER) {
+            loser.score -= 10;
+            loser.lose += 1;
+          }
           await this.usersRepository.update(loser.id, loser);
         }
         const message: string =
