@@ -7,11 +7,11 @@ import { MatchGameMode } from '../../matches/constants/match-game-mode.enum';
 @Injectable()
 export class LobbyManagerService {
   ladderClassic: Set<Socket> = new Set<Socket>();
+
   ladderReverse: Set<Socket> = new Set<Socket>();
+
   ladderHard: Set<Socket> = new Set<Socket>();
-  exhibitionClassic: Set<Socket> = new Set<Socket>();
-  exhibitionReverse: Set<Socket> = new Set<Socket>();
-  exhibitionHard: Set<Socket> = new Set<Socket>();
+
   dispatching = false;
 
   // NOTE push is add
@@ -20,23 +20,13 @@ export class LobbyManagerService {
 
   constructor(private readonly roomManagerService: RoomManagerService) {}
 
-  queue(type: MatchType, mode: MatchGameMode): Set<Socket> {
-    if (type === MatchType.LADDER) {
-      if (mode === MatchGameMode.CLASSIC) {
-        return this.ladderClassic;
-      } else if (mode === MatchGameMode.REVERSE) {
-        return this.ladderReverse;
-      } else {
-        return this.ladderHard;
-      }
+  queue(mode: MatchGameMode): Set<Socket> {
+    if (mode === MatchGameMode.CLASSIC) {
+      return this.ladderClassic;
+    } else if (mode === MatchGameMode.REVERSE) {
+      return this.ladderReverse;
     } else {
-      if (mode === MatchGameMode.CLASSIC) {
-        return this.exhibitionClassic;
-      } else if (mode === MatchGameMode.REVERSE) {
-        return this.exhibitionReverse;
-      } else {
-        return this.exhibitionHard;
-      }
+      return this.ladderHard;
     }
   }
 
@@ -48,12 +38,7 @@ export class LobbyManagerService {
     });
   }
 
-  dispatch(
-    server: Server,
-    set: Set<Socket>,
-    type: MatchType,
-    mode: MatchGameMode,
-  ): void {
+  dispatch(server: Server, set: Set<Socket>, mode: MatchGameMode): void {
     if (this.dispatching) {
       return;
     }
@@ -70,7 +55,13 @@ export class LobbyManagerService {
       }
       set.delete(socket1);
 
-      this.roomManagerService.createRoom(server, socket0, socket1, type, mode);
+      this.roomManagerService.createRoom(
+        server,
+        socket0,
+        socket1,
+        MatchType.LADDER,
+        mode,
+      );
     }
     this.dispatching = false;
   }

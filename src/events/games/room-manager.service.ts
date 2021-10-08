@@ -75,24 +75,19 @@ export class RoomManagerService {
     const transformedUser1: User = plainToClass(User, user1);
     const transformedUser2: User = plainToClass(User, user2);
 
-    server
-      .to(socket0.id)
-      .emit(
-        'ready',
-        PlayerPosition.LEFT,
-        transformedUser1,
-        transformedUser2,
-        CLIENT_SETTINGS,
-      );
-    server
-      .to(socket1.id)
-      .emit(
-        'ready',
-        PlayerPosition.RIGHT,
-        transformedUser1,
-        transformedUser2,
-        CLIENT_SETTINGS,
-      );
+    server.to(socket0.id).emit('ready', {
+      position: PlayerPosition.LEFT,
+      user1: transformedUser1,
+      user2: transformedUser2,
+      setting: CLIENT_SETTINGS,
+    });
+    server.to(socket1.id).emit('ready', {
+      position: PlayerPosition.RIGHT,
+      user1: transformedUser1,
+      user2: transformedUser2,
+      setting: CLIENT_SETTINGS,
+    });
+
     console.log('Room Created :', roomId);
   }
 
@@ -111,12 +106,12 @@ export class RoomManagerService {
             ? 'YOU ARE NOT PREPARED'
             : null;
         this.roomIds.delete(socket.id);
-        server.to(socket.id).emit('destroy', message);
+        server.to(socket.id).emit('destroy', { message });
         socket.leave(roomId);
       },
     );
     await Promise.all(promises);
-    server.to(roomId).emit('destroy', 'Game canceled!');
+    server.to(roomId).emit('destroy', { mesage: 'Game canceled!' });
     this.rooms.delete(roomId);
     await this.matchesRepository.delete(roomId);
   }
@@ -150,12 +145,14 @@ export class RoomManagerService {
         const message: string =
           socket.id === winnerSocketId ? 'YOU WIN!' : 'YOU LOSE!';
         this.roomIds.delete(socket.id);
-        server.to(socket.id).emit('destroy', message);
+        server.to(socket.id).emit('destroy', { message });
         socket.leave(roomId);
       },
     );
     await Promise.all(promises);
-    server.to(roomId).emit('destroy', `Game ended! Winner is ${winner.name}.`);
+    server
+      .to(roomId)
+      .emit('destroy', { message: `Game ended! Winner is ${winner.name}.` });
     console.log('after loop');
     this.rooms.delete(roomId);
     await this.matchesRepository.update(roomId, {

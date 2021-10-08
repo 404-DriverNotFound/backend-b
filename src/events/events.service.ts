@@ -75,27 +75,22 @@ export class EventsService {
     return `${user.name} disconnected.`;
   }
 
-  handleJoinRoom(client: Socket, channel: Channel): string {
-    client.join(channel.id);
+  handleJoinRoom(client: Socket, id: string): string {
+    client.join(id);
     return 'Joined the channel.';
   }
 
-  handleLeaveRoom(client: Socket, channel: Channel): string {
-    client.leave(channel.id);
+  handleLeaveRoom(client: Socket, id: string): string {
+    client.leave(id);
     return 'Leaved the channel.';
   }
 
   // NOTE events for Game below:
 
-  handleWaiting(
-    server: Server,
-    client: Socket,
-    type: MatchType,
-    mode: MatchGameMode,
-  ): void {
-    const set = this.lobbyManagerService.queue(type, mode);
+  handleWaiting(server: Server, client: Socket, mode: MatchGameMode): void {
+    const set = this.lobbyManagerService.queue(mode);
     set.add(client);
-    this.lobbyManagerService.dispatch(server, set, type, mode); // FIXME roommanager
+    this.lobbyManagerService.dispatch(server, set, mode); // FIXME roommanager
   }
 
   handleReady(client: Socket): void {
@@ -123,18 +118,13 @@ export class EventsService {
     }
   }
 
-  handleLeaveGame(
-    server: Server,
-    client: Socket,
-    type: MatchType,
-    mode: MatchGameMode,
-  ): string {
+  handleLeaveGame(server: Server, client: Socket, mode: MatchGameMode): string {
     // TODO 소켓이 끊어지면 플레이어일때 게임 종료되는 로직 추가
     const roomId: string = this.roomManagerService.roomIds.get(client.id);
     if (roomId) {
       this.roomManagerService.destroyRoom(server, roomId);
     }
-    this.lobbyManagerService.queue(type, mode).delete(client);
+    this.lobbyManagerService.queue(mode).delete(client);
     return 'You leave the game.';
   }
 

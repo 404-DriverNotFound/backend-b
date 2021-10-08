@@ -8,12 +8,12 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Channel } from 'src/channels/entities/channel.entity';
-import { KeyCode } from './games/constants/key-code.enum';
 import { EventsService } from './events.service';
-import { OnMatchTypeModeDto } from './games/dto/on-match-type-mode.dto';
-import { Match } from 'src/matches/match.entity';
 import { InviteMatchDto } from './games/dto/invite-match.dto';
+import { MatchModeDto } from './games/dto/match-mode.dto';
+import { WatchMatchDto } from './games/dto/watch-match.dto';
+import { ChannelDto } from './games/dto/channel.dto';
+import { KeyCodeDto } from './games/dto/key-code.dto';
 
 @WebSocketGateway()
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -33,17 +33,17 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('joinRoom')
   handleJoinRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() channel: Channel,
+    @MessageBody() { id }: ChannelDto,
   ): string {
-    return this.eventsService.handleJoinRoom(client, channel);
+    return this.eventsService.handleJoinRoom(client, id);
   }
 
   @SubscribeMessage('leaveRoom')
   handleLeaveRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() channel: Channel,
+    @MessageBody() { id }: ChannelDto,
   ): string {
-    return this.eventsService.handleLeaveRoom(client, channel);
+    return this.eventsService.handleLeaveRoom(client, id);
   }
 
   // NOTE events for Game below:
@@ -51,9 +51,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('waiting')
   handleWaiting(
     @ConnectedSocket() client: Socket,
-    @MessageBody() { type, mode }: OnMatchTypeModeDto,
+    @MessageBody() { mode }: MatchModeDto,
   ): void {
-    return this.eventsService.handleWaiting(this.server, client, type, mode);
+    return this.eventsService.handleWaiting(this.server, client, mode);
   }
 
   @SubscribeMessage('ready')
@@ -64,7 +64,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('keydown')
   handleKeyDown(
     @ConnectedSocket() client: Socket,
-    @MessageBody() keyCode: KeyCode,
+    @MessageBody() { keyCode }: KeyCodeDto,
   ): void {
     return this.eventsService.handleKeyDown(client, keyCode);
   }
@@ -72,7 +72,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('keyup')
   handlekeyUp(
     @ConnectedSocket() client: Socket,
-    @MessageBody() keyCode: KeyCode,
+    @MessageBody() { keyCode }: KeyCodeDto,
   ): void {
     return this.eventsService.handlekeyUp(client, keyCode);
   }
@@ -80,15 +80,15 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('leaveGame')
   handleLeaveGame(
     @ConnectedSocket() client: Socket,
-    @MessageBody() { type, mode }: OnMatchTypeModeDto,
+    @MessageBody() { mode }: MatchModeDto,
   ): string {
-    return this.eventsService.handleLeaveGame(this.server, client, type, mode);
+    return this.eventsService.handleLeaveGame(this.server, client, mode);
   }
 
   @SubscribeMessage('watchMatch')
   handleWatchMatch(
     @ConnectedSocket() client: Socket,
-    @MessageBody() { id }: Match,
+    @MessageBody() { id }: WatchMatchDto,
   ): Promise<void> {
     return this.eventsService.handleWatchMatch(this.server, client, id);
   }
